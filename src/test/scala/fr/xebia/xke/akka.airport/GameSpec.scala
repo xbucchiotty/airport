@@ -13,7 +13,7 @@ class GameSpec extends FunSpec {
 
     it("should terminates when runway is terminated") {
       val runway = system.actorOf(Props[Runway])
-      val game = system.actorOf(Props.create(classOf[Game], runway))
+      val game = system.actorOf(Props.create(classOf[Game], runway),"game")
       val probe = TestProbe()
 
       probe watch game

@@ -6,13 +6,14 @@ import fr.xebia.xke.akka.airport.Event.Landed
 class Runway extends Actor with ActorLogging {
 
   val free: Receive = {
-    case Landed(landed) =>
-      context become occupied(landed)
+    case Landed =>
+      log.info("Plane <{}> landed on runway <{}>", sender.path.name, self.path.name)
+      context become occupied(sender)
   }
 
   def occupied(staying: ActorRef): Receive = {
-    case Landed(landed) =>
-      log.info("Collision on runway between {} and {}", staying.path.name, landed.path.name)
+    case Landed =>
+      log.error("Collision on runway {} between {} and {}", self.path.name, staying.path.name, sender.path.name)
       context stop self
   }
 

@@ -9,28 +9,30 @@ import org.scalatest.FunSpec
 class RunwaySpec extends FunSpec {
 
   private implicit val system = ActorSystem.create("RunwaySpec")
-  private val runway = system.actorOf(Props[Runway])
-
-  private val first = TestProbe().ref
-  private val second = TestProbe().ref
+  private val runway = system.actorOf(Props[Runway], "runway")
 
   describe("A runway") {
 
     it("should accept a plane for landing when free") {
       val probe = TestProbe()
+      val plane = TestProbe()
+
       probe watch runway
 
-      probe.send(runway, Landed(first))
+      plane.send(runway, Landed)
 
       probe.expectNoMsg(10 millisecond)
     }
 
     it("shouldn't accept a plane when already occupied") {
       val probe = TestProbe()
+      val plane1 = TestProbe()
+      val plane2 = TestProbe()
+
       probe watch runway
 
-      probe.send(runway, Landed(first))
-      probe.send(runway, Landed(second))
+      plane1.send(runway, Landed)
+      plane2.send(runway, Landed)
 
       probe.expectTerminated(runway, 10 millisecond)
 
