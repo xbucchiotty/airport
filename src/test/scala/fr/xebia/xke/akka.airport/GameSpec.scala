@@ -1,20 +1,19 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorSystem, Props, ActorRef}
+import akka.actor.{ActorSystem, Props}
 import akka.testkit.TestProbe
 import concurrent.duration._
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.scalatest.FunSpec
 
-class GameSpec extends FunSpec with BeforeAndAfter {
+class GameSpec extends FunSpec {
 
-  private implicit var system: ActorSystem = null
-  private implicit var game: ActorRef = null
+  private implicit val system = ActorSystem.create("GameSpec")
 
   describe("A game") {
 
     it("should terminates when runway is terminated") {
       val runway = system.actorOf(Props[Runway])
-      game = system.actorOf(Props.create(classOf[Game], runway))
+      val game = system.actorOf(Props.create(classOf[Game], runway))
       val probe = TestProbe()
 
       probe watch game
@@ -25,15 +24,6 @@ class GameSpec extends FunSpec with BeforeAndAfter {
       //Then
       probe.expectTerminated(game, 100 milliseconds)
     }
-  }
-
-
-  before {
-    system = ActorSystem.create("GameSpec")
-  }
-
-  after {
-    system.shutdown()
   }
 
 }

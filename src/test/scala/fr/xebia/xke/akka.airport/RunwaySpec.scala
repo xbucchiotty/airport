@@ -1,18 +1,18 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorRef, Props, ActorSystem}
+import akka.actor.{Props, ActorSystem}
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Event.Landed
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.scalatest.FunSpec
 
-class RunwaySpec extends FunSpec with BeforeAndAfter {
+class RunwaySpec extends FunSpec {
 
-  private implicit var system: ActorSystem = null
-  private implicit var runway: ActorRef = null
+  private implicit val system = ActorSystem.create("RunwaySpec")
+  private val runway = system.actorOf(Props[Runway])
 
-  private var first: ActorRef = null
-  private var second: ActorRef = null
+  private val first = TestProbe().ref
+  private val second = TestProbe().ref
 
   describe("A runway") {
 
@@ -36,17 +36,6 @@ class RunwaySpec extends FunSpec with BeforeAndAfter {
 
     }
 
-  }
-
-  before {
-    system = ActorSystem.create("RunwaySpec")
-    runway = system.actorOf(Props[Runway])
-    first = TestProbe().ref
-    second = TestProbe().ref
-  }
-
-  after {
-    system.shutdown()
   }
 
 }

@@ -7,7 +7,7 @@ import languageFeature.postfixOps
 import scala.util.Random
 import fr.xebia.xke.akka.airport.Event.Landed
 
-class Plane(initiallyInTheAir: Boolean) extends Actor {
+class Plane extends Actor {
 
   val inTheAir: Receive = {
     case Land(runway) => {
@@ -16,15 +16,8 @@ class Plane(initiallyInTheAir: Boolean) extends Actor {
     }
   }
 
-  def parked: Receive = {
-    ???
-  }
-
   def receive: Receive =
-    if (initiallyInTheAir)
-      inTheAir
-    else
-      parked
+    inTheAir
 
 
   private def landingDuration: FiniteDuration =
