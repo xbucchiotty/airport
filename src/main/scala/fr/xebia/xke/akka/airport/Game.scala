@@ -4,27 +4,25 @@ import akka.actor.{ActorLogging, Terminated, Props, ActorRef, Actor}
 
 class Game extends Actor with ActorLogging {
 
-  var runway: ActorRef = null
+  var airTrafficControl: ActorRef = null
 
-  def this(runway: ActorRef) = {
+  def this(airControl: ActorRef) = {
     this()
-    this.runway = runway
+    this.airTrafficControl = airControl
   }
 
   override def preStart() {
-    if (runway == null)
-      runway = context.actorOf(Props[Runway])
+    if (airTrafficControl == null)
+      airTrafficControl = context.actorOf(Props[Runway])
 
-    context watch runway
+    context watch airTrafficControl
   }
 
   def receive: Receive = {
-    case Terminated(ref) if ref == runway =>
-      log.info("Game terminates because of the runway")
+    case Terminated(ref) if ref == airTrafficControl =>
+      log.info("Game terminates because of the air traffic")
       context stop self
 
-
-    case m => s"Whoops $m"
   }
 
 }

@@ -5,19 +5,19 @@ import akka.actor.{Props, ActorSystem}
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Land
-import org.scalatest.FunSpec
-import scala.language.postfixOps
 import fr.xebia.xke.akka.airport.Event.Landed
+import org.scalatest.{OneInstancePerTest, BeforeAndAfter, FunSpec}
+import scala.language.postfixOps
 
-class PlaneSpec extends FunSpec {
+class PlaneSpec extends FunSpec with OneInstancePerTest with BeforeAndAfter {
 
-  private implicit val system: ActorSystem = ActorSystem.create("PlaneSpec")
+  private implicit val system = ActorSystem.create("PlaneSpec")
 
   describe("A plane") {
 
-    describe("when flying") {
+    val flyingPlane = system.actorOf(Props[Plane], "plane")
 
-      val flyingPlane = system.actorOf(Props[Plane],"plane")
+    describe("when flying") {
 
       it("can lands on a runway") {
         val control = TestProbe()
@@ -25,9 +25,13 @@ class PlaneSpec extends FunSpec {
 
         control.send(flyingPlane, Land(runway.ref))
 
-        runway.expectMsg(MAX_LANDING_TIMEOUT milliseconds, Landed)
+        runway.expectMsg(MAX_LANDING_TIMEOUT milliseconds, Landed(flyingPlane))
       }
     }
+  }
+
+  after {
+    system.shutdown()
   }
 
 }

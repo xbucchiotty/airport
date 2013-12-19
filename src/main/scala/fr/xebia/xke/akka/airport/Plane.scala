@@ -12,7 +12,7 @@ class Plane extends Actor {
   val inTheAir: Receive = {
     case Land(runway) => {
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(landingDuration, runway, Landed)
+      context.system.scheduler.scheduleOnce(landingDuration, runway, Landed(self))
     }
   }
 
