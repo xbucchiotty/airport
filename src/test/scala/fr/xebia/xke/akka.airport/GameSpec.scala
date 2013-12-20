@@ -1,34 +1,27 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorSystem, Props}
-import akka.testkit.TestProbe
-import concurrent.duration._
-import org.scalatest.{BeforeAndAfter, OneInstancePerTest, FunSpec}
 
-class GameSpec extends FunSpec with OneInstancePerTest with BeforeAndAfter {
+class GameSpec extends GameSpecs with AirTrafficControlSpecs {
 
-  private implicit val system = ActorSystem.create("GameSpec")
+  `Given an actor system` {
+    implicit system =>
 
-  describe("A game") {
+      `Given an air traffic control` {
+        control =>
 
-    it("should terminates when runway is terminated") {
-      val airControl = system.actorOf(Props[AirTrafficControl], "airControl")
-      val game = system.actorOf(Props.create(classOf[Game], airControl), "game")
-      val probe = TestProbe()
+          `Given a game`(control) {
+            game =>
 
-      probe watch game
+              `Given a probe watching`(game) {
+                probe =>
 
-      //When
-      system.stop(airControl)
+                  `When target terminates`(control) {
 
-      //Then
-      probe.expectTerminated(game, 100 milliseconds)
-    }
+                    `Then it should terminates`(probe, game)
+                  }
+              }
+          }
+      }
   }
-
-  after {
-    system.shutdown()
-  }
-
 }
 

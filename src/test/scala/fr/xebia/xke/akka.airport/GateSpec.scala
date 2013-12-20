@@ -1,21 +1,20 @@
 package fr.xebia.xke.akka.airport
 
-import languageFeature.postfixOps
-
 class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs {
 
   `Given an actor system` {
     implicit system =>
 
       `Given a gate` {
-        (gate, probe) =>
+        gate =>
 
-          `Given a plane has already parked at`(gate) {
+          `Given a probe watching`(gate) {
+            probe =>
 
-            `When a plane parks at`(gate) {
+              `When a plane parks at`(gate) {
 
-              `Then it should terminates`(probe, gate)
-            }
+                `Then nothing should happen`(probe, gate)
+              }
           }
       }
   }
@@ -24,12 +23,21 @@ class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs {
     implicit system =>
 
       `Given a gate` {
-        (gate, probe) =>
+        gate =>
 
-          `When a plane parks at`(gate) {
+          `Given a probe watching`(gate) {
+            probe =>
 
-            `Then nothing should happen`(probe, gate)
+              `Given a plane has already parked at`(gate) {
+
+                `When a plane parks at`(gate) {
+
+                  `Then it should terminates`(probe, gate)
+                }
+              }
           }
+
+
       }
   }
 }

@@ -1,58 +1,91 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{Props, ActorSystem}
-import akka.testkit.TestProbe
-import concurrent.duration._
-import fr.xebia.xke.akka.airport.Event.Landed
-import org.scalatest.{OneInstancePerTest, BeforeAndAfter, FunSpec}
+import akka.actor.{ActorRef, Props, ActorSystem}
+import org.scalatest.FreeSpec
 
-class RunwaySpec extends FunSpec with OneInstancePerTest with BeforeAndAfter {
+class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTrafficControlSpecs {
 
-  private implicit val system = ActorSystem.create("RunwaySpec")
-  private val airControl = TestProbe()
+  `Given an actor system` {
+    implicit system =>
 
-  describe("A runway") {
-    val runway = system.actorOf(Props(classOf[Runway], airControl.ref), "runway")
+      `Given a probe` {
+        airControl =>
 
-    it("should accept a plane for landing when free") {
-      val probe = TestProbe()
-      val plane = TestProbe()
+          `Given a runway`(airControl.ref) {
+            runway =>
 
-      probe watch runway
+              `Given a probe watching`(runway) {
+                probe =>
 
-      plane.send(runway, Landed(plane.ref))
+                  `When a plane lands at`(runway) {
 
-      probe.expectNoMsg(10 millisecond)
-      plane.expectNoMsg(10 millisecond)
-    }
-
-    it("shouldn't accept a plane when already occupied") {
-      val probe = TestProbe()
-      val plane1 = TestProbe()
-      val plane2 = TestProbe()
-
-      probe watch runway
-
-      plane1.send(runway, Landed(plane1.ref))
-      plane2.send(runway, Landed(plane2.ref))
-
-      probe.expectTerminated(runway, 10 millisecond)
-
-    }
-
-    it("should notify air control when plane has landed") {
-      val plane = TestProbe()
-      val planeRef = plane.ref
-
-      val msg = Landed(planeRef)
-      plane.send(runway, msg)
-
-      airControl.expectMsg(msg)
-    }
-
+                    `Then nothing should happen`(probe, runway)
+                  }
+              }
+          }
+      }
   }
 
-  after {
-    system.shutdown()
+  `Given an actor system` {
+    implicit system =>
+
+      `Given a probe` {
+        airControl =>
+
+          `Given a runway`(airControl.ref) {
+            runway =>
+
+              `Given a probe watching`(runway) {
+                probe =>
+
+                  `Given a plane has already landed`(runway) {
+
+                    `When a plane lands at`(runway) {
+
+                      `Then it should terminates`(probe, runway)
+
+                    }
+                  }
+              }
+          }
+      }
+  }
+
+  /*`Given an actor system` {
+    implicit system =>
+
+      `Given a probe` {
+        airControl =>
+
+          `Given a runway`(airControl.ref) {
+            runway =>
+
+              `Given a probe watching`(runway) {
+                probe =>
+
+                  `Given a probe watching`(runway) {
+                    plane =>
+
+                      `When a plane lands at`(runway) {
+
+                        `Then air traffic control is notified of the landing`(airControl,)
+                      }
+                  }
+              }
+          }
+      }
+  }  */
+
+}
+
+trait RunwaySpecs extends FreeSpec {
+
+
+  def `Given a runway`(airControl: ActorRef)(fun: (ActorRef => NextStep))(implicit system: ActorSystem) {
+    "Given a runway" - {
+      fun {
+        system.actorOf(Props(classOf[Runway], airControl), "runway")
+      }
+    }
   }
 }

@@ -1,37 +1,21 @@
 package fr.xebia.xke.akka.airport
 
-import Plane.MAX_LANDING_TIMEOUT
-import akka.actor.{Props, ActorSystem}
-import akka.testkit.TestProbe
-import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.Landed
-import org.scalatest.{OneInstancePerTest, BeforeAndAfter, FunSpec}
-import scala.language.postfixOps
+class PlaneSpec extends PlaneSpecs with ActorSpecs {
 
-class PlaneSpec extends FunSpec with OneInstancePerTest with BeforeAndAfter {
+  `Given an actor system` {
+    implicit system =>
 
-  private implicit val system = ActorSystem.create("PlaneSpec")
+      `Given a flying plane` {
+        plane =>
 
-  describe("A plane") {
+          `Given a probe` {
+            runway =>
 
-    val flyingPlane = system.actorOf(Props[Plane], "plane")
+              `When a plane requested to land`(plane, runway.ref) {
 
-    describe("when flying") {
-
-      it("can lands on a runway") {
-        val control = TestProbe()
-        val runway = TestProbe()
-
-        control.send(flyingPlane, Land(runway.ref))
-
-        runway.expectMsg(MAX_LANDING_TIMEOUT milliseconds, Landed(flyingPlane))
+                `Then the plane should land within timeout`(plane, runway)
+              }
+          }
       }
-    }
   }
-
-  after {
-    system.shutdown()
-  }
-
 }

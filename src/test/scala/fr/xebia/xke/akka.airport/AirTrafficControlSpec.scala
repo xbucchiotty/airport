@@ -1,50 +1,21 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{Actor, Props, ActorSystem}
-import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.Incoming
-import languageFeature.postfixOps
-import org.scalatest.{BeforeAndAfter, OneInstancePerTest, FunSpec}
 
-class AirTrafficControlSpec extends FunSpec with OneInstancePerTest with BeforeAndAfter {
+class AirTrafficControlSpec extends AirTrafficControlSpecs {
 
-  private implicit val system = ActorSystem.create("ControlSpec")
-  private val airControl = system.actorOf(Props[AirTrafficControl], "runway")
-  private val plane = TestProbe()
+  `Given an actor system` {
+    implicit system =>
 
-  describe("An air traffic control") {
+      `Given an air traffic control` {
+        control =>
 
-    Given_a_free_runway {
+          `When a plane incomes`(control) {
+            plane =>
 
-      When_a_plane_incomes {
-
-        it("should tell the plane to land") {
-
-          plane.expectMsgAnyClassOf(classOf[Land])
-
-        }
+              `Then it should tell the plane to land`(plane)
+          }
       }
-    }
-  }
 
-
-  def Given_a_free_runway(fun: => Unit) =
-    describe("given a runway is free") {
-      fun
-    }
-
-  def When_a_plane_incomes(fun: => Unit) =
-    describe("when a new plane incomes") {
-
-      plane.send(airControl, Incoming)
-
-      fun
-    }
-
-
-  after {
-    system.shutdown()
   }
 }
 

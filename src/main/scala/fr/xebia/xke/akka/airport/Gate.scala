@@ -5,8 +5,6 @@ import fr.xebia.xke.akka.airport.Event.Parked
 
 class Gate extends Actor with ActorLogging {
 
-  println("\ninit")
-
   def free: Receive = {
     case Parked =>
       log.info("Plane <{}> parked on gate <{}>", sender.path.name, self.path.name)
