@@ -73,6 +73,13 @@ trait PlaneSpecs extends ActorSpecs {
     }
   }
 
+  def `When the plane lands at`(plane: TestProbe,runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When the plane lands " - {
+      plane send(runway, Landed(plane.ref))
+      fun
+    }
+  }
+
   def `When a plane enters the taxiway`(plane: TestProbe, taxiway: ActorRef)(fun: => NextStep) {
     "When a plane enters the taxiway" - {
       plane send(taxiway, Entered(plane.ref))

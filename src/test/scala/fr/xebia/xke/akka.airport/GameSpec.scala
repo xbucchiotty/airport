@@ -8,22 +8,26 @@ class GameSpec extends GameSpecs with AirTrafficControlSpecs {
   `Given an actor system` {
     implicit system =>
 
-      `Given an air traffic control` {
-        control =>
+      `Given a probe` {
+        groundControl => {
 
-          `Given a game`(control) {
-            game =>
+          `Given an air traffic control`(groundControl.ref) {
+            control =>
 
-              `Given a probe watching`(game) {
-                probe =>
+              `Given a game`(control) {
+                game =>
 
-                  `When target terminates`(control) {
+                  `Given a probe watching`(game) {
+                    probe =>
 
-                    `Then it should terminates`(probe, game)
+                      `When target terminates`(control) {
+
+                        `Then it should terminates`(probe, game)
+                      }
                   }
               }
           }
+        }
       }
   }
 }
-

@@ -2,28 +2,22 @@ package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Command.{Contact, Incoming, Land}
 import fr.xebia.xke.akka.airport.Event.Landed
-import fr.xebia.xke.akka.airport.Event.Landed
-import fr.xebia.xke.akka.airport.Event.{Landed, Incoming}
 import fr.xebia.xke.akka.airport._
 
 trait AirTrafficControlSpecs extends ActorSpecs {
 
-  def `Given an air traffic control`(fun: (ActorRef => NextStep))(implicit system: ActorSystem) {
+  def `Given an air traffic control`(groundControl: ActorRef)(fun: (ActorRef => NextStep))(implicit system: ActorSystem) {
     "Given an air traffic control" - {
-      val airControl = system.actorOf(Props[AirTrafficControl], "aircontrol")
+      val airControl = system.actorOf(Props(classOf[AirTrafficControl], groundControl), "aircontrol")
 
       fun(airControl)
     }
-
   }
 
   def `When a plane incomes`(control: ActorRef)(fun: (TestProbe) => NextStep)(implicit system: ActorSystem) {
     "When a plane incomes" - {
-
       `Given a probe` {
         plane =>
           plane.send(control, Incoming)
@@ -34,7 +28,6 @@ trait AirTrafficControlSpecs extends ActorSpecs {
 
   def `Then it should tell the plane to land`(plane: TestProbe) {
     "Then it should tell the plane to land" in {
-
       plane expectMsgAnyClassOf classOf[Land]
     }
   }
@@ -44,4 +37,12 @@ trait AirTrafficControlSpecs extends ActorSpecs {
       airControl expectMsg Landed(plane)
     }
   }
+
+  def `Then air traffic control should tell the plane to contact ground control`(plane: TestProbe, groundControl: ActorRef) {
+    "Then air traffic control should tell the plane to contact ground control" in {
+      plane expectMsg Contact(groundControl)
+    }
+  }
+
+
 }
