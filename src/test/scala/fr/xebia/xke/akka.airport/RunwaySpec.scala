@@ -10,15 +10,19 @@ class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTra
       `Given a probe` {
         airControl =>
 
-          `Given a runway`(airControl.ref) {
-            runway =>
+          `Given a probe` {
+            plane =>
 
-              `Given a probe watching`(runway) {
-                probe =>
+              `Given a runway`(airControl.ref) {
+                runway =>
 
-                  `When a plane lands at`(runway) {
+                  `Given a probe watching`(runway) {
+                    probe =>
 
-                    `Then nothing should happen`(probe, runway)
+                      `When the plane lands at`(plane, runway) {
+
+                        `Then air traffic control is notified of the landing`(airControl, plane.ref)
+                      }
                   }
               }
           }
@@ -49,31 +53,4 @@ class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTra
           }
       }
   }
-
-  /*`Given an actor system` {
-    implicit system =>
-
-      `Given a probe` {
-        airControl =>
-
-          `Given a runway`(airControl.ref) {
-            runway =>
-
-              `Given a probe watching`(runway) {
-                probe =>
-
-                  `Given a probe watching`(runway) {
-                    plane =>
-
-                      `When a plane lands at`(runway) {
-
-                        `Then air traffic control is notified of the landing`(airControl,)
-                      }
-                  }
-              }
-          }
-      }
-  }  */
-
 }
-
