@@ -1,7 +1,5 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorRef, Props, ActorSystem}
-import org.scalatest.FreeSpec
 import fr.xebia.xke.akka.airport.specs.{RunwaySpecs, ActorSpecs, PlaneSpecs, AirTrafficControlSpecs}
 
 class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTrafficControlSpecs {

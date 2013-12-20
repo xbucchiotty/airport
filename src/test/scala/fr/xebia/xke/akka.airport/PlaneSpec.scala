@@ -13,7 +13,7 @@ class PlaneSpec extends PlaneSpecs with ActorSpecs {
           `Given a probe` {
             runway =>
 
-              `When a plane requested to land`(plane, runway.ref) {
+              `When a plane is requested to land`(plane, runway.ref) {
 
                 `Then the plane should land within timeout`(plane, runway)
               }

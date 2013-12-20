@@ -12,6 +12,8 @@ object Event {
 
   case object Parked extends Event
 
+  case class Entered(plane: ActorRef) extends Event
+
   case object Incoming extends Command
 
 }

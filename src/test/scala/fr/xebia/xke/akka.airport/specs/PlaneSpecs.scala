@@ -6,39 +6,19 @@ import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Land
 import fr.xebia.xke.akka.airport.Command.Land
 import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.Landed
-import fr.xebia.xke.akka.airport.Event.Landed
-import fr.xebia.xke.akka.airport.Event.{Landed, Parked}
+import fr.xebia.xke.akka.airport.Event.{Entered, Landed, Parked}
 import fr.xebia.xke.akka.airport._
 import languageFeature.postfixOps
+import fr.xebia.xke.akka.airport.Event.Entered
+import fr.xebia.xke.akka.airport.Event.Landed
+import fr.xebia.xke.akka.airport.Command.Land
 
 trait PlaneSpecs extends ActorSpecs {
 
   def `Given a flying plane`(fun: (ActorRef => NextStep))(implicit system: ActorSystem) {
     "Given a flying plane" - {
-
       fun {
         system.actorOf(Props[Plane])
-      }
-    }
-  }
-
-  def `When a plane requested to land`(plane: ActorRef, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
-    "When a plane requested to land" - {
-      `Given a probe` {
-        control =>
-          control send(plane, Land(runway))
-          fun
-      }
-    }
-  }
-
-  def `Given a plane has already landed`(runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
-    "When a plane requested to land" - {
-      `Given a probe` {
-        plane =>
-          plane send(runway, Landed(plane.ref))
-          fun
       }
     }
   }
@@ -60,18 +40,52 @@ trait PlaneSpecs extends ActorSpecs {
           plane send(gate, Parked)
           fun
       }
-
     }
   }
 
-  def `When a plane lands at`(runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
-    "When a plane parks " - {
+  def `When a plane is requested to land`(plane: ActorRef, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When a plane is requested to land" - {
+      `Given a probe` {
+        control =>
+          control send(plane, Land(runway))
+          fun
+      }
+    }
+  }
+
+  def `Given a plane has already landed`(runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When a plane has already landed" - {
       `Given a probe` {
         plane =>
           plane send(runway, Landed(plane.ref))
           fun
       }
+    }
+  }
 
+  def `When a plane lands at`(runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When a plane lands " - {
+      `Given a probe` {
+        plane =>
+          plane send(runway, Landed(plane.ref))
+          fun
+      }
+    }
+  }
+
+  def `When a plane enters the taxiway`(plane: TestProbe, taxiway: ActorRef)(fun: => NextStep) {
+    "When a plane enters the taxiway" - {
+      plane send(taxiway, Entered(plane.ref))
+      fun
+    }
+  }
+
+  def `Given a plane has already entered the taxiway`(taxiway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "Given a plane has already entered the taxiway" - {
+      val plane = TestProbe()
+
+      plane send(taxiway, Entered(plane.ref))
+      fun
     }
   }
 
