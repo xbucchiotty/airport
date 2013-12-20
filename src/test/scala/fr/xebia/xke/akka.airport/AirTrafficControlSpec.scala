@@ -1,5 +1,7 @@
 package fr.xebia.xke.akka.airport
 
+import fr.xebia.xke.akka.airport.specs.AirTrafficControlSpecs
+
 
 class AirTrafficControlSpec extends AirTrafficControlSpecs {
 

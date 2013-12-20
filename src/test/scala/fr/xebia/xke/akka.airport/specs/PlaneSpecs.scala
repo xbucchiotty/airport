@@ -1,11 +1,16 @@
-package fr.xebia.xke.akka.airport
+package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.{Landed, Parked}
-import languageFeature.postfixOps
 import concurrent.duration._
+import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Event.Landed
+import fr.xebia.xke.akka.airport.Event.Landed
+import fr.xebia.xke.akka.airport.Event.{Landed, Parked}
+import fr.xebia.xke.akka.airport._
+import languageFeature.postfixOps
 
 trait PlaneSpecs extends ActorSpecs {
 

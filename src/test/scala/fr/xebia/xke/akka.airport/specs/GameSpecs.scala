@@ -1,6 +1,7 @@
-package fr.xebia.xke.akka.airport
+package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
+import fr.xebia.xke.akka.airport._
 import org.scalatest.FreeSpec
 
 trait GameSpecs extends FreeSpec {

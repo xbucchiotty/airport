@@ -2,6 +2,7 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, Props, ActorSystem}
 import org.scalatest.FreeSpec
+import fr.xebia.xke.akka.airport.specs.{RunwaySpecs, ActorSpecs, PlaneSpecs, AirTrafficControlSpecs}
 
 class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTrafficControlSpecs {
 
@@ -78,14 +79,3 @@ class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTra
 
 }
 
-trait RunwaySpecs extends FreeSpec {
-
-
-  def `Given a runway`(airControl: ActorRef)(fun: (ActorRef => NextStep))(implicit system: ActorSystem) {
-    "Given a runway" - {
-      fun {
-        system.actorOf(Props(classOf[Runway], airControl), "runway")
-      }
-    }
-  }
-}

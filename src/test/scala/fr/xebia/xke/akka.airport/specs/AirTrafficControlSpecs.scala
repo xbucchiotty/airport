@@ -1,9 +1,14 @@
-package fr.xebia.xke.akka.airport
+package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
 import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Event.Landed
+import fr.xebia.xke.akka.airport.Event.Landed
 import fr.xebia.xke.akka.airport.Event.{Landed, Incoming}
+import fr.xebia.xke.akka.airport._
 
 trait AirTrafficControlSpecs extends ActorSpecs {
 

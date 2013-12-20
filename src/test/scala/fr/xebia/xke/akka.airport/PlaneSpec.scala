@@ -1,5 +1,7 @@
 package fr.xebia.xke.akka.airport
 
+import fr.xebia.xke.akka.airport.specs.{PlaneSpecs, ActorSpecs}
+
 class PlaneSpec extends PlaneSpecs with ActorSpecs {
 
   `Given an actor system` {
