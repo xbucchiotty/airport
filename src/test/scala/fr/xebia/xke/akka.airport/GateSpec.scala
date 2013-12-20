@@ -1,73 +1,35 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{Props, ActorSystem}
-import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.Event.Parked
 import languageFeature.postfixOps
-import org.scalatest.{FlatSpec, FreeSpec, OneInstancePerTest}
-import concurrent.duration._
 
-class GateSpec extends FreeSpec with OneInstancePerTest {
+class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs {
 
-  implicit val system = ActorSystem.create("GateSpec")
+  `Given an actor system` {
+    implicit system =>
 
-  "A free gate" - {
+      `Given a gate` {
+        (gate, probe) =>
 
-    s"when a plane parks in" - {
+          `Given a plane has already parked at`(gate) {
 
-      "nothing should happens" in {
+            `When a plane parks at`(gate) {
 
-        val gate = system.actorOf(Props[Gate], "gate")
-        val probe = TestProbe()
-        probe watch gate
-
-
-        TestProbe().send(gate, Parked)
-        probe.expectNoMsg(10 milliseconds)
-
-        system.shutdown()
+              `Then it should terminates`(probe, gate)
+            }
+          }
       }
-    }
   }
 
-  "An occupied gate " - {
+  `Given an actor system` {
+    implicit system =>
 
-    s"when a plane parks in " - {
+      `Given a gate` {
+        (gate, probe) =>
 
-      "it should terminates" in {
-        val gate = system.actorOf(Props[Gate], "gate")
-        val probe = TestProbe()
-        probe watch gate
+          `When a plane parks at`(gate) {
 
-        TestProbe().send(gate, Parked)
-
-        //s"When a plane parks in ${gate.path.name}" - {
-        TestProbe().send(gate, Parked)
-        probe.expectTerminated(gate)
-
-        system.shutdown()
+            `Then nothing should happen`(probe, gate)
+          }
       }
-    }
-
   }
-
-
-}
-
-trait MySpec extends FlatSpec {
-
-  object Given {
-    def an_occupied_gate() {
-
-    }
-  }
-
-
-  trait GateFixture {
-
-    def system: ActorSystem
-
-    val gate = system.actorOf(Props[Gate])
-  }
-
 }
