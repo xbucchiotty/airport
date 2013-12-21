@@ -18,7 +18,7 @@ class TaxiwaySpec extends TaxiwaySpecs with PlaneSpecs with ActorSpecs {
 
                   `When a plane enters the taxiway`(plane, taxiway) {
 
-                    `Then ground control is notified of the plane entering the taxiway`(groundControl, plane.ref)
+                    `Then ground control is notified of the plane entering the taxiway`(groundControl, plane.ref, taxiway)
                   }
               }
 

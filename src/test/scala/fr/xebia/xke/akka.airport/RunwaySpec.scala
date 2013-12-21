@@ -21,7 +21,7 @@ class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTra
 
                       `When the plane lands at`(plane, runway) {
 
-                        `Then air traffic control is notified of the landing`(airControl, plane.ref)
+                        `Then air traffic control is notified of the landing`(airControl, plane.ref, runway)
                       }
                   }
               }

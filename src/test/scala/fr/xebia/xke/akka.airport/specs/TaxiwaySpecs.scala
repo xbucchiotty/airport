@@ -16,9 +16,9 @@ trait TaxiwaySpecs extends FreeSpec {
     }
   }
 
-  def `Then ground control is notified of the plane entering the taxiway`(groundControl: TestProbe, plane: ActorRef) {
+  def `Then ground control is notified of the plane entering the taxiway`(groundControl: TestProbe, plane: ActorRef, taxiway: ActorRef) {
     "Then ground control is notified of the plane entering the taxiway" in {
-      groundControl expectMsg Entered(plane)
+      groundControl expectMsg Entered(plane, taxiway)
     }
   }
 }

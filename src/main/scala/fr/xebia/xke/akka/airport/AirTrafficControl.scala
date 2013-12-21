@@ -1,8 +1,8 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, Props, Actor}
-import fr.xebia.xke.akka.airport.Command.{Incoming, Contact, Land}
-import fr.xebia.xke.akka.airport.Event.Landed
+import fr.xebia.xke.akka.airport.Command.{Contact, Land}
+import fr.xebia.xke.akka.airport.Event.{Incoming, Landed}
 
 class AirTrafficControl(groundControl: ActorRef) extends Actor {
 
@@ -13,7 +13,7 @@ class AirTrafficControl(groundControl: ActorRef) extends Actor {
     case Incoming =>
       sender ! Land(runway)
 
-    case Landed(plane) =>
+    case Landed(plane, _) =>
       plane ! Contact(groundControl)
   }
 

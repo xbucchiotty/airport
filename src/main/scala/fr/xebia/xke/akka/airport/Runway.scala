@@ -7,7 +7,7 @@ class Runway(airControl: ActorRef) extends Actor with ActorLogging {
 
   val free: Receive = {
 
-    case msg@Landed(plane) =>
+    case msg@Landed(plane, _) =>
       log.info("Plane <{}> landed on runway <{}>", plane.path.name, self.path.name)
 
       airControl forward msg
@@ -17,7 +17,7 @@ class Runway(airControl: ActorRef) extends Actor with ActorLogging {
 
   def occupied(staying: ActorRef): Receive = {
 
-    case Landed(other) =>
+    case Landed(other, _) =>
       log.error("Collision on runway <{}> between <{}> and <{}>", self.path.name, staying.path.name, other.path.name)
 
       context stop self

@@ -8,7 +8,7 @@ class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLo
 
 
   def available(free: Int): Receive = {
-    case msg@Entered(plane) =>
+    case msg@Entered(plane, _) =>
       log.info("Plane <{}> runs on taxiway <{}>", plane.path.name, self.path.name)
       groundControl forward msg
 
@@ -20,7 +20,7 @@ class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLo
   }
 
   val full: Receive = {
-    case msg@Entered(plane) =>
+    case msg@Entered(plane, _) =>
       log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
       context stop self
   }

@@ -57,7 +57,7 @@ trait PlaneSpecs extends ActorSpecs {
     "When a plane has already landed" - {
       `Given a probe` {
         plane =>
-          plane send(runway, Landed(plane.ref))
+          plane send(runway, Landed(plane.ref, runway))
           fun
       }
     }
@@ -67,22 +67,22 @@ trait PlaneSpecs extends ActorSpecs {
     "When a plane lands " - {
       `Given a probe` {
         plane =>
-          plane send(runway, Landed(plane.ref))
+          plane send(runway, Landed(plane.ref, runway))
           fun
       }
     }
   }
 
-  def `When the plane lands at`(plane: TestProbe,runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+  def `When the plane lands at`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When the plane lands " - {
-      plane send(runway, Landed(plane.ref))
+      plane send(runway, Landed(plane.ref, runway))
       fun
     }
   }
 
   def `When a plane enters the taxiway`(plane: TestProbe, taxiway: ActorRef)(fun: => NextStep) {
     "When a plane enters the taxiway" - {
-      plane send(taxiway, Entered(plane.ref))
+      plane send(taxiway, Entered(plane.ref, taxiway))
       fun
     }
   }
@@ -91,7 +91,7 @@ trait PlaneSpecs extends ActorSpecs {
     "Given a plane has already entered the taxiway" - {
       val plane = TestProbe()
 
-      plane send(taxiway, Entered(plane.ref))
+      plane send(taxiway, Entered(plane.ref, taxiway))
       fun
     }
   }
@@ -99,7 +99,7 @@ trait PlaneSpecs extends ActorSpecs {
   def `Then the plane should land within timeout`(plane: ActorRef, runway: TestProbe) {
     "Then the plane should land within timeout" in {
 
-      runway.expectMsg(Plane.MAX_LANDING_TIMEOUT milliseconds, Landed(plane))
+      runway.expectMsg(Plane.MAX_LANDING_TIMEOUT milliseconds, Landed(plane, runway.ref))
     }
   }
 
