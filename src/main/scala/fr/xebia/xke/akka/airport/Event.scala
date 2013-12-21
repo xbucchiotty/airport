@@ -26,6 +26,6 @@ object Command {
 
   case class Contact(target: ActorRef) extends Command
 
-  case class Park(runway: ActorRef, gate: ActorRef) extends Command
+  case class Park(taxiway: ActorRef, gate: ActorRef) extends Command
 
 }
