@@ -21,4 +21,20 @@ trait TaxiwaySpecs extends FreeSpec {
       groundControl expectMsg HasEntered(plane, taxiway)
     }
   }
+
+  def `When a plane enters the taxiway`(plane: TestProbe, taxiway: ActorRef)(fun: => NextStep) {
+    "When a plane enters the taxiway" - {
+      plane send(taxiway, HasEntered(plane.ref, taxiway))
+      fun
+    }
+  }
+
+  def `Given a plane has already entered the taxiway`(taxiway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "Given a plane has already entered the taxiway" - {
+      val plane = TestProbe()
+
+      plane send(taxiway, HasEntered(plane.ref, taxiway))
+      fun
+    }
+  }
 }

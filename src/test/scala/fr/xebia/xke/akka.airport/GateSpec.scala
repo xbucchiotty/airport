@@ -1,8 +1,8 @@
 package fr.xebia.xke.akka.airport
 
-import fr.xebia.xke.akka.airport.specs.{GroundControlSpecs, PlaneSpecs, ActorSpecs, GateSpecs}
+import fr.xebia.xke.akka.airport.specs.{RunwaySpecs, GroundControlSpecs, PlaneSpecs, ActorSpecs, GateSpecs}
 
-class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs with GroundControlSpecs {
+class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs with GroundControlSpecs with RunwaySpecs {
 
   `Given an actor system` {
     implicit system =>
@@ -59,7 +59,7 @@ class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs with GroundCont
                   `Given a probe watching`(gate) {
                     probe =>
 
-                      `Given a plane has already parked at`(gate) {
+                      `Given a plane is already parked at`(gate) {
 
                         `When a plane parks at`(plane, gate) {
 

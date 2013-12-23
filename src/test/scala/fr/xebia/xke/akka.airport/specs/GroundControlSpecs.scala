@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.Command.Park
+import fr.xebia.xke.akka.airport.Command.TaxiAndPark
 import fr.xebia.xke.akka.airport.Event.{HasLeft, HasParked, Incoming}
 import fr.xebia.xke.akka.airport._
 
@@ -25,7 +25,7 @@ trait GroundControlSpecs extends ActorSpecs {
 
   def `Then it should tell the plane to park`(plane: TestProbe) {
     "Then it should tell the plane to park" in {
-      plane expectMsgClass classOf[Park]
+      plane expectMsgClass classOf[TaxiAndPark]
     }
   }
 

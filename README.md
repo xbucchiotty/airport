@@ -31,7 +31,7 @@
     Taxiway-->Ground Control: Taxi
 
     Taxiway->Taxiway: Taxiing with random duration
-    Taxiway-->Gate: Parked(plane,gate)
     Taxiway-->Ground Control: Leave(Taxiway)
+    Taxiway-->Gate: Parked(plane,gate)
     Gate-->-Plane: Parked(plane,gate)
     end

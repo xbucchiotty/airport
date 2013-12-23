@@ -3,6 +3,8 @@ package fr.xebia.xke.akka.airport.specs
 import akka.actor.{Props, ActorSystem, ActorRef}
 import fr.xebia.xke.akka.airport._
 import org.scalatest.FreeSpec
+import akka.testkit.TestProbe
+import fr.xebia.xke.akka.airport.Event.{HasLeft, HasLanded}
 
 trait RunwaySpecs extends FreeSpec {
 
@@ -14,4 +16,33 @@ trait RunwaySpecs extends FreeSpec {
       }
     }
   }
+
+  def `Given a plane has already landed`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When a plane has already landed" - {
+      plane send(runway, HasLanded(plane.ref, runway))
+      fun
+    }
+  }
+
+  def `When a plane lands at`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When a plane lands " - {
+      plane send(runway, HasLanded(plane.ref, runway))
+      fun
+    }
+  }
+
+  def `When the plane leaves`(plane: TestProbe, target: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    s"When the plane ${plane.ref.path.name} leaves ${target.path.name}" - {
+      plane send(target, HasLeft(plane.ref, target))
+      fun
+    }
+  }
+
+  def `When the plane lands at`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    "When the plane lands " - {
+      plane send(runway, HasLanded(plane.ref, runway))
+      fun
+    }
+  }
+
 }

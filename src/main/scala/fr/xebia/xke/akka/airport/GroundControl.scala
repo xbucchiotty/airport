@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Props, Actor}
 import fr.xebia.xke.akka.airport.Event.{HasLeft, HasEntered, Incoming}
-import fr.xebia.xke.akka.airport.Command.Park
+import fr.xebia.xke.akka.airport.Command.TaxiAndPark
 
 class GroundControl extends Actor with ActorLogging {
 
@@ -11,7 +11,7 @@ class GroundControl extends Actor with ActorLogging {
 
   def receive: Receive = {
     case Incoming =>
-      sender ! Park(taxiway, gate)
+      sender ! TaxiAndPark(taxiway, gate)
 
     case HasEntered(plane, aTaxiway) =>
       log.warning("TODO IMPLEMENTS ME (ground control notified of a plane has entered a taxiway)")
