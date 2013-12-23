@@ -1,7 +1,6 @@
 package fr.xebia.xke.akka.airport
 
 import fr.xebia.xke.akka.airport.specs.{RunwaySpecs, ActorSpecs, PlaneSpecs, AirTrafficControlSpecs}
-import org.scalatest.OneInstancePerTest
 
 class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTrafficControlSpecs {
 
@@ -65,6 +64,32 @@ class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTra
 
                             }
                           }
+                      }
+                  }
+              }
+          }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      `Given a probe` {
+        plane =>
+
+          `Given a probe` {
+            airControl =>
+
+              `Given a runway`(airControl.ref) {
+                runway =>
+
+                  `Given a probe watching`(runway) {
+                    probe =>
+
+                      `When the plane leaves`(plane, runway) {
+
+                        `Then it should terminates`(probe, runway)
+
                       }
                   }
               }
