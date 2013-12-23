@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport.specs
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
 import fr.xebia.xke.akka.airport.Command.Park
-import fr.xebia.xke.akka.airport.Event.Incoming
+import fr.xebia.xke.akka.airport.Event.{HasLeft, HasParked, Incoming}
 import fr.xebia.xke.akka.airport._
 
 trait GroundControlSpecs extends ActorSpecs {
@@ -26,6 +26,18 @@ trait GroundControlSpecs extends ActorSpecs {
   def `Then it should tell the plane to park`(plane: TestProbe) {
     "Then it should tell the plane to park" in {
       plane expectMsgClass classOf[Park]
+    }
+  }
+
+  def `Then ground control is notified of the plane parked at gate`(groundControl: TestProbe, plane: ActorRef, gate: ActorRef) {
+    "Then ground control is notified of the plane parked at gate" in {
+      groundControl expectMsg HasParked(plane, gate)
+    }
+  }
+
+  def `Then ground control is notified of the plane leaving gate`(groundControl: TestProbe, plane: ActorRef, gate: ActorRef) {
+    "Then ground control is notified of the plane leaving gate" in {
+      groundControl expectMsg HasLeft(plane, gate)
     }
   }
 }

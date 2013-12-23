@@ -29,13 +29,10 @@ trait PlaneSpecs extends ActorSpecs {
     }
   }
 
-  def `When a plane parks at`(gate: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+  def `When a plane parks at`(plane: TestProbe, gate: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When a plane parks " - {
-      `Given a probe` {
-        plane =>
-          plane send(gate, HasParked(plane.ref, gate))
-          fun
-      }
+      plane send(gate, HasParked(plane.ref, gate))
+      fun
     }
   }
 

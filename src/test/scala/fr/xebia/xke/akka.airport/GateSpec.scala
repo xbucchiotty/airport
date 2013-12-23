@@ -1,21 +1,44 @@
 package fr.xebia.xke.akka.airport
 
-import fr.xebia.xke.akka.airport.specs.{PlaneSpecs, ActorSpecs, GateSpecs}
+import fr.xebia.xke.akka.airport.specs.{GroundControlSpecs, PlaneSpecs, ActorSpecs, GateSpecs}
 
-class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs {
+class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs with GroundControlSpecs {
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a gate` {
-        gate =>
+      `Given a probe` {
+        groundControl =>
 
-          `Given a probe watching`(gate) {
-            probe =>
+          `Given a probe` {
+            firstPlane =>
 
-              `When a plane parks at`(gate) {
+              `Given a gate`(groundControl.ref) {
+                gate =>
 
-                `Then nothing should happen`(probe, gate)
+                  `Given a probe watching`(gate) {
+                    probe =>
+
+                      `When a plane parks at`(firstPlane, gate) {
+
+                        `Then ground control is notified of the plane parked at gate`(groundControl, firstPlane.ref, gate)
+
+                        `When the plane leaves`(firstPlane, gate) {
+
+                          `Then ground control is notified of the plane leaving gate`(groundControl, firstPlane.ref, gate)
+
+                          `Given a probe` {
+                            secondPlane =>
+
+                              `When a plane parks at`(secondPlane, gate) {
+
+                                `Then ground control is notified of the plane parked at gate`(groundControl, secondPlane.ref, gate)
+
+                              }
+                          }
+                        }
+                      }
+                  }
               }
           }
       }
@@ -24,22 +47,29 @@ class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs {
   `Given an actor system` {
     implicit system =>
 
-      `Given a gate` {
-        gate =>
+      `Given a probe` {
+        plane =>
 
-          `Given a probe watching`(gate) {
-            probe =>
+          `Given a probe` {
+            groundControl => {
 
-              `Given a plane has already parked at`(gate) {
+              `Given a gate`(groundControl.ref) {
+                gate =>
 
-                `When a plane parks at`(gate) {
+                  `Given a probe watching`(gate) {
+                    probe =>
 
-                  `Then it should terminates`(probe, gate)
-                }
+                      `Given a plane has already parked at`(gate) {
+
+                        `When a plane parks at`(plane, gate) {
+
+                          `Then it should terminates`(probe, gate)
+                        }
+                      }
+                  }
               }
+            }
           }
-
-
       }
   }
 }

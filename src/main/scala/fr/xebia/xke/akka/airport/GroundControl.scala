@@ -16,7 +16,7 @@ class GroundControl extends Actor with ActorLogging {
     case HasEntered(plane, aTaxiway) =>
       log.warning("TODO IMPLEMENTS ME (ground control notified of a plane has entered a taxiway)")
 
-    case HasLeft(_,_) =>
+    case HasLeft(plane, aTaxiway) =>
       log.warning("TODO IMPLEMENTS ME (ground control notified of a plane has left a taxiway)")
   }
 }
