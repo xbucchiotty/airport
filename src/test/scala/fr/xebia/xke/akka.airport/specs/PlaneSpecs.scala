@@ -5,7 +5,7 @@ import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Land
 import fr.xebia.xke.akka.airport.Event.{HasParked, HasLeft, HasEntered, HasLanded}
-import fr.xebia.xke.akka.airport.{Command, Plane, NextStep}
+import fr.xebia.xke.akka.airport.{Event, Command, Plane, NextStep}
 import languageFeature.postfixOps
 
 trait PlaneSpecs extends ActorSpecs {
@@ -52,9 +52,9 @@ trait PlaneSpecs extends ActorSpecs {
     }
   }
 
-  def `Then plane should enter the taxiway`(plane: ActorRef, taxiway: TestProbe) {
+  def `Then plane should enter the taxiway`(plane: ActorRef, taxiway: TestProbe, gate: ActorRef) {
     "Then plane should enter the taxiway" in {
-      taxiway expectMsg HasEntered(plane, taxiway.ref)
+      taxiway expectMsg Event.TaxiingToGate(plane, taxiway.ref, gate)
     }
   }
 

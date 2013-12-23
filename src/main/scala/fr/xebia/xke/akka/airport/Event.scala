@@ -16,7 +16,9 @@ object Event {
 
   case class HasLeft(plane: ActorRef, previousLocation: ActorRef) extends Event
 
-  case object Incoming extends Command
+  case class TaxiingToGate(plane: ActorRef, taxiway: ActorRef, gate: ActorRef) extends Event
+
+  case object Incoming extends Event
 
 }
 

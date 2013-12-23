@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.{ActorRef, Actor}
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.{TaxiAndPark, Land}
-import fr.xebia.xke.akka.airport.Event.{HasParked, HasEntered, HasLeft, HasLanded}
+import fr.xebia.xke.akka.airport.Event.{TaxiingToGate, HasParked, HasEntered, HasLeft, HasLanded}
 import languageFeature.postfixOps
 import scala.util.Random
 
@@ -25,7 +25,7 @@ class Plane extends Actor {
   def waitingToPark(runway: ActorRef): Receive = {
     case Command.TaxiAndPark(taxiway, gate) =>
       runway ! HasLeft(self, runway)
-      taxiway ! HasEntered(self, taxiway)
+      taxiway ! TaxiingToGate(self, taxiway, gate)
 
       context become taxiing(taxiway, gate)
   }

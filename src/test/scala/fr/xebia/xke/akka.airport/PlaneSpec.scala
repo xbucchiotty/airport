@@ -50,7 +50,7 @@ class PlaneSpec extends PlaneSpecs with ActorSpecs {
 
                               `Then plane should leave runway`(plane, runway)
 
-                              `Then plane should enter the taxiway`(plane, taxiway)
+                              `Then plane should enter the taxiway`(plane, taxiway, gate.ref)
 
                               `Given a probe watching`(plane) {
                                 probe =>
