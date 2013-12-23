@@ -2,9 +2,10 @@ package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
+import fr.xebia.xke.akka.airport.AirTrafficControl
 import fr.xebia.xke.akka.airport.Command.{Contact, Land}
-import fr.xebia.xke.akka.airport.Event.{Incoming, Landed}
-import fr.xebia.xke.akka.airport._
+import fr.xebia.xke.akka.airport.Event.{HasLeft, Incoming, HasLanded}
+import fr.xebia.xke.akka.airport.NextStep
 
 trait AirTrafficControlSpecs extends ActorSpecs {
 
@@ -34,7 +35,13 @@ trait AirTrafficControlSpecs extends ActorSpecs {
 
   def `Then air traffic control is notified of the landing`(airControl: TestProbe, plane: ActorRef, runway: ActorRef) {
     "Then the air traffic control is notified of the landing" in {
-      airControl expectMsg Landed(plane, runway)
+      airControl.expectMsg(HasLanded(plane, runway))
+    }
+  }
+
+  def `Then air traffic control is notified of the plane leaving the runway`(airControl: TestProbe, plane: ActorRef, runway: ActorRef) {
+    "Then air traffic control is notified of the plane leaving the runway" in {
+      airControl.expectMsg(HasLeft(plane, runway))
     }
   }
 

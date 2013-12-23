@@ -2,16 +2,12 @@ package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
-import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.{Entered, Landed, Parked}
-import fr.xebia.xke.akka.airport._
+import fr.xebia.xke.akka.airport.Event.{HasLeft, HasEntered, HasLanded, HasParked}
+import fr.xebia.xke.akka.airport.Plane
+import fr.xebia.xke.akka.airport.NextStep
 import languageFeature.postfixOps
-import fr.xebia.xke.akka.airport.Event.Entered
-import fr.xebia.xke.akka.airport.Event.Landed
-import fr.xebia.xke.akka.airport.Command.Land
+import concurrent.duration._
 
 trait PlaneSpecs extends ActorSpecs {
 
@@ -26,8 +22,8 @@ trait PlaneSpecs extends ActorSpecs {
   def `Given a plane has already parked at`(gate: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "Given a plane has already parked" - {
       `Given a probe` {
-        probe =>
-          probe send(gate, Parked)
+        plane =>
+          plane send(gate, HasParked(plane.ref, gate))
           fun
       }
     }
@@ -37,7 +33,7 @@ trait PlaneSpecs extends ActorSpecs {
     "When a plane parks " - {
       `Given a probe` {
         plane =>
-          plane send(gate, Parked)
+          plane send(gate, HasParked(plane.ref, gate))
           fun
       }
     }
@@ -53,36 +49,37 @@ trait PlaneSpecs extends ActorSpecs {
     }
   }
 
-  def `Given a plane has already landed`(runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+  def `Given a plane has already landed`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When a plane has already landed" - {
-      `Given a probe` {
-        plane =>
-          plane send(runway, Landed(plane.ref, runway))
-          fun
-      }
+      plane send(runway, HasLanded(plane.ref, runway))
+      fun
     }
   }
 
-  def `When a plane lands at`(runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+  def `When a plane lands at`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When a plane lands " - {
-      `Given a probe` {
-        plane =>
-          plane send(runway, Landed(plane.ref, runway))
-          fun
-      }
+      plane send(runway, HasLanded(plane.ref, runway))
+      fun
+    }
+  }
+
+  def `When the plane leaves`(plane: TestProbe, target: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
+    s"When the plane ${plane.ref.path.name} leaves ${target.path.name}" - {
+      plane send(target, HasLeft(plane.ref, target))
+      fun
     }
   }
 
   def `When the plane lands at`(plane: TestProbe, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When the plane lands " - {
-      plane send(runway, Landed(plane.ref, runway))
+      plane send(runway, HasLanded(plane.ref, runway))
       fun
     }
   }
 
   def `When a plane enters the taxiway`(plane: TestProbe, taxiway: ActorRef)(fun: => NextStep) {
     "When a plane enters the taxiway" - {
-      plane send(taxiway, Entered(plane.ref, taxiway))
+      plane send(taxiway, HasEntered(plane.ref, taxiway))
       fun
     }
   }
@@ -91,7 +88,7 @@ trait PlaneSpecs extends ActorSpecs {
     "Given a plane has already entered the taxiway" - {
       val plane = TestProbe()
 
-      plane send(taxiway, Entered(plane.ref, taxiway))
+      plane send(taxiway, HasEntered(plane.ref, taxiway))
       fun
     }
   }
@@ -99,7 +96,7 @@ trait PlaneSpecs extends ActorSpecs {
   def `Then the plane should land within timeout`(plane: ActorRef, runway: TestProbe) {
     "Then the plane should land within timeout" in {
 
-      runway.expectMsg(Plane.MAX_LANDING_TIMEOUT milliseconds, Landed(plane, runway.ref))
+      runway.expectMsg(Plane.MAX_LANDING_TIMEOUT milliseconds, HasLanded(plane, runway.ref))
     }
   }
 

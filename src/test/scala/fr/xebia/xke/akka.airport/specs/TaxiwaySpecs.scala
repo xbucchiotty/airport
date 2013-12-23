@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport.specs
 
 import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.Event.Entered
+import fr.xebia.xke.akka.airport.Event.HasEntered
 import fr.xebia.xke.akka.airport._
 import org.scalatest.FreeSpec
 
@@ -18,7 +18,7 @@ trait TaxiwaySpecs extends FreeSpec {
 
   def `Then ground control is notified of the plane entering the taxiway`(groundControl: TestProbe, plane: ActorRef, taxiway: ActorRef) {
     "Then ground control is notified of the plane entering the taxiway" in {
-      groundControl expectMsg Entered(plane, taxiway)
+      groundControl expectMsg HasEntered(plane, taxiway)
     }
   }
 }

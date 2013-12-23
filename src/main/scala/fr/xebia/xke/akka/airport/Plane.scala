@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.Actor
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.Landed
+import fr.xebia.xke.akka.airport.Event.HasLanded
 import languageFeature.postfixOps
 import scala.util.Random
 
@@ -12,7 +12,7 @@ class Plane extends Actor {
   val inTheAir: Receive = {
     case Land(runway) => {
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(landingDuration, runway, Landed(self, runway))
+      context.system.scheduler.scheduleOnce(landingDuration, runway, HasLanded(self, runway))
     }
   }
 
