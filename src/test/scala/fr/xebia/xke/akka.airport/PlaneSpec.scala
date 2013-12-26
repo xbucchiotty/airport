@@ -1,89 +1,208 @@
 package fr.xebia.xke.akka.airport
 
-import fr.xebia.xke.akka.airport.specs.{PlaneSpecs, ActorSpecs}
+import akka.actor.Props
+import akka.testkit.TestProbe
+import concurrent.duration._
+import fr.xebia.xke.akka.airport.Command.Contact
+import fr.xebia.xke.akka.airport.Event.{HasParked, TaxiingToGate, HasLeft, HasEntered, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.specs.ActorSpecs
+import languageFeature.postfixOps
+import org.scalatest.ShouldMatchers
 
-class PlaneSpec extends PlaneSpecs with ActorSpecs {
+class PlaneSpec extends ActorSpecs with ShouldMatchers {
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a flying plane` {
-        plane =>
+      "Given a plane" - {
 
-          `Given a probe` {
-            runway =>
+        "When it starts" - {
 
-              `Given a probe` {
-                airControl =>
+          "Then it should contact the aircontrol" in {
 
-                  `When a plane is requested to land`(airControl, plane, runway.ref) {
+            val airControl = TestProbe()
 
-                    `Then the plane should land within timeout`(plane, runway)
+            system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
 
-                  }
-              }
+            airControl expectMsg Incoming
           }
+        }
+      }
+  }
+
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a plane" - {
+
+        "When it runs out of kerozen" - {
+
+          "Then it should terminates" in {
+
+            val airControl = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
+
+            val probe = TestProbe()
+            probe watch plane
+
+            probe expectTerminated(plane, (2 * Plane.OUT_OF_KEROZEN_TIMEOUT).milliseconds)
+          }
+        }
       }
   }
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a flying plane` {
-        plane =>
+      "Given a flying plane" - {
 
-          `Given a probe watching`(plane) {
-            probe =>
+        "When the airControl request the plane to land on the runway" - {
 
-              `When a plane is not requested to land withing timeout` {
+          "Then the plane should land withing timeout" in {
+            //Given
+            val airControl = TestProbe()
+            val runway = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
+            airControl expectMsg Incoming
 
-                `Then it should terminates`(probe, plane)
+            //When
+            airControl.send(plane, Command.Land(runway.ref))
 
-              }
+            //Then
+            airControl expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
+            runway expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
           }
+        }
       }
   }
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a flying plane` {
-        plane =>
+      "Given a landed plane" - {
 
-          `Given a probe` {
-            runway =>
+        "When the plane is requested to contact ground control" - {
 
-              `Given a plane has already landed`(plane, runway.ref) {
+          "Then the plane should make the contact" in {
+            //Given
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
+            airControl expectMsg Incoming
+            airControl.send(plane, Command.Land(TestProbe().ref))
+            airControl expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
 
-                `Given a probe` {
-                  gate =>
+            //When
+            airControl.send(plane, Contact(groundControl.ref))
 
-                    `Given a probe` {
-                      taxiway =>
-
-                        `Given a probe` {
-                          groundControl =>
-
-                            `When a plane is requested to taxi to gate through taxiway`(groundControl, plane, taxiway.ref, gate.ref) {
-
-                              `Then plane should leave runway`(plane, runway)
-
-                              `Then plane should enter the taxiway`(plane, taxiway, gate.ref)
-
-                              `Given a probe watching`(plane) {
-                                probe =>
-
-                                  `When a plane parks at`(plane, gate.ref) {
-
-                                    `Then it should terminates`(probe, plane)
-                                  }
-                              }
-                            }
-                        }
-                    }
-                }
-              }
+            //Then
+            groundControl expectMsg Incoming
+            groundControl.lastSender should be(plane)
           }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a landed plane" - {
+
+        "When the plane is requested taxi" - {
+
+          "Then it should informs airControl, runway, groundControl and taxiway of its movement" in {
+            //Given
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val taxiway = TestProbe()
+            val runway = TestProbe()
+            val gate = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
+            airControl expectMsg Incoming
+            airControl.send(plane, Command.Land(runway.ref))
+            airControl expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
+            runway expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
+            airControl.send(plane, Contact(groundControl.ref))
+            groundControl expectMsg Incoming
+
+            //When
+            groundControl.send(plane, Command.TaxiAndPark(taxiway.ref, gate.ref))
+
+            //Then
+            runway expectMsg HasLeft
+            airControl expectMsg HasLeft
+            taxiway expectMsg TaxiingToGate(gate.ref)
+            groundControl expectMsg HasEntered
+          }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a taxiing plane" - {
+
+        "When the plane exits from the taxiway" - {
+
+          "Then it should informs the groundcontrol of its movement" in {
+            //Given
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val taxiway = TestProbe()
+            val gate = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
+            airControl expectMsg Incoming
+            airControl.send(plane, Command.Land(TestProbe().ref))
+            airControl expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
+            airControl.send(plane, Contact(groundControl.ref))
+            groundControl expectMsg Incoming
+            groundControl.send(plane, Command.TaxiAndPark(taxiway.ref, gate.ref))
+            groundControl expectMsg HasEntered
+
+            //When
+            taxiway.send(plane, HasParked)
+
+            //Then
+            groundControl expectMsg HasParked
+          }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a parked plane" - {
+
+        "When the plane has finished unloading passengers" - {
+
+          "Then it should terminates and notify groundControl and gate" in {
+            //Given
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val taxiway = TestProbe()
+            val gate = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref), "plane")
+            val probe = TestProbe()
+            probe watch plane
+            airControl expectMsg Incoming
+            airControl.send(plane, Command.Land(TestProbe().ref))
+            airControl expectMsg(2 * Plane.MAX_LANDING_TIMEOUT.milliseconds, HasLanded)
+            airControl.send(plane, Contact(groundControl.ref))
+            groundControl expectMsg Incoming
+            groundControl.send(plane, Command.TaxiAndPark(taxiway.ref, gate.ref))
+            groundControl expectMsg HasEntered
+            taxiway.send(plane, HasParked)
+            groundControl expectMsg HasParked
+
+            //Then
+            probe expectTerminated(plane, 2 * Plane.MAX_UNLOADING_PASSENGERS_TIMEOUT.milliseconds)
+            gate expectMsg HasLeft
+            groundControl expectMsg HasLeft
+          }
+        }
       }
   }
 }

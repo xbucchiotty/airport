@@ -71,7 +71,6 @@
     Taxiway-->Gate: Parked
     Taxiway-->Plane: Parked
     Plane->Ground Control: Parked
-    Plane->Ground Control: Parked
     end
 
     opt Unloading passengers

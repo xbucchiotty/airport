@@ -6,27 +6,27 @@ import fr.xebia.xke.akka.airport.Command.{Contact, TaxiAndPark, Land}
 import fr.xebia.xke.akka.airport.Event.{HasParked, Incoming, TaxiingToGate, HasEntered, HasLeft, HasLanded}
 import languageFeature.postfixOps
 import scala.util.Random
+import fr.xebia.xke.akka.airport.Plane.{UnloadingTerminated, OutOfKerozen}
 
-class Plane extends Actor with ActorLogging {
+class Plane(airControl: ActorRef) extends Actor with ActorLogging {
 
   val inTheAir: Receive = {
     case Land(runway) =>
 
       import context.dispatcher
-      val airControl = sender
-      context.system.scheduler.scheduleOnce(landingDuration, self, Landed(airControl, runway))
+      context.system.scheduler.scheduleOnce(landingDuration, self, Landed(runway))
 
-    case this.Landed(airControl, runway) =>
+    case this.Landed(runway) =>
       airControl ! HasLanded
       runway ! HasLanded
-      context become waitingToPark(airControl, runway)
+      context become waitingToPark(runway)
 
-    case this.OutOfKerozen =>
+    case OutOfKerozen =>
       log.error("Plane {} is out of kerozen, it crashes", self.path.name)
       context stop self
   }
 
-  def waitingToPark(airControl: ActorRef, runway: ActorRef): Receive = {
+  def waitingToPark(runway: ActorRef): Receive = {
     case Contact(groundControl) =>
       groundControl ! Incoming
 
@@ -43,6 +43,15 @@ class Plane extends Actor with ActorLogging {
   def taxiing(groundControl: ActorRef, taxiway: ActorRef, destination: ActorRef): Receive = {
     case HasParked =>
       groundControl ! HasParked
+      import context.dispatcher
+      context.system.scheduler.scheduleOnce(unloadingDuration, self, UnloadingTerminated)
+      context become unloadingPassengers(groundControl, destination)
+  }
+
+  def unloadingPassengers(groundControl: ActorRef, gate: ActorRef): Receive = {
+    case UnloadingTerminated =>
+      groundControl ! HasLeft
+      gate ! HasLeft
       context stop self
   }
 
@@ -55,11 +64,16 @@ class Plane extends Actor with ActorLogging {
       MILLISECONDS
     )
 
-  case object OutOfKerozen
+  private def unloadingDuration: FiniteDuration =
+    Duration(
+      Random.nextInt(Plane.MAX_UNLOADING_PASSENGERS_TIMEOUT),
+      MILLISECONDS
+    )
 
-  case class Landed(airControl: ActorRef, runway: ActorRef)
+  case class Landed(runway: ActorRef)
 
   override def preStart() {
+    airControl ! Incoming
     import context.dispatcher
     context.system.scheduler.scheduleOnce(Plane.OUT_OF_KEROZEN_TIMEOUT milliseconds, self, OutOfKerozen)
   }
@@ -68,5 +82,12 @@ class Plane extends Actor with ActorLogging {
 
 object Plane {
   val MAX_LANDING_TIMEOUT = 300
+  val MAX_UNLOADING_PASSENGERS_TIMEOUT = 5000
   val OUT_OF_KEROZEN_TIMEOUT = 3000
+
+  case object OutOfKerozen
+
+  case object UnloadingTerminated
+
+
 }
