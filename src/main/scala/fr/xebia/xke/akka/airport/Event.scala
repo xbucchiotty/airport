@@ -8,15 +8,15 @@ trait Command
 
 object Event {
 
-  case class HasLanded(plane: ActorRef, runway: ActorRef) extends Event
+  case object HasLanded extends Event
 
-  case class HasParked(plane: ActorRef, gate: ActorRef) extends Event
+  case object HasParked extends Event
 
-  case class HasEntered(plane: ActorRef, location: ActorRef) extends Event
+  case object HasEntered extends Event
 
-  case class HasLeft(plane: ActorRef, previousLocation: ActorRef) extends Event
+  case object HasLeft extends Event
 
-  case class TaxiingToGate(plane: ActorRef, taxiway: ActorRef, gate: ActorRef) extends Event
+  case class TaxiingToGate(gate: ActorRef) extends Event
 
   case object Incoming extends Event
 

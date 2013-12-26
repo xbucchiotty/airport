@@ -31,13 +31,13 @@ trait GroundControlSpecs extends ActorSpecs {
 
   def `Then ground control is notified of the plane parked at gate`(groundControl: TestProbe, plane: ActorRef, gate: ActorRef) {
     "Then ground control is notified of the plane parked at gate" in {
-      groundControl expectMsg HasParked(plane, gate)
+      groundControl expectMsg HasParked
     }
   }
 
   def `Then ground control is notified of the plane leaving gate`(groundControl: TestProbe, plane: ActorRef, gate: ActorRef) {
     "Then ground control is notified of the plane leaving gate" in {
-      groundControl expectMsg HasLeft(plane, gate)
+      groundControl expectMsg HasLeft
     }
   }
 }

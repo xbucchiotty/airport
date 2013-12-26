@@ -20,42 +20,30 @@ trait TaxiwaySpecs extends FreeSpec {
 
   def `When a plane enters the taxiway`(plane: TestProbe, taxiway: ActorRef, gate: ActorRef)(fun: => NextStep) {
     s"When a plane ${plane.ref.path.name} enters the taxiway" - {
-      plane send(taxiway, TaxiingToGate(plane.ref, taxiway, gate))
+      plane send(taxiway, TaxiingToGate(gate))
       fun
     }
   }
 
   def `When queuing timeout is reached`(taxiway: ActorRef, plane: ActorRef, gate: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When queuing timeout is reached" - {
-      TestProbe().send(taxiway, HasParked(plane, gate))
+      TestProbe().send(taxiway, HasParked)
       fun
     }
   }
 
   def `Then ground control is notified of the plane leaving the taxiway`(groundControl: TestProbe, plane: ActorRef, taxiway: ActorRef) {
     "Then ground control is notified of the plane leaving the taxiway" in {
-      groundControl.fishForMessage(max = (2 * Taxiway.TAXIING_TIMEOUT).milliseconds) {
-        case HasLeft(planeFromMsg, taxiwayFromMsg) =>
-          plane === planeFromMsg && taxiway === taxiwayFromMsg
-      }
     }
   }
 
   def `Then ground control is notified of the plane entering the taxiway`(groundControl: TestProbe, plane: ActorRef, taxiway: ActorRef) {
     "Then ground control is notified of the plane entering the taxiway" in {
-      groundControl.fishForMessage(max = (2 * Taxiway.TAXIING_TIMEOUT).milliseconds) {
-        case HasEntered(planeFromMsg, taxiwayFromMsg) =>
-          plane === planeFromMsg && taxiway === taxiwayFromMsg
-      }
     }
   }
 
   def `Then plane should be out of taxiway within timeout`(taxiway: ActorRef, groundControl: TestProbe, gate: TestProbe, plane: ActorRef) {
     "Then plane should be out of taxiway within timeout" in {
-      gate.fishForMessage(max = (2 * Taxiway.TAXIING_TIMEOUT).milliseconds) {
-        case HasParked(planeFromMsg, gateFromMsg) =>
-          plane === planeFromMsg && gate.ref === gateFromMsg
-      }
     }
   }
 

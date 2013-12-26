@@ -35,13 +35,13 @@ trait AirTrafficControlSpecs extends ActorSpecs {
 
   def `Then air traffic control is notified of the landing`(airControl: TestProbe, plane: ActorRef, runway: ActorRef) {
     "Then the air traffic control is notified of the landing" in {
-      airControl.expectMsg(HasLanded(plane, runway))
+      airControl.expectMsg(HasLanded)
     }
   }
 
   def `Then air traffic control is notified of the plane leaving the runway`(airControl: TestProbe, plane: ActorRef, runway: ActorRef) {
     "Then air traffic control is notified of the plane leaving the runway" in {
-      airControl.expectMsg(HasLeft(plane, runway))
+      airControl.expectMsg(HasLeft)
     }
   }
 

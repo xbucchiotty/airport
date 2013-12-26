@@ -2,8 +2,8 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, ActorRef, Actor}
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{TaxiAndPark, Land}
-import fr.xebia.xke.akka.airport.Event.{TaxiingToGate, HasParked, HasEntered, HasLeft, HasLanded}
+import fr.xebia.xke.akka.airport.Command.{Contact, TaxiAndPark, Land}
+import fr.xebia.xke.akka.airport.Event.{HasParked, Incoming, TaxiingToGate, HasEntered, HasLeft, HasLanded}
 import languageFeature.postfixOps
 import scala.util.Random
 
@@ -13,28 +13,36 @@ class Plane extends Actor with ActorLogging {
     case Land(runway) =>
 
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(landingDuration, self, HasLanded(self, runway))
+      val airControl = sender
+      context.system.scheduler.scheduleOnce(landingDuration, self, Landed(airControl, runway))
 
-    case msg@HasLanded(plane, runway) if plane == self =>
-      if (sender == self)
-        runway forward msg
-      context become waitingToPark(runway)
+    case this.Landed(airControl, runway) =>
+      airControl ! HasLanded
+      runway ! HasLanded
+      context become waitingToPark(airControl, runway)
 
     case this.OutOfKerozen =>
       log.error("Plane {} is out of kerozen, it crashes", self.path.name)
       context stop self
   }
 
-  def waitingToPark(runway: ActorRef): Receive = {
-    case Command.TaxiAndPark(taxiway, gate) =>
-      runway ! HasLeft(self, runway)
-      taxiway ! TaxiingToGate(self, taxiway, gate)
+  def waitingToPark(airControl: ActorRef, runway: ActorRef): Receive = {
+    case Contact(groundControl) =>
+      groundControl ! Incoming
 
-      context become taxiing(taxiway, gate)
+    case Command.TaxiAndPark(taxiway, gate) =>
+      val groundControl = sender
+      runway ! HasLeft
+      airControl ! HasLeft
+      taxiway ! TaxiingToGate(gate)
+      groundControl ! HasEntered
+
+      context become taxiing(groundControl, taxiway, gate)
   }
 
-  def taxiing(taxiway: ActorRef, destination: ActorRef): Receive = {
-    case HasParked(plane, gate) if plane == self && gate == destination =>
+  def taxiing(groundControl: ActorRef, taxiway: ActorRef, destination: ActorRef): Receive = {
+    case HasParked =>
+      groundControl ! HasParked
       context stop self
   }
 
@@ -48,6 +56,8 @@ class Plane extends Actor with ActorLogging {
     )
 
   case object OutOfKerozen
+
+  case class Landed(airControl: ActorRef, runway: ActorRef)
 
   override def preStart() {
     import context.dispatcher

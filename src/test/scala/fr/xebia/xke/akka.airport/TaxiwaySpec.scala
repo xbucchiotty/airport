@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport
 
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Event.{HasEntered, HasLeft}
+import fr.xebia.xke.akka.airport.Event.{HasParked, HasEntered, HasLeft}
 import fr.xebia.xke.akka.airport.specs.{TaxiwaySpecs, PlaneSpecs, ActorSpecs}
 import languageFeature.postfixOps
 
@@ -121,19 +121,19 @@ class TaxiwaySpec extends TaxiwaySpecs with PlaneSpecs with ActorSpecs {
                     "When the start taxiing in an order" - {
                       planes.foreach {
                         plane =>
-                          plane send(taxiway, Event.TaxiingToGate(plane.ref, taxiway, gate.ref))
+                          plane send(taxiway, Event.TaxiingToGate(gate.ref))
                       }
 
                       "Then they should leave the taxiway in the same order" in {
                         groundControl.within(10 seconds) {}
                         planes.foreach {
                           plane =>
-                            groundControl expectMsg HasEntered(plane.ref, taxiway)
+                            groundControl expectMsg HasEntered
                         }
 
                         planes.foreach {
                           plane =>
-                            groundControl expectMsg HasLeft(plane.ref, taxiway)
+                            groundControl expectMsg HasParked
                         }
                       }
                     }

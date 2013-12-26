@@ -41,33 +41,33 @@ trait PlaneSpecs extends ActorSpecs {
 
   def `Given a plane has already landed`(plane: ActorRef, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "Given the plane has already landed" - {
-      TestProbe().send(plane, HasLanded(plane, runway))
+      TestProbe().send(plane, HasLanded)
       fun
     }
   }
 
   def `When a plane parks at`(plane: ActorRef, gate: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When a plane parks at" - {
-      TestProbe().send(plane, HasParked(plane, gate))
+      TestProbe().send(plane, HasParked)
       fun
     }
   }
 
   def `Then plane should leave runway`(plane: ActorRef, runway: TestProbe) {
     "Then plane should leave runway" in {
-      runway expectMsg HasLeft(plane, runway.ref)
+      runway expectMsg HasLeft
     }
   }
 
   def `Then plane should enter the taxiway`(plane: ActorRef, taxiway: TestProbe, gate: ActorRef) {
     "Then plane should enter the taxiway" in {
-      taxiway expectMsg Event.TaxiingToGate(plane, taxiway.ref, gate)
+      taxiway expectMsg Event.TaxiingToGate(gate)
     }
   }
 
   def `Then the plane should land within timeout`(plane: ActorRef, runway: TestProbe) {
     "Then the plane should land within timeout" in {
-      runway.expectMsg((Plane.MAX_LANDING_TIMEOUT * 2) milliseconds, HasLanded(plane, runway.ref))
+      runway.expectMsg((Plane.MAX_LANDING_TIMEOUT * 2) milliseconds, HasLanded)
     }
   }
 

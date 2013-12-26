@@ -7,20 +7,19 @@ import languageFeature.postfixOps
 import scala.util.Random
 import scala.collection.immutable.Queue
 
-class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLogging {
+class Taxiway(capacity: Int) extends Actor with ActorLogging {
   assert(capacity > 0)
 
-  private var queue = Queue.empty[HasParked]
+  private var queue = Queue.empty[(ActorRef, ActorRef)]
 
   private var free = capacity
 
   val acceptNewPlane: Receive = {
-    case msg@TaxiingToGate(plane, taxiway, gate) if taxiway == self =>
+    case msg@TaxiingToGate(gate) =>
+
+      val plane = sender
       log.info("Plane <{}> runs on taxiway <{}>", plane.path.name, self.path.name)
-
-      groundControl ! HasEntered(plane, self)
-
-      this.queue = queue enqueue HasParked(plane, gate)
+      this.queue = queue enqueue(plane, msg.gate)
 
       free -= 1
       if (free < 1) {
@@ -32,7 +31,8 @@ class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLo
   }
 
   val rejectNewPlane: Receive = {
-    case msg@TaxiingToGate(plane, taxiway, _) if taxiway == self =>
+    case msg: TaxiingToGate =>
+      val plane = sender
       log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
       context stop self
 
@@ -41,13 +41,12 @@ class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLo
   val planeLeaves: Receive = {
     case this.Tick =>
       if (queue.nonEmpty) {
-        val (msg, newQueue) = queue.dequeue
+        val ((plane, gate), newQueue) = queue.dequeue
         this.queue = newQueue
-        import msg._
 
         log.info("Plane <{}> leaves taxiway <{}>", plane.path.name, self.path.name)
-        groundControl ! HasLeft(plane, self)
-        gate ! msg
+        gate ! HasParked
+        plane ! HasParked
 
         free += 1
 

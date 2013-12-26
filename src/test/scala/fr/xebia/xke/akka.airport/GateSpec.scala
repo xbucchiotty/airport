@@ -1,75 +1,90 @@
 package fr.xebia.xke.akka.airport
 
-import fr.xebia.xke.akka.airport.specs.{RunwaySpecs, GroundControlSpecs, PlaneSpecs, ActorSpecs, GateSpecs}
+import akka.actor.Props
+import akka.testkit.TestProbe
+import fr.xebia.xke.akka.airport.specs.ActorSpecs
+import fr.xebia.xke.akka.airport.Event.{HasLeft, HasParked}
+import languageFeature.postfixOps
+import concurrent.duration._
 
-class GateSpec extends GateSpecs with PlaneSpecs with ActorSpecs with GroundControlSpecs with RunwaySpecs {
+class GateSpec extends ActorSpecs {
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        groundControl =>
+      "Given a free gate" - {
 
-          `Given a probe` {
-            firstPlane =>
+        "Given a plane" - {
 
-              `Given a gate`(groundControl.ref) {
-                gate =>
+          "Then a plane car parks at the gate" in {
+            val gate = system.actorOf(Props[Gate], "gate")
+            val probe = TestProbe()
+            probe watch gate
 
-                  `Given a probe watching`(gate) {
-                    probe =>
+            val plane = TestProbe()
 
-                      `When a plane parks at`(firstPlane, gate) {
-
-                        `Then ground control is notified of the plane parked at gate`(groundControl, firstPlane.ref, gate)
-
-                        `When the plane leaves`(firstPlane, gate) {
-
-                          `Then ground control is notified of the plane leaving gate`(groundControl, firstPlane.ref, gate)
-
-                          `Given a probe` {
-                            secondPlane =>
-
-                              `When a plane parks at`(secondPlane, gate) {
-
-                                `Then ground control is notified of the plane parked at gate`(groundControl, secondPlane.ref, gate)
-
-                              }
-                          }
-                        }
-                      }
-                  }
-              }
+            plane send(gate, HasParked)
+            probe expectNoMsg (100 milliseconds)
           }
+        }
       }
   }
-
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        plane =>
+      "Given two planes" - {
 
-          `Given a probe` {
-            groundControl => {
+        "Given a free gate" - {
 
-              `Given a gate`(groundControl.ref) {
-                gate =>
+          "Given first plane is parked at the gate" - {
 
-                  `Given a probe watching`(gate) {
-                    probe =>
+            "When a second plane try to park" - {
 
-                      `Given a plane is already parked at`(gate) {
+              "Then gate terminates" in {
+                val firstPlane = TestProbe()
+                val secondPlane = TestProbe()
 
-                        `When a plane parks at`(plane, gate) {
+                val gate = system.actorOf(Props[Gate], "gate")
+                val probe = TestProbe()
+                probe watch gate
 
-                          `Then it should terminates`(probe, gate)
-                        }
-                      }
-                  }
+                firstPlane send(gate, HasParked)
+
+                secondPlane send(gate, HasParked)
+
+                probe expectTerminated(gate, 100 milliseconds)
               }
             }
           }
+        }
+      }
+  }
+  `Given an actor system` {
+    implicit system =>
+
+      "Given two planes" - {
+
+        "Given a free gate" - {
+
+          "When first plane parkes and leaves the gate" - {
+
+            "Then second plane can park at the gate" - {
+              val firstPlane = TestProbe()
+              val secondPlane = TestProbe()
+
+              val gate = system.actorOf(Props[Gate], "gate")
+              val probe = TestProbe()
+              probe watch gate
+
+              firstPlane send(gate, HasParked)
+              firstPlane send(gate, HasLeft)
+              secondPlane send(gate, HasParked)
+
+              probe expectNoMsg (100 milliseconds)
+
+            }
+          }
+        }
       }
   }
 }
