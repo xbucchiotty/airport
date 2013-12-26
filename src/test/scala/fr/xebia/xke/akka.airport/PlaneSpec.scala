@@ -32,6 +32,24 @@ class PlaneSpec extends PlaneSpecs with ActorSpecs {
       `Given a flying plane` {
         plane =>
 
+          `Given a probe watching`(plane) {
+            probe =>
+
+              `When a plane is not requested to land withing timeout` {
+
+                `Then it should terminates`(probe, plane)
+
+              }
+          }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      `Given a flying plane` {
+        plane =>
+
           `Given a probe` {
             runway =>
 

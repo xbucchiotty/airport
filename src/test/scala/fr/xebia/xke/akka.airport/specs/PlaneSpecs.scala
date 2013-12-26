@@ -4,7 +4,7 @@ import akka.actor.{Props, ActorSystem, ActorRef}
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.Event.{HasParked, HasLeft, HasEntered, HasLanded}
+import fr.xebia.xke.akka.airport.Event.{HasParked, HasLeft, HasLanded}
 import fr.xebia.xke.akka.airport.{Event, Command, Plane, NextStep}
 import languageFeature.postfixOps
 
@@ -21,6 +21,13 @@ trait PlaneSpecs extends ActorSpecs {
   def `When a plane is requested to land`(airControl: TestProbe, plane: ActorRef, runway: ActorRef)(fun: => NextStep)(implicit system: ActorSystem) {
     "When a plane is requested to land" - {
       airControl send(plane, Land(runway))
+      fun
+    }
+  }
+
+  def `When a plane is not requested to land withing timeout`(fun: => NextStep)(implicit system: ActorSystem) {
+    "When a plane is not requested to land withing timeout" - {
+      Thread.sleep(Plane.OUT_OF_KEROZEN_TIMEOUT)
       fun
     }
   }

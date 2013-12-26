@@ -59,10 +59,6 @@ class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLo
 
   }
 
-  import context.dispatcher
-
-  context.system.scheduler.scheduleOnce(randomTaxiingDuration, self, Tick)
-
   def available: Receive = planeLeaves orElse acceptNewPlane
 
   def full: Receive = planeLeaves orElse rejectNewPlane
@@ -75,6 +71,11 @@ class Taxiway(capacity: Int, groundControl: ActorRef) extends Actor with ActorLo
 
   case object Tick
 
+  override def preStart() {
+    import context.dispatcher
+
+    context.system.scheduler.scheduleOnce(randomTaxiingDuration, self, Tick)
+  }
 }
 
 object Taxiway {
