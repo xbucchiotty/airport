@@ -1,99 +1,101 @@
 package fr.xebia.xke.akka.airport
 
-import fr.xebia.xke.akka.airport.specs.{RunwaySpecs, ActorSpecs, PlaneSpecs, AirTrafficControlSpecs}
+import akka.actor.Props
+import akka.testkit.TestProbe
+import concurrent.duration._
+import fr.xebia.xke.akka.airport.Event.{HasLeft, HasLanded}
+import fr.xebia.xke.akka.airport.specs.{ActorSpecs, PlaneSpecs}
+import languageFeature.postfixOps
 
-class RunwaySpec extends RunwaySpecs with ActorSpecs with PlaneSpecs with AirTrafficControlSpecs {
+class RunwaySpec extends ActorSpecs with PlaneSpecs {
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        airControl =>
+      "Given a free runway" - {
 
-          `Given a probe` {
-            plane =>
+        "Then a plane can land on the runway" in {
+          val runway = system.actorOf(Props[Runway], "runway")
+          val probe = TestProbe()
+          probe watch runway
 
-              `Given a runway`(airControl.ref) {
-                runway =>
+          val plane = TestProbe()
 
-                  `When the plane lands at`(plane, runway) {
+          plane.send(runway, HasLanded)
 
-                    `Then air traffic control is notified of the landing`(airControl, plane.ref, runway)
+          probe expectNoMsg (100 milliseconds)
 
-                    `When the plane leaves`(plane, runway) {
-                      `Then air traffic control is notified of the plane leaving the runway`(airControl, plane.ref, runway)
-
-                      `Given a probe` {
-                        secondPlane =>
-
-                          `When the plane lands at`(secondPlane, runway) {
-
-                            `Then air traffic control is notified of the landing`(airControl, secondPlane.ref, runway)
-                          }
-                      }
-                    }
-                  }
-              }
-          }
+        }
       }
   }
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        firstPlane =>
+      "Given an occupied runway" - {
 
-          `Given a probe` {
-            secondPlane =>
+        "When a plane try to land on the runway" - {
 
-              `Given a probe` {
-                airControl =>
+          "Then the runway should terminates" in {
+            val runway = system.actorOf(Props[Runway], "runway")
+            val probe = TestProbe()
+            probe watch runway
 
-                  `Given a runway`(airControl.ref) {
-                    runway =>
+            val firstPlane = TestProbe()
+            val secondPlane = TestProbe()
 
-                      `Given a probe watching`(runway) {
-                        probe =>
+            firstPlane.send(runway, HasLanded)
+            secondPlane.send(runway, HasLanded)
 
-                          `Given a plane has already landed`(firstPlane, runway) {
-
-                            `When a plane lands at`(secondPlane, runway) {
-
-                              `Then it should terminates`(probe, runway)
-
-                            }
-                          }
-                      }
-                  }
-              }
+            probe expectTerminated(runway, 100 milliseconds)
           }
+        }
       }
   }
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        plane =>
+      "Given an occupied runway" - {
 
-          `Given a probe` {
-            airControl =>
+        "When a plane try to leave without having landed before" - {
 
-              `Given a runway`(airControl.ref) {
-                runway =>
+          "Then the runway should terminates" in {
+            val runway = system.actorOf(Props[Runway], "runway")
+            val probe = TestProbe()
+            probe watch runway
 
-                  `Given a probe watching`(runway) {
-                    probe =>
+            val plane = TestProbe()
 
-                      `When the plane leaves`(plane, runway) {
+            plane.send(runway, HasLeft)
 
-                        `Then it should terminates`(probe, runway)
-
-                      }
-                  }
-              }
+            probe expectTerminated(runway, 100 milliseconds)
           }
+        }
+      }
+  }
+  `Given an actor system` {
+    implicit system =>
+
+      "Given an occupied runway" - {
+
+        "When the first plane leaves the runway" - {
+
+          "Then the second plane can land" in {
+            val runway = system.actorOf(Props[Runway], "runway")
+            val probe = TestProbe()
+            probe watch runway
+
+            val firstPlane = TestProbe()
+            val secondPlane = TestProbe()
+
+            firstPlane.send(runway, HasLanded)
+            firstPlane.send(runway, HasLeft)
+            secondPlane.send(runway, HasLanded)
+
+            probe expectNoMsg (100 milliseconds)
+          }
+        }
       }
   }
 }
