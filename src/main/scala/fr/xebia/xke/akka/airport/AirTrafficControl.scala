@@ -9,13 +9,16 @@ class AirTrafficControl(groundControl: ActorRef, runway: ActorRef) extends Actor
   def receive: Receive = {
 
     case Incoming =>
-      sender ! Land(runway)
+      log.info(s"plane ${sender.path.name} requests to land!")
+      //sender ! Land(runway)
 
     case HasLanded =>
-      sender ! Contact(groundControl)
+      log.info(s"plane ${sender.path.name} has landed!")
+      //sender ! Contact(groundControl)
 
     case HasLeft =>
-      sender ! "Bye"
+      log.info(s"plane ${sender.path.name} has left!")
+      //sender ! "Bye"
 
   }
 

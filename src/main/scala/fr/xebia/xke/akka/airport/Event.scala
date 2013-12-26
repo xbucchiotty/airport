@@ -12,13 +12,15 @@ object Event {
 
   case object HasParked extends Event
 
-  case object HasEntered extends Event
+  case object StartTaxi extends Event
 
   case object HasLeft extends Event
 
   case class TaxiingToGate(gate: ActorRef) extends Event
 
   case object Incoming extends Event
+
+  case class Score(points: Int) extends Event
 
 }
 

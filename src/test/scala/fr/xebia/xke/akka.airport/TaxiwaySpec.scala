@@ -4,11 +4,11 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Event.{TaxiingToGate, HasParked}
-import fr.xebia.xke.akka.airport.specs.{PlaneSpecs, ActorSpecs}
+import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
 
-class TaxiwaySpec extends PlaneSpecs with ActorSpecs with ShouldMatchers {
+class TaxiwaySpec extends ActorSpecs with ShouldMatchers {
 
   `Given an actor system` {
     implicit system =>

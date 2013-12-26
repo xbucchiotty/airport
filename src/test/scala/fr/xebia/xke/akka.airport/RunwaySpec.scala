@@ -4,10 +4,10 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Event.{HasLeft, HasLanded}
-import fr.xebia.xke.akka.airport.specs.{ActorSpecs, PlaneSpecs}
+import fr.xebia.xke.akka.airport.specs.{ActorSpecs}
 import languageFeature.postfixOps
 
-class RunwaySpec extends ActorSpecs with PlaneSpecs {
+class RunwaySpec extends ActorSpecs {
 
   `Given an actor system` {
     implicit system =>

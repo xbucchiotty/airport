@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
-import fr.xebia.xke.akka.airport.Event.{HasEntered, HasLeft, TaxiingToGate, HasParked}
+import fr.xebia.xke.akka.airport.Event.{StartTaxi, HasLeft, TaxiingToGate, HasParked}
 import concurrent.duration._
 import languageFeature.postfixOps
 import scala.util.Random

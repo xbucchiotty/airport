@@ -1,19 +1,22 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorLogging, ActorRef, Actor}
+import akka.actor.{Cancellable, ActorLogging, ActorRef, Actor}
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.{Contact, TaxiAndPark, Land}
-import fr.xebia.xke.akka.airport.Event.{HasParked, Incoming, TaxiingToGate, HasEntered, HasLeft, HasLanded}
+import fr.xebia.xke.akka.airport.Event.{Score, HasParked, Incoming, TaxiingToGate, StartTaxi, HasLeft, HasLanded}
 import languageFeature.postfixOps
 import scala.util.Random
 import fr.xebia.xke.akka.airport.Plane.{UnloadingTerminated, OutOfKerozen}
 
-class Plane(airControl: ActorRef) extends Actor with ActorLogging {
+class Plane(airControl: ActorRef, game: ActorRef) extends Actor with ActorLogging {
+
+  var outOfKerozenCrash: Cancellable = null
 
   val inTheAir: Receive = {
     case Land(runway) =>
 
       import context.dispatcher
+      outOfKerozenCrash.cancel()
       context.system.scheduler.scheduleOnce(landingDuration, self, Landed(runway))
 
     case this.Landed(runway) =>
@@ -35,7 +38,7 @@ class Plane(airControl: ActorRef) extends Actor with ActorLogging {
       runway ! HasLeft
       airControl ! HasLeft
       taxiway ! TaxiingToGate(gate)
-      groundControl ! HasEntered
+      groundControl ! StartTaxi
 
       context become taxiing(groundControl, taxiway, gate)
   }
@@ -52,6 +55,7 @@ class Plane(airControl: ActorRef) extends Actor with ActorLogging {
     case UnloadingTerminated =>
       groundControl ! HasLeft
       gate ! HasLeft
+      game ! Score(10)
       context stop self
   }
 
@@ -75,7 +79,7 @@ class Plane(airControl: ActorRef) extends Actor with ActorLogging {
   override def preStart() {
     airControl ! Incoming
     import context.dispatcher
-    context.system.scheduler.scheduleOnce(Plane.OUT_OF_KEROZEN_TIMEOUT milliseconds, self, OutOfKerozen)
+    outOfKerozenCrash = context.system.scheduler.scheduleOnce(Plane.OUT_OF_KEROZEN_TIMEOUT milliseconds, self, OutOfKerozen)
   }
 }
 
