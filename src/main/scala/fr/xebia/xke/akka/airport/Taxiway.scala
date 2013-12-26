@@ -38,14 +38,14 @@ class Taxiway(capacity: Int) extends Actor with ActorLogging {
 
   }
 
-  val planeLeaves: Receive = {
+  val dequeueAPlane: Receive = {
     case this.Tick =>
       if (queue.nonEmpty) {
         val ((plane, gate), newQueue) = queue.dequeue
         this.queue = newQueue
 
         log.info("Plane <{}> leaves taxiway <{}>", plane.path.name, self.path.name)
-        gate ! HasParked
+        gate.tell(HasParked, sender = plane)
         plane ! HasParked
 
         free += 1
@@ -58,9 +58,9 @@ class Taxiway(capacity: Int) extends Actor with ActorLogging {
 
   }
 
-  def available: Receive = planeLeaves orElse acceptNewPlane
+  def available: Receive = dequeueAPlane orElse acceptNewPlane
 
-  def full: Receive = planeLeaves orElse rejectNewPlane
+  def full: Receive = dequeueAPlane orElse rejectNewPlane
 
   def receive: Receive = available
 

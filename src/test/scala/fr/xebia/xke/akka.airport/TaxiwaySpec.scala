@@ -1,74 +1,35 @@
 package fr.xebia.xke.akka.airport
 
+import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Event.{HasParked, HasEntered, HasLeft}
+import fr.xebia.xke.akka.airport.Event.{TaxiingToGate, HasParked}
 import fr.xebia.xke.akka.airport.specs.{TaxiwaySpecs, PlaneSpecs, ActorSpecs}
 import languageFeature.postfixOps
+import org.scalatest.matchers.ShouldMatchers
 
-class TaxiwaySpec extends TaxiwaySpecs with PlaneSpecs with ActorSpecs {
+class TaxiwaySpec extends TaxiwaySpecs with PlaneSpecs with ActorSpecs with ShouldMatchers {
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        groundControl => {
+      "Given a taxiway of capacity 1 " - {
 
-          `Given a probe` {
-            gate =>
+        "Given a plane enters the taxiway" - {
 
-              `Given a taxiway of capacity`(1, groundControl.ref) {
-                taxiway =>
+          "When queueing is finished" - {
 
-                  `Given a probe` {
-                    plane =>
+            "Then Gate and planes are notified of the parking event" in {
+              val taxiway = system.actorOf(Props(classOf[Taxiway], 1), "taxiway")
 
-                      `When a plane enters the taxiway`(plane, taxiway, gate.ref) {
+              val plane = TestProbe()
+              val gate = TestProbe()
 
-                        `Then ground control is notified of the plane entering the taxiway`(groundControl, plane.ref, taxiway)
+              plane send(taxiway, TaxiingToGate(gate.ref))
 
-                        `When queuing timeout is reached`(taxiway, plane.ref, gate.ref) {
-
-                          `Then ground control is notified of the plane leaving the taxiway`(groundControl, plane.ref, taxiway)
-                        }
-                      }
-                  }
-              }
-          }
-        }
-      }
-  }
-  `Given an actor system` {
-    implicit system =>
-      `Given a probe` {
-        groundControl => {
-
-          `Given a probe` {
-            gate =>
-
-              `Given a taxiway of capacity`(1, groundControl.ref) {
-                taxiway =>
-
-                  `Given a probe` {
-                    plane =>
-
-                      `Given a probe watching`(taxiway) {
-                        probe =>
-
-                          `Given a probe` {
-                            secondPlane =>
-
-                              `When a plane enters the taxiway`(plane, taxiway, gate.ref) {
-
-                                `When a plane enters the taxiway`(secondPlane, taxiway, gate.ref) {
-
-                                  `Then it should terminates`(probe, taxiway)
-                                }
-                              }
-                          }
-                      }
-                  }
-              }
+              plane.expectMsg(Taxiway.TAXIING_TIMEOUT milliseconds, HasParked)
+              gate.expectMsg(Taxiway.TAXIING_TIMEOUT milliseconds, HasParked)
+            }
           }
         }
       }
@@ -77,71 +38,54 @@ class TaxiwaySpec extends TaxiwaySpecs with PlaneSpecs with ActorSpecs {
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        groundControl => {
+      "Given a taxiway of capacity 1 " - {
 
-          `Given a probe` {
-            gate =>
+        "Given a plane is queueing" - {
 
-              `Given a taxiway of capacity`(10, groundControl.ref) {
-                taxiway =>
+          "When a second plane try to enter the taxiway" - {
 
-                  `Given a probe` {
-                    plane =>
+            "The taxiway should terminates" in {
+              val taxiway = system.actorOf(Props(classOf[Taxiway], 1), "taxiway")
 
-                      `When a plane enters the taxiway`(plane, taxiway, gate.ref) {
+              val firstPlane = TestProbe()
+              val secondPlane = TestProbe()
+              val gate = TestProbe()
+              val probe = TestProbe()
+              probe watch taxiway
 
-                        `Then plane should be out of taxiway within timeout`(taxiway, groundControl, gate, plane.ref)
-                      }
-                  }
-              }
+              firstPlane send(taxiway, TaxiingToGate(gate.ref))
+              secondPlane send(taxiway, TaxiingToGate(gate.ref))
+
+              probe expectTerminated(taxiway, 100 milliseconds)
+            }
           }
         }
       }
   }
-
 
   `Given an actor system` {
     implicit system =>
 
-      `Given a probe` {
-        groundControl => {
+      "Given a taxiway of capacity 5 " - {
 
-          `Given a probe` {
-            gate =>
+        "When 5 planes are queueing" - {
 
-              `Given a taxiway of capacity`(10, groundControl.ref) {
-                taxiway =>
+          "Then they should exit in the same order" in {
 
-                  "Given 5 planes" - {
+            val taxiway = system.actorOf(Props(classOf[Taxiway], 5), "taxiway")
 
-                    val planes = for (i <- 0 until 5)
-                    yield TestProbe()
+            val planes = for (i <- 0 until 5)
+            yield TestProbe()
+            val gate = TestProbe()
 
-                    "When the start taxiing in an order" - {
-                      planes.foreach {
-                        plane =>
-                          plane send(taxiway, Event.TaxiingToGate(gate.ref))
-                      }
+            planes.foreach(plane => plane send(taxiway, TaxiingToGate(gate.ref)))
 
-                      "Then they should leave the taxiway in the same order" in {
-                        groundControl.within(10 seconds) {}
-                        planes.foreach {
-                          plane =>
-                            groundControl expectMsg HasEntered
-                        }
-
-                        planes.foreach {
-                          plane =>
-                            groundControl expectMsg HasParked
-                        }
-                      }
-                    }
-                  }
-              }
+            planes.foreach(plane => {
+              gate expectMsg(Taxiway.TAXIING_TIMEOUT milliseconds, HasParked)
+              gate.lastSender should be(plane.ref)
+            })
           }
         }
       }
   }
-
 }
