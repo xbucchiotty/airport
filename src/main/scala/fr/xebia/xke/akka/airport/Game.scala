@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.{ActorLogging, Terminated, Props, ActorRef, Actor}
 import languageFeature.postfixOps
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Game.NewPlane
+import fr.xebia.xke.akka.airport.Game.{ErrorInGame, NewPlane}
 import fr.xebia.xke.akka.airport.Event.Score
 
 class Game(config: GameConfiguration = GameConfiguration()) extends Actor with ActorLogging {
@@ -30,8 +30,7 @@ class Game(config: GameConfiguration = GameConfiguration()) extends Actor with A
 
   def receive: Receive = {
     case Terminated(ref) =>
-      log.info("Game terminates because of {}", ref.path.name)
-      context stop self
+      throw ErrorInGame(ref.path.name)
 
     case NewPlane =>
       val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self), s"AF-${ planes.size }")
@@ -51,5 +50,7 @@ case class GameConfiguration(nrOfRunways: Int = 1, taxiwayCapacity: Int = 10, nr
 object Game {
 
   case object NewPlane
+
+  case class ErrorInGame(cause: String) extends Exception(cause)
 
 }

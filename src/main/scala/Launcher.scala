@@ -5,5 +5,8 @@ object Launcher extends App {
 
   val system = ActorSystem()
 
-  system.actorOf(Props(classOf[Game],GameConfiguration()), "game")
+  system.actorOf(
+    Props(classOf[Game], GameConfiguration()), "game")
+
+
 }
