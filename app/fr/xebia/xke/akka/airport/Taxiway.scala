@@ -1,11 +1,11 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
-import fr.xebia.xke.akka.airport.Event.{StartTaxi, HasLeft, TaxiingToGate, HasParked}
 import concurrent.duration._
+import fr.xebia.xke.akka.airport.GameEvent.{StartTaxi, HasLeft, TaxiingToGate, HasParked}
 import languageFeature.postfixOps
-import scala.util.Random
 import scala.collection.immutable.Queue
+import scala.util.Random
 
 class Taxiway(capacity: Int) extends Actor with ActorLogging {
   assert(capacity > 0)

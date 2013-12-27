@@ -1,10 +1,10 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Terminated, Props, ActorRef, Actor}
-import languageFeature.postfixOps
 import concurrent.duration._
+import fr.xebia.xke.akka.airport.GameEvent.Score
 import fr.xebia.xke.akka.airport.Game.{ErrorInGame, NewPlane}
-import fr.xebia.xke.akka.airport.Event.Score
+import languageFeature.postfixOps
 
 class Game(config: GameConfiguration = GameConfiguration()) extends Actor with ActorLogging {
 
@@ -24,13 +24,13 @@ class Game(config: GameConfiguration = GameConfiguration()) extends Actor with A
     context watch gate
     context watch taxiway
 
-    import context.dispatcher
-    context.system.scheduler.schedule(1 second, 5 seconds, self, NewPlane)
+    /*import context.dispatcher
+    context.system.scheduler.schedule(1 second, 5 seconds, self, NewPlane)*/
   }
 
   def receive: Receive = {
     case Terminated(ref) =>
-      throw ErrorInGame(ref.path.name)
+      //throw ErrorInGame(ref.path.name)
 
     case NewPlane =>
       val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self), s"AF-${ planes.size }")

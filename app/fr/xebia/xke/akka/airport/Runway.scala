@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, ActorLogging, Actor}
-import fr.xebia.xke.akka.airport.Event.{HasLanded, HasLeft}
+import fr.xebia.xke.akka.airport.GameEvent.{HasLanded, HasLeft}
 
 class Runway extends Actor with ActorLogging {
 

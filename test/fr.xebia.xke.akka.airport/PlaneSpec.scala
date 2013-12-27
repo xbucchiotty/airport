@@ -4,7 +4,7 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.Contact
-import fr.xebia.xke.akka.airport.Event.{Score, HasParked, TaxiingToGate, HasLeft, StartTaxi, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.GameEvent.{Score, HasParked, TaxiingToGate, HasLeft, StartTaxi, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers

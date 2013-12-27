@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, ActorRef, Props, Actor}
 import fr.xebia.xke.akka.airport.Command.{Contact, Land}
-import fr.xebia.xke.akka.airport.Event.{HasLeft, Incoming, HasLanded}
+import fr.xebia.xke.akka.airport.GameEvent.{HasLeft, Incoming, HasLanded}
 
 class AirTrafficControl(groundControl: ActorRef, runway: ActorRef) extends Actor with ActorLogging {
 
@@ -10,11 +10,11 @@ class AirTrafficControl(groundControl: ActorRef, runway: ActorRef) extends Actor
 
     case Incoming =>
       log.info(s"plane ${sender.path.name} requests to land!")
-      //sender ! Land(runway)
+      sender ! Land(runway)
 
     case HasLanded =>
       log.info(s"plane ${sender.path.name} has landed!")
-      //sender ! Contact(groundControl)
+      sender ! Contact(groundControl)
 
     case HasLeft =>
       log.info(s"plane ${sender.path.name} has left!")

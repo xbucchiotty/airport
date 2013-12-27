@@ -4,6 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /game/start                 controllers.Application.start
+POST    /game/plane                 controllers.Application.newPlane
+GET     /game/reset                 controllers.Application.reset
+GET     /events                     controllers.Application.events
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

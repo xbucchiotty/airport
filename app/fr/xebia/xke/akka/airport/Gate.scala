@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, ActorLogging, Actor}
-import fr.xebia.xke.akka.airport.Event.{HasLeft, HasParked}
+import fr.xebia.xke.akka.airport.GameEvent.{HasLeft, HasParked}
 
 class Gate extends Actor with ActorLogging {
 

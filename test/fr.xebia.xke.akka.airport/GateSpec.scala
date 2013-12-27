@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.Props
 import akka.testkit.TestProbe
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
-import fr.xebia.xke.akka.airport.Event.{HasLeft, HasParked}
+import fr.xebia.xke.akka.airport.GameEvent.{HasLeft, HasParked}
 import languageFeature.postfixOps
 import concurrent.duration._
 
