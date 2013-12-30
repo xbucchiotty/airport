@@ -1,15 +1,14 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Terminated, Props, ActorRef, Actor}
-import concurrent.duration._
+import fr.xebia.xke.akka.airport.Game.NewPlane
 import fr.xebia.xke.akka.airport.GameEvent.Score
-import fr.xebia.xke.akka.airport.Game.{ErrorInGame, NewPlane}
 import languageFeature.postfixOps
 
-class Game(config: GameConfiguration = GameConfiguration()) extends Actor with ActorLogging {
+class Game(settings: Settings = new Settings()) extends Actor with ActorLogging {
 
   val runway = context.actorOf(Props[Runway], "runway-1")
-  val taxiway = context.actorOf(Props(classOf[Taxiway], config.taxiwayCapacity), "taxiway-Z")
+  val taxiway = context.actorOf(Props(classOf[Taxiway], settings), "taxiway-Z")
   val gate = context.actorOf(Props[Gate], "gate-1")
 
   val groundControl = context.actorOf(Props(classOf[GroundControl], taxiway, gate), "groundControl")
@@ -30,22 +29,19 @@ class Game(config: GameConfiguration = GameConfiguration()) extends Actor with A
 
   def receive: Receive = {
     case Terminated(ref) =>
-      //throw ErrorInGame(ref.path.name)
+      context stop self
 
     case NewPlane =>
-      val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self), s"AF-${ planes.size }")
+      val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ planes.size }")
       context watch newPlane
       planes += newPlane
 
     case Score(points) =>
-      log.info(s"unwatch $sender")
       context unwatch sender
       score += points
   }
 
 }
-
-case class GameConfiguration(nrOfRunways: Int = 1, taxiwayCapacity: Int = 10, nrOfGates: Int = 1)
 
 object Game {
 

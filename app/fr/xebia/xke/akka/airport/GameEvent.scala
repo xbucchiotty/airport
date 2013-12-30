@@ -26,15 +26,16 @@ object GameEvent {
 
 }
 
-case class FlightEvent(evt: String, flightName: String) extends UIEvent
+case class PlaneEvent(evt: String, flightName: String) extends UIEvent
 
-object FlightEvent {
-  def crash(flightName: String) = FlightEvent("crash", flightName)
-  def add(flightName: String) = FlightEvent("add", flightName)
-  def landed(flightName: String) = FlightEvent("landed", flightName)
-  def taxi(flightName: String) = FlightEvent("taxi", flightName)
-  def park(flightName: String) = FlightEvent("park", flightName)
-  def leave(flightName: String) = FlightEvent("leave", flightName)
+object PlaneEvent {
+  def crash(flightName: String) = PlaneEvent("crash", flightName)
+  def add(flightName: String) = PlaneEvent("add", flightName)
+  def landed(flightName: String) = PlaneEvent("landed", flightName)
+  def taxi(flightName: String) = PlaneEvent("taxi", flightName)
+  def park(flightName: String) = PlaneEvent("park", flightName)
+  def leave(flightName: String) = PlaneEvent("leave", flightName)
+  def collision(flightName: String) = PlaneEvent("collision", flightName)
 }
 
 object Command {

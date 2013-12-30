@@ -5,26 +5,27 @@ import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Game.NewPlane
-import fr.xebia.xke.akka.airport.{FlightEvent, UIEvent, GameConfiguration, Game}
+import fr.xebia.xke.akka.airport.{PlaneEvent, UIEvent, Settings, Game}
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Enumerator.TreatCont1
 import play.api.libs.iteratee.{Input, Enumerator, Iteratee}
 import play.api.mvc._
 import scala.Some
 import scala.concurrent.{ExecutionContext, Future}
+import scala.collection.immutable.Queue
 
 object Application extends Controller {
 
   def index = Action {
+    if (game != null) {
+      system.stop(game)
+      game = null
+    }
+
+    game = system.actorOf(Props(classOf[Game], Settings.EASY))
+
     Ok(views.html.index())
   }
-
-  import play.api.Play.current
-
-  val system = Akka.system
-  val listener = system.actorOf(Props[Listener])
-  var game: ActorRef = null
-  system.eventStream.subscribe(listener, classOf[UIEvent])
 
   def events = WebSocket.using[String] {
     request =>
@@ -38,7 +39,7 @@ object Application extends Controller {
 
       val out = Enumerator2.infineUnfold(listener) {
         listener =>
-          ask(listener, Events)(Timeout(1 second))
+          ask(listener, DequeueEvents)(Timeout(1 second))
             .mapTo[Option[String]]
             .map(replyOption => replyOption
             .map(reply => (listener, reply))
@@ -48,22 +49,6 @@ object Application extends Controller {
       (in, out)
   }
 
-  def reset = Action {
-    if (game != null) {
-      system.stop(game)
-      game = null
-    }
-
-    Redirect(routes.Application.start())
-  }
-
-  def start = Action {
-    if (game == null) {
-      game = system.actorOf(Props(classOf[Game], GameConfiguration()), name = "game")
-    }
-    Ok
-  }
-
   def newPlane = Action {
     if (game != null) {
       val inbox = Inbox.create(system)
@@ -71,26 +56,36 @@ object Application extends Controller {
     }
     Ok
   }
+
+  import play.api.Play.current
+
+  val system = Akka.system
+
+  val listener = system.actorOf(Props[Listener])
+  var game: ActorRef = null
+  system.eventStream.subscribe(listener, classOf[UIEvent])
 }
 
 class Listener extends Actor {
 
-  private var buffer = List.empty[String]
+  private var buffer = Queue.empty[String]
 
   def receive = {
-    case FlightEvent(evt, name) =>
-      buffer = s"$evt:$name" :: buffer
+    case PlaneEvent(evt, name) =>
+      buffer = buffer enqueue s"$evt:$name"
 
-    case Events =>
-      sender ! buffer.headOption
-
+    case DequeueEvents =>
       if (buffer.nonEmpty) {
-        buffer = buffer.tail
+        val (msg, newBuffer) = buffer.dequeue
+        sender ! Some(msg)
+        buffer = newBuffer
+      } else {
+        sender ! Option.empty[String]
       }
   }
 }
 
-case object Events
+case object DequeueEvents
 
 case class GameEvent(message: String)
 

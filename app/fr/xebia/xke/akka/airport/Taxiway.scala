@@ -1,18 +1,15 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
-import concurrent.duration._
-import fr.xebia.xke.akka.airport.GameEvent.{StartTaxi, HasLeft, TaxiingToGate, HasParked}
+import fr.xebia.xke.akka.airport.GameEvent.{TaxiingToGate, HasParked}
 import languageFeature.postfixOps
 import scala.collection.immutable.Queue
-import scala.util.Random
 
-class Taxiway(capacity: Int) extends Actor with ActorLogging {
-  assert(capacity > 0)
+class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
   private var queue = Queue.empty[(ActorRef, ActorRef)]
 
-  private var free = capacity
+  private var free = settings.taxiwayCapacity
 
   val acceptNewPlane: Receive = {
     case msg@TaxiingToGate(gate) =>
@@ -33,6 +30,7 @@ class Taxiway(capacity: Int) extends Actor with ActorLogging {
   val rejectNewPlane: Receive = {
     case msg: TaxiingToGate =>
       val plane = sender
+      context.system.eventStream.publish(PlaneEvent.collision(plane.path.name))
       log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
       context stop self
 
@@ -54,7 +52,7 @@ class Taxiway(capacity: Int) extends Actor with ActorLogging {
       }
 
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(randomTaxiingDuration, self, Tick)
+      context.system.scheduler.scheduleOnce(settings.aRandomTaxiingDuration, self, Tick)
 
   }
 
@@ -64,19 +62,11 @@ class Taxiway(capacity: Int) extends Actor with ActorLogging {
 
   def receive: Receive = available
 
-  private def randomTaxiingDuration: FiniteDuration =
-    Duration(Random.nextInt(Taxiway.TAXIING_TIMEOUT), MILLISECONDS)
-
-
   case object Tick
 
   override def preStart() {
     import context.dispatcher
 
-    context.system.scheduler.scheduleOnce(randomTaxiingDuration, self, Tick)
+    context.system.scheduler.scheduleOnce(settings.aRandomTaxiingDuration, self, Tick)
   }
-}
-
-object Taxiway {
-  val TAXIING_TIMEOUT = 1000
 }
