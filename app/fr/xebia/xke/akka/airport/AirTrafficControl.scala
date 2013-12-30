@@ -10,7 +10,7 @@ class AirTrafficControl(groundControl: ActorRef, runway: ActorRef) extends Actor
 
     case Incoming =>
       log.info(s"plane ${sender.path.name} requests to land!")
-      sender ! Land(runway)
+      //sender ! Land(runway)
 
     case HasLanded =>
       log.info(s"plane ${sender.path.name} has landed!")

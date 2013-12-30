@@ -29,7 +29,7 @@ class Game(settings: Settings = new Settings()) extends Actor with ActorLogging 
 
   def receive: Receive = {
     case Terminated(ref) =>
-      context stop self
+      //context stop self
 
     case NewPlane =>
       val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ planes.size }")
