@@ -16,8 +16,8 @@ class Gate extends Actor with ActorLogging {
   def occupied(plane: ActorRef): Receive = {
     case HasParked => {
       val newPlane = sender
-      context.system.eventStream.publish(PlaneEvent.collision(plane.path.name))
-      context.system.eventStream.publish(PlaneEvent.collision(newPlane.path.name))
+      context.system.eventStream.publish(PlaneEvent.collision(plane.path.name, newPlane.path.name))
+      context.system.eventStream.publish(PlaneEvent.collision(newPlane.path.name, plane.path.name))
       log.error("Collision on gate <{}> between <{}> and <{}>", self.path.name, plane.path.name, newPlane.path.name)
       context stop self
     }

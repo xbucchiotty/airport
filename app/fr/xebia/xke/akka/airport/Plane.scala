@@ -18,6 +18,7 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
       context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
         def run() {
           airControl ! Ack
+          publish(PlaneEvent.detail("Landed ack"))
 
           import context.dispatcher
           outOfKerozenCrash.cancel()
@@ -26,13 +27,13 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
       })
 
     case this.Landed(runway) =>
-      context.system.eventStream.publish(PlaneEvent.landed(self.path.name))
+      publish(PlaneEvent.landed)
       airControl ! HasLanded
       runway ! HasLanded
       context become waitingToPark(runway)
 
     case OutOfKerozen =>
-      context.system.eventStream.publish(PlaneEvent.crash(self.path.name))
+      publish(PlaneEvent.crash)
       log.error("Plane {} is out of kerozen, it crashes", self.path.name)
       context stop self
   }
@@ -56,7 +57,7 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
         def run() {
           groundControl ! Ack
 
-          context.system.eventStream.publish(PlaneEvent.taxi(self.path.name))
+          publish(PlaneEvent.taxi)
 
           runway ! HasLeft
           airControl ! HasLeft
@@ -70,7 +71,7 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
 
   def taxiing(groundControl: ActorRef, taxiway: ActorRef, destination: ActorRef): Receive = {
     case HasParked =>
-      context.system.eventStream.publish(PlaneEvent.park(self.path.name))
+      publish(PlaneEvent.park)
       groundControl ! HasParked
       import context.dispatcher
       context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, UnloadingTerminated)
@@ -79,7 +80,7 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
 
   def unloadingPassengers(groundControl: ActorRef, gate: ActorRef): Receive = {
     case UnloadingTerminated =>
-      context.system.eventStream.publish(PlaneEvent.leave(self.path.name))
+      publish(PlaneEvent.leave)
       groundControl ! HasLeft
       gate ! HasLeft
       game ! Score(10)
@@ -92,12 +93,16 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
   case class Landed(runway: ActorRef)
 
   override def preStart() {
-    context.system.eventStream.publish(PlaneEvent.add(self.path.name))
+    publish(PlaneEvent.add)
 
     airControl ! Incoming
 
     import context.dispatcher
     outOfKerozenCrash = context.system.scheduler.scheduleOnce(settings.outOfKerozenTimeout milliseconds, self, OutOfKerozen)
+  }
+
+  private def publish(event: String => UIEvent) {
+    context.system.eventStream.publish(event(self.path.name))
   }
 }
 

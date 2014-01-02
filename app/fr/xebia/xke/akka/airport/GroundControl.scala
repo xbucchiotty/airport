@@ -7,7 +7,7 @@ class GroundControl(taxiway: ActorRef, gate: ActorRef) extends Actor with ActorL
 
   def receive: Receive = {
     case Incoming =>
-      sender ! Command.TaxiAndPark(taxiway, gate)
+      //sender ! Command.TaxiAndPark(taxiway, gate)
       log.info(s"plane ${sender.path.name} requests to park!")
 
     case StartTaxi =>

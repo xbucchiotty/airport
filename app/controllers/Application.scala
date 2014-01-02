@@ -81,8 +81,8 @@ class UIEventListener extends Actor {
   private var buffer = Queue.empty[String]
 
   def receive = {
-    case PlaneEvent(evt, name) =>
-      buffer = buffer enqueue s"$evt:$name"
+    case event: PlaneEvent =>
+      buffer = buffer enqueue event.toJson
 
     case DequeueEvents =>
       if (buffer.nonEmpty) {

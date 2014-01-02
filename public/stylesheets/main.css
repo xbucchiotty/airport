@@ -1,5 +1,5 @@
 .strip{
-    width: 150px;
+    width: 175px;
     min-height: 50px;
     border: 1px solid #d4d4d4;
 }
@@ -19,6 +19,10 @@
 li > .id {
     font-family: monospace;
     font-weight: bold;
+}
+
+li > .detail {
+    font-style: italic;
 }
 
 li > p {

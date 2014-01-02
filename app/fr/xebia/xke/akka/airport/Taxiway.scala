@@ -30,7 +30,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   val rejectNewPlane: Receive = {
     case msg: TaxiingToGate =>
       val plane = sender
-      context.system.eventStream.publish(PlaneEvent.collision(plane.path.name))
+      context.system.eventStream.publish(PlaneEvent.collision(plane.path.name, self.path.name))
       log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
       context stop self
 

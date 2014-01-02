@@ -26,16 +26,31 @@ object GameEvent {
 
 }
 
-case class PlaneEvent(evt: String, flightName: String) extends UIEvent
+case class PlaneEvent(evt: String, flightName: String, detail: String) extends UIEvent {
+
+  lazy val toJson: String = s"""{
+    "step" : "$evt" ,
+    "flightName" : "$flightName" ,
+    "detail" : "$detail"
+   }""".stripMargin
+}
 
 object PlaneEvent {
-  def crash(flightName: String) = PlaneEvent("crash", flightName)
-  def add(flightName: String) = PlaneEvent("add", flightName)
-  def landed(flightName: String) = PlaneEvent("landed", flightName)
-  def taxi(flightName: String) = PlaneEvent("taxi", flightName)
-  def park(flightName: String) = PlaneEvent("park", flightName)
-  def leave(flightName: String) = PlaneEvent("leave", flightName)
-  def collision(flightName: String) = PlaneEvent("collision", flightName)
+  def detail(detail: String)(flightName: String) = PlaneEvent(evt = "", flightName = flightName, detail = detail)
+
+  def crash(flightName: String) = PlaneEvent(evt = "", flightName, detail = "Error: out of kerozen")
+
+  def add(flightName: String) = PlaneEvent("incoming", flightName, detail = "Incoming")
+
+  def landed(flightName: String) = PlaneEvent("runway", flightName, detail = "Landed")
+
+  def taxi(flightName: String) = PlaneEvent("taxiway", flightName, detail = "Taxi")
+
+  def park(flightName: String) = PlaneEvent("gate", flightName, detail = "Park")
+
+  def leave(flightName: String) = PlaneEvent("done", flightName, detail = "Ok")
+
+  def collision(flightName: String, collisioned: String) = PlaneEvent("", flightName, detail = s"Error: Collision with $collisioned")
 }
 
 object Command {
