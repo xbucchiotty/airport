@@ -45,10 +45,10 @@ function doSend(message) {
 
 function create(flightName){
    return  $('<li>',{
-        html: flightName,
+        html: '</i><p class="id"><i class="icon-plane"></i> '+flightName+'</p>',
         id: flightName,
         class: 'strip'
-    });
+    }).addClass('regular');
 }
 
 function find(flightName){
@@ -79,6 +79,7 @@ function crash(flightName){
 
     find(flightName)
         .addClass('error')
+        .removeClass('regular')
         .append(newItem);
 }
 
@@ -89,6 +90,7 @@ function collision(flightName){
 
     find(flightName)
         .addClass('error')
+        .removeClass('regular')
         .append(newItem);
 }
 

@@ -31,6 +31,8 @@ class Runway extends Actor with ActorLogging {
 
     case HasLanded =>
       val other = sender
+      context.system.eventStream.publish(PlaneEvent.collision(staying.path.name))
+      context.system.eventStream.publish(PlaneEvent.collision(other.path.name))
       log.error("Collision on runway <{}> between <{}> and <{}>", self.path.name, staying.path.name, other.path.name)
 
       context stop self
