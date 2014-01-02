@@ -3,14 +3,15 @@ package fr.xebia.xke.akka.airport
 import scala.concurrent.duration._
 import scala.util.Random
 
-class Settings(
-                val nrOfRunways: Int = 1,
-                val taxiwayCapacity: Int = 10,
-                val nrOfGates: Int = 1,
-                landingMaxDuration: Int = 300,
-                taxiingMaxDuration: Int = 3000,
-                unloadingPassengersMaxDuration: Int = 5000,
-                val outOfKerozenTimeout: Int = 3000) {
+case class Settings(
+                     nrOfRunways: Int,
+                     taxiwayCapacity: Int,
+                     nrOfGates: Int,
+                     landingMaxDuration: Int,
+                     taxiingMaxDuration: Int,
+                     unloadingPassengersMaxDuration: Int,
+                     outOfKerozenTimeout: Int,
+                     ackMaxDuration: Int) {
 
   private def aRandomDuration(maxDurationInMillis: Int): FiniteDuration = {
     val minDuration = maxDurationInMillis / 2
@@ -31,8 +32,29 @@ class Settings(
   def aRandomTaxiingDuration =
     aRandomDuration(taxiingMaxDuration)
 
+  def aRandomAckDuration =
+    aRandomDuration(ackMaxDuration)
+
 }
 
 object Settings {
-  lazy val EASY = new Settings(1, 10, 1, 3000, 5000, 10000)
+  lazy val EASY = new Settings(
+    nrOfRunways = 1,
+    taxiingMaxDuration = 10,
+    taxiwayCapacity = 1,
+    nrOfGates = 1,
+    landingMaxDuration = 3000,
+    unloadingPassengersMaxDuration = 5000,
+    outOfKerozenTimeout = 10000,
+    ackMaxDuration = 500)
+
+  lazy val TEST = new Settings(
+    nrOfRunways = 1,
+    taxiingMaxDuration = 10,
+    taxiwayCapacity = 1,
+    nrOfGates = 1,
+    landingMaxDuration = 300,
+    unloadingPassengersMaxDuration = 500,
+    outOfKerozenTimeout = 1000,
+    ackMaxDuration = 100)
 }

@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{Cancellable, ActorLogging, ActorRef, Actor}
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Contact, Land}
+import fr.xebia.xke.akka.airport.Command.{Ack, Contact, Land}
 import fr.xebia.xke.akka.airport.GameEvent.{Score, HasParked, Incoming, TaxiingToGate, StartTaxi, HasLeft, HasLanded}
 import fr.xebia.xke.akka.airport.Plane.{UnloadingTerminated, OutOfKerozen}
 import languageFeature.postfixOps
@@ -14,8 +14,16 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
   val inTheAir: Receive = {
     case Land(runway) =>
       import context.dispatcher
-      outOfKerozenCrash.cancel()
-      context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
+      val airControl = sender
+      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
+        def run() {
+          airControl ! Ack
+
+          import context.dispatcher
+          outOfKerozenCrash.cancel()
+          context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
+        }
+      })
 
     case this.Landed(runway) =>
       context.system.eventStream.publish(PlaneEvent.landed(self.path.name))
@@ -31,18 +39,33 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
 
   def waitingToPark(runway: ActorRef): Receive = {
     case Contact(groundControl) =>
-      groundControl ! Incoming
+      import context.dispatcher
+      val airControl = sender
+      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
+        def run() {
+          airControl ! Ack
+
+          groundControl ! Incoming
+        }
+      })
 
     case Command.TaxiAndPark(taxiway, gate) =>
-      context.system.eventStream.publish(PlaneEvent.taxi(self.path.name))
-
+      import context.dispatcher
       val groundControl = sender
-      runway ! HasLeft
-      airControl ! HasLeft
-      taxiway ! TaxiingToGate(gate)
-      groundControl ! StartTaxi
+      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
+        def run() {
+          groundControl ! Ack
 
-      context become taxiing(groundControl, taxiway, gate)
+          context.system.eventStream.publish(PlaneEvent.taxi(self.path.name))
+
+          runway ! HasLeft
+          airControl ! HasLeft
+          taxiway ! TaxiingToGate(gate)
+          groundControl ! StartTaxi
+
+          context become taxiing(groundControl, taxiway, gate)
+        }
+      })
   }
 
   def taxiing(groundControl: ActorRef, taxiway: ActorRef, destination: ActorRef): Receive = {

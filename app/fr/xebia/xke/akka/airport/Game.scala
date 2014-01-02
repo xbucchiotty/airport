@@ -5,7 +5,7 @@ import fr.xebia.xke.akka.airport.Game.NewPlane
 import fr.xebia.xke.akka.airport.GameEvent.Score
 import languageFeature.postfixOps
 
-class Game(settings: Settings = new Settings()) extends Actor with ActorLogging {
+class Game(settings: Settings) extends Actor with ActorLogging {
 
   val runway = context.actorOf(Props[Runway], "runway-1")
   val taxiway = context.actorOf(Props(classOf[Taxiway], settings), "taxiway-Z")

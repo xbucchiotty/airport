@@ -46,4 +46,6 @@ object Command {
 
   case class TaxiAndPark(taxiway: ActorRef, gate: ActorRef) extends Command
 
+  case object Ack
+
 }
