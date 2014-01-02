@@ -24,6 +24,15 @@ object Application extends Controller {
 
     game = system.actorOf(Props(classOf[Game], Settings.EASY))
 
+    if (listener != null) {
+      system.eventStream.unsubscribe(listener)
+      system.stop(listener)
+    }
+
+    listener = system.actorOf(Props[UIEventListener])
+
+    system.eventStream.subscribe(listener, classOf[UIEvent])
+
     Ok(views.html.index())
   }
 
@@ -37,7 +46,7 @@ object Application extends Controller {
           println("Disconnected")
       }
 
-      val out = Enumerator2.infineUnfold(listener) {
+      val out = Enumerator2.infiniteUnfold(listener) {
         listener =>
           ask(listener, DequeueEvents)(Timeout(1 second))
             .mapTo[Option[String]]
@@ -53,20 +62,21 @@ object Application extends Controller {
     if (game != null) {
       val inbox = Inbox.create(system)
       inbox.send(game, NewPlane)
+      Ok
+    } else {
+      Redirect(routes.Application.index())
     }
-    Ok
   }
 
   import play.api.Play.current
 
   val system = Akka.system
 
-  val listener = system.actorOf(Props[Listener])
+  var listener: ActorRef = null
   var game: ActorRef = null
-  system.eventStream.subscribe(listener, classOf[UIEvent])
 }
 
-class Listener extends Actor {
+class UIEventListener extends Actor {
 
   private var buffer = Queue.empty[String]
 
@@ -98,13 +108,13 @@ object Enumerator2 {
    *          to unfold and the next input, or none if the value is completely unfolded.
    *          $paramEcSingle
    */
-  def infineUnfold[S, E](s: S)(f: S => Future[Option[(S, E)]])(implicit ec: ExecutionContext): Enumerator[E] = Enumerator.checkContinue1(s)(new TreatCont1[E, S] {
+  def infiniteUnfold[S, E](s: S)(f: S => Future[Option[(S, E)]])(implicit ec: ExecutionContext): Enumerator[E] = Enumerator.checkContinue1(s)(new TreatCont1[E, S] {
     val pec = ec.prepare()
 
     def apply[A](loop: (Iteratee[E, A], S) => Future[Iteratee[E, A]], s: S, k: Input[E] => Iteratee[E, A]): Future[Iteratee[E, A]] = {
       f(s).flatMap {
         case Some((newS, e)) => loop(k(Input.El(e)), newS)
-        case None => Thread.sleep(100); loop(k(Input.Empty), s)
+        case None => Thread.sleep(50); loop(k(Input.Empty), s)
       }(ExecutionContext.global)
     }
   })
