@@ -40,7 +40,7 @@ object PlaneEvent {
 
   def crash(flightName: String) = PlaneEvent(evt = "", flightName, detail = "Error: out of kerozen")
 
-  def add(flightName: String) = PlaneEvent("incoming", flightName, detail = "Incoming")
+  def incoming(flightName: String) = PlaneEvent("incoming", flightName, detail = "Incoming")
 
   def landed(flightName: String) = PlaneEvent("runway", flightName, detail = "Landed")
 

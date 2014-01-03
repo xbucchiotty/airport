@@ -13,18 +13,13 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
 
   val inTheAir: Receive = {
     case Land(runway) =>
-      import context.dispatcher
-      val airControl = sender
-      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
-        def run() {
-          airControl ! Ack
-          publish(PlaneEvent.detail("Landed ack"))
+      replyTo(airControl) {
+        publish(PlaneEvent.detail("Land ack"))
 
-          import context.dispatcher
-          outOfKerozenCrash.cancel()
-          context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
-        }
-      })
+        import context.dispatcher
+        outOfKerozenCrash.cancel()
+        context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
+      }
 
     case this.Landed(runway) =>
       publish(PlaneEvent.landed)
@@ -40,40 +35,32 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
 
   def waitingToPark(runway: ActorRef): Receive = {
     case Contact(groundControl) =>
-      import context.dispatcher
-      val airControl = sender
-      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
-        def run() {
-          airControl ! Ack
-
-          groundControl ! Incoming
-        }
-      })
+      replyTo(airControl) {
+        groundControl ! Incoming
+      }
 
     case Command.TaxiAndPark(taxiway, gate) =>
-      import context.dispatcher
       val groundControl = sender
-      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
-        def run() {
-          groundControl ! Ack
 
-          publish(PlaneEvent.taxi)
+      replyTo(groundControl) {
+        publish(PlaneEvent.taxi)
 
-          runway ! HasLeft
-          airControl ! HasLeft
-          taxiway ! TaxiingToGate(gate)
-          groundControl ! StartTaxi
+        runway ! HasLeft
+        airControl ! HasLeft
+        taxiway ! TaxiingToGate(gate)
+        groundControl ! StartTaxi
 
-          context become taxiing(groundControl, taxiway, gate)
-        }
-      })
+        context become taxiing(groundControl, taxiway, gate)
+      }
   }
 
   def taxiing(groundControl: ActorRef, taxiway: ActorRef, destination: ActorRef): Receive = {
     case HasParked =>
       publish(PlaneEvent.park)
       groundControl ! HasParked
+
       import context.dispatcher
+
       context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, UnloadingTerminated)
       context become unloadingPassengers(groundControl, destination)
   }
@@ -90,28 +77,41 @@ class Plane(airControl: ActorRef, game: ActorRef, settings: Settings) extends Ac
   def receive: Receive =
     inTheAir
 
-  case class Landed(runway: ActorRef)
 
   override def preStart() {
-    publish(PlaneEvent.add)
+    publish(PlaneEvent.incoming)
 
     airControl ! Incoming
 
     import context.dispatcher
+
     outOfKerozenCrash = context.system.scheduler.scheduleOnce(settings.outOfKerozenTimeout milliseconds, self, OutOfKerozen)
   }
+
+  private def replyTo(target: ActorRef)(command: => Unit) {
+    if (settings.isRadioOk) {
+      import context.dispatcher
+      context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
+        def run() {
+          target ! Ack
+
+          command
+        }
+      })
+    }
+  }
+
+  private case class Landed(runway: ActorRef)
 
   private def publish(event: String => UIEvent) {
     context.system.eventStream.publish(event(self.path.name))
   }
 }
 
-
 object Plane {
 
   case object OutOfKerozen
 
   case object UnloadingTerminated
-
 
 }

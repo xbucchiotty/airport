@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Ack, Contact}
+import fr.xebia.xke.akka.airport.Command.{Land, Ack, Contact}
 import fr.xebia.xke.akka.airport.GameEvent.{Score, HasParked, TaxiingToGate, HasLeft, StartTaxi, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
@@ -12,7 +12,7 @@ import org.scalatest.ShouldMatchers
 class PlaneSpec extends ActorSpecs with ShouldMatchers {
 
   val settings = Settings.TEST
-  
+
   `Given an actor system` {
     implicit system =>
 
@@ -28,6 +28,36 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
 
             airControl expectMsg Incoming
           }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a plane" - {
+
+        "Given the radio fability is 0.5" - {
+
+          "When airControl ask for a command" - {
+
+            "Ask is received half of the time" in {
+              val airControl = TestProbe()
+
+              for (_ <- 1 to 10) {
+                val plane = system.actorOf(Props(classOf[Plane], airControl.ref, TestProbe().ref, settings.copy(radioFability = 0.5, ackMaxDuration = 10)))
+
+                TestProbe().send(plane, Land(TestProbe().ref))
+
+              }
+
+              airControl.receiveWhile(200 milliseconds) {
+                case Ack => 1
+                case _ => 0
+              }.sum should (equal(4) or equal(5) or equal(6))
+            }
+          }
+
         }
       }
   }

@@ -11,7 +11,8 @@ case class Settings(
                      taxiingMaxDuration: Int,
                      unloadingPassengersMaxDuration: Int,
                      outOfKerozenTimeout: Int,
-                     ackMaxDuration: Int) {
+                     ackMaxDuration: Int,
+                     radioFability: Double) {
 
   private def aRandomDuration(maxDurationInMillis: Int): FiniteDuration = {
     val minDuration = maxDurationInMillis / 2
@@ -35,6 +36,9 @@ case class Settings(
   def aRandomAckDuration =
     aRandomDuration(ackMaxDuration)
 
+  def isRadioOk =
+    Random.nextDouble() <= radioFability
+
 }
 
 object Settings {
@@ -46,7 +50,8 @@ object Settings {
     landingMaxDuration = 3000,
     unloadingPassengersMaxDuration = 5000,
     outOfKerozenTimeout = 10000,
-    ackMaxDuration = 500)
+    ackMaxDuration = 500,
+    radioFability = 1)
 
   lazy val TEST = new Settings(
     nrOfRunways = 1,
@@ -56,5 +61,6 @@ object Settings {
     landingMaxDuration = 300,
     unloadingPassengersMaxDuration = 500,
     outOfKerozenTimeout = 1000,
-    ackMaxDuration = 100)
+    ackMaxDuration = 100,
+    radioFability = 1)
 }
