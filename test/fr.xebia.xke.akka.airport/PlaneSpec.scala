@@ -4,7 +4,7 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.{Land, Ack, Contact}
-import fr.xebia.xke.akka.airport.GameEvent.{Score, HasParked, TaxiingToGate, HasLeft, StartTaxi, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.PlaneEvent.{HasParked, TaxiingToGate, HasLeft, StartTaxi, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
@@ -54,7 +54,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
               airControl.receiveWhile(200 milliseconds) {
                 case Ack => 1
                 case _ => 0
-              }.sum should (equal(4) or equal(5) or equal(6))
+              }.sum should (be < 10 and be > 0)
             }
           }
 
@@ -224,7 +224,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
 
         "When the plane has finished unloading passengers" - {
 
-          "Then it should terminates and notify groundControl and gate, and scores the game" in {
+          "Then it should terminates and notify groundControl and gate" in {
             //Given
             val game = TestProbe()
             val airControl = TestProbe()
@@ -251,7 +251,6 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             probe expectTerminated(plane, 2 * settings.landingMaxDuration.milliseconds)
             gate expectMsg HasLeft
             groundControl expectMsg HasLeft
-            game expectMsg Score(10)
           }
         }
       }

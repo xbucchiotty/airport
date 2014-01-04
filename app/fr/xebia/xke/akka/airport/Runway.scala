@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, ActorLogging, Actor}
-import fr.xebia.xke.akka.airport.GameEvent.{HasLanded, HasLeft}
+import fr.xebia.xke.akka.airport.PlaneEvent.{Collision, HasLanded, HasLeft}
 
 class Runway extends Actor with ActorLogging {
 
@@ -31,8 +31,10 @@ class Runway extends Actor with ActorLogging {
 
     case HasLanded =>
       val other = sender
-      context.system.eventStream.publish(PlaneEvent.collision(staying.path.name, other.path.name))
-      context.system.eventStream.publish(PlaneEvent.collision(other.path.name, staying.path.name))
+
+      staying ! Collision(other)
+      other ! Collision(staying)
+
       log.error("Collision on runway <{}> between <{}> and <{}>", self.path.name, staying.path.name, other.path.name)
 
       context stop self

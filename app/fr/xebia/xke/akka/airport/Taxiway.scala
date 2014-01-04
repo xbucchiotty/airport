@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
-import fr.xebia.xke.akka.airport.GameEvent.{TaxiingToGate, HasParked}
+import fr.xebia.xke.akka.airport.PlaneEvent.{Collision, TaxiingToGate, HasParked}
 import languageFeature.postfixOps
 import scala.collection.immutable.Queue
 
@@ -30,8 +30,11 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   val rejectNewPlane: Receive = {
     case msg: TaxiingToGate =>
       val plane = sender
-      context.system.eventStream.publish(PlaneEvent.collision(plane.path.name, self.path.name))
+
+      plane ! Collision(self)
+
       log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
+
       context stop self
 
   }

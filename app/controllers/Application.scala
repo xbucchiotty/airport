@@ -1,18 +1,17 @@
 package controllers
 
-import akka.actor.{Inbox, ActorRef, Props, Actor}
+import akka.actor.{Inbox, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Game.NewPlane
-import fr.xebia.xke.akka.airport.{PlaneEvent, UIEvent, Settings, Game}
+import fr.xebia.xke.akka.airport.{Settings, Game}
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Enumerator.TreatCont1
 import play.api.libs.iteratee.{Input, Enumerator, Iteratee}
 import play.api.mvc._
 import scala.Some
 import scala.concurrent.{ExecutionContext, Future}
-import scala.collection.immutable.Queue
 
 object Application extends Controller {
 
@@ -29,9 +28,9 @@ object Application extends Controller {
       system.stop(listener)
     }
 
-    listener = system.actorOf(Props[UIEventListener])
+    listener = system.actorOf(Props[PlaneStatusListener])
 
-    system.eventStream.subscribe(listener, classOf[UIEvent])
+    system.eventStream.subscribe(listener, classOf[PlaneStatus])
 
     Ok(views.html.index())
   }
@@ -76,28 +75,7 @@ object Application extends Controller {
   var game: ActorRef = null
 }
 
-class UIEventListener extends Actor {
-
-  private var buffer = Queue.empty[String]
-
-  def receive = {
-    case event: PlaneEvent =>
-      buffer = buffer enqueue event.toJson
-
-    case DequeueEvents =>
-      if (buffer.nonEmpty) {
-        val (msg, newBuffer) = buffer.dequeue
-        sender ! Some(msg)
-        buffer = newBuffer
-      } else {
-        sender ! Option.empty[String]
-      }
-  }
-}
-
 case object DequeueEvents
-
-case class GameEvent(message: String)
 
 object Enumerator2 {
   /**

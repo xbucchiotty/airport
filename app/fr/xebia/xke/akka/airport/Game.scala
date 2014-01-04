@@ -2,7 +2,6 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Terminated, Props, ActorRef, Actor}
 import fr.xebia.xke.akka.airport.Game.NewPlane
-import fr.xebia.xke.akka.airport.GameEvent.Score
 import languageFeature.postfixOps
 
 class Game(settings: Settings) extends Actor with ActorLogging {
@@ -14,7 +13,7 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   val groundControl = context.actorOf(Props(classOf[GroundControl], taxiway, gate), "groundControl")
   val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runway), "airTrafficControl")
 
-  var planes = Set.empty[ActorRef]
+  var planes = Vector.empty[ActorRef]
 
   var score = 0
 
@@ -28,17 +27,14 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   }
 
   def receive: Receive = {
-    case Terminated(ref) =>
+    case Terminated(_) =>
       //context stop self
 
     case NewPlane =>
       val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ planes.size }")
       context watch newPlane
-      planes += newPlane
+      planes = planes :+ newPlane
 
-    case Score(points) =>
-      context unwatch sender
-      score += points
   }
 
 }
