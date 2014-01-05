@@ -15,7 +15,7 @@ trait PlaneState extends Actor with ActorLogging {
 
   protected val plane = self
 
-  private var status: PlaneStatus = PlaneStatus("", self.path.name, "")
+  private var status: PlaneStatus = PlaneStatus("", self.path.name, "", "")
 
   private var lastReply: Cancellable = null
 
@@ -39,8 +39,9 @@ trait PlaneState extends Actor with ActorLogging {
     publishState()
   }
 
-  protected def updateError(error: Any) {
-    updateStatus(s"Error: $error")
+  protected def updateError(error: String) {
+    status = status.copy(error = error)
+    publishState()
   }
 
   protected def updateStep(newStep: String) {
@@ -69,7 +70,7 @@ trait PlaneState extends Actor with ActorLogging {
 
     private def publishPlaneStatus: (Any => Any) = {
       case error: PlaneError =>
-        updateError(error)
+        updateError(error.message)
         error
 
       case event: PlaneEvent =>
@@ -85,9 +86,7 @@ trait PlaneState extends Actor with ActorLogging {
 
     private def registerError: Receive = {
       case msg =>
-
         context stop self
-
     }
   }
 }

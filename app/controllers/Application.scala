@@ -5,7 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Game.NewPlane
-import fr.xebia.xke.akka.airport.{Settings, Game}
+import fr.xebia.xke.akka.airport.{GameEvent, Settings, Game}
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Enumerator.TreatCont1
 import play.api.libs.iteratee.{Input, Enumerator, Iteratee}
@@ -28,9 +28,10 @@ object Application extends Controller {
       system.stop(listener)
     }
 
-    listener = system.actorOf(Props[PlaneStatusListener])
+    listener = system.actorOf(Props[EventListener])
 
     system.eventStream.subscribe(listener, classOf[PlaneStatus])
+    system.eventStream.subscribe(listener, classOf[GameEvent])
 
     Ok(views.html.index())
   }

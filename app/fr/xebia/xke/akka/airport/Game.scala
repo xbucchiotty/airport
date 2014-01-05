@@ -1,8 +1,10 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorLogging, Terminated, Props, ActorRef, Actor}
+import akka.actor.{ActorLogging, Props, ActorRef, Actor}
+import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
+import scala.util.Random
 
 class Game(settings: Settings) extends Actor with ActorLogging {
 
@@ -18,23 +20,30 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   var score = 0
 
   override def preStart() {
-    context watch runway
-    context watch gate
-    context watch taxiway
-
     /*import context.dispatcher
     context.system.scheduler.schedule(1 second, 5 seconds, self, NewPlane)*/
+
+    context.system.eventStream.subscribe(self, classOf[PlaneStatus])
+
+    publishScore()
   }
 
+
   def receive: Receive = {
-    case Terminated(_) =>
-      //context stop self
+    case PlaneStatus("done", _, _, _) =>
+      score += 5
+      publishScore()
+
+    case PlaneStatus(_, _, _, error) if error.nonEmpty =>
+      score -= 2
+      publishScore()
 
     case NewPlane =>
-      val newPlane = context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ planes.size }")
-      context watch newPlane
-      planes = planes :+ newPlane
+      context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 10000 }")
+  }
 
+  private def publishScore() {
+    context.system.eventStream.publish(Score(score, 50))
   }
 
 }

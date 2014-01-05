@@ -4,7 +4,11 @@ import akka.actor.ActorRef
 
 trait PlaneEvent
 
-trait PlaneError extends PlaneEvent
+trait PlaneError extends PlaneEvent {
+  def message: String
+
+  override def toString = message
+}
 
 object PlaneEvent {
 
@@ -17,7 +21,7 @@ object PlaneEvent {
   case object HasLeft extends PlaneEvent
 
   case class Collision(otherPlane: ActorRef) extends PlaneError {
-    override def toString = s"Collision with ${otherPlane.path.name}"
+    val message = s"Collision with ${otherPlane.path.name}"
   }
 
   case class TaxiingToGate(gate: ActorRef) extends PlaneEvent {
@@ -28,6 +32,8 @@ object PlaneEvent {
 
   case object Done extends PlaneEvent
 
-  case object OutOfKerozen extends PlaneError
+  case object OutOfKerozen extends PlaneError{
+    val message = "Out of kerozen"
+  }
 
 }

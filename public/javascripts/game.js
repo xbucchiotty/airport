@@ -9,25 +9,56 @@ function onMessage(evt) {
 
     var uiEvent = JSON.parse(evt.data);
 
+    if(uiEvent.type === 'PlaneStatus'){
+        onPlaneStatus(uiEvent);
+    }
+    else if (uiEvent.type === 'Score'){
+        onScore(uiEvent);
+    }
+    else if (uiEvent.type === 'GameOver'){
+        onGameOver(uiEvent);
+    }
+}
+
+function onGameOver(uiEvent){
+    websocket.close();
+    alert("Looser");
+}
+
+function onScore(newScore){
+    $("#score")
+    .find("#counter")
+    .html(newScore.current + " / " + newScore.objective);
+
+    $("#score").find(".bar").css('width',''+ (100 * newScore.current / newScore.objective) + '%');
+}
+
+function onPlaneStatus(uiEvent){
     var strip;
+
     if(uiEvent.step != ''){
         strip = detachOrCreate(uiEvent.flightName);
 
         var zone = $("#"+uiEvent.step);
 
         zone.append(strip);
+
     }
 
     if(strip == undefined){
         strip = find(uiEvent.flightName);
     }
 
-    strip.find(".detail").html(uiEvent.detail);
+    if(uiEvent.error != ''){
+        strip
+            .addClass('error')
+            .removeClass('regular')
+            .find(".detail")
+            .html(uiEvent.error);
 
-    if(uiEvent.detail.length >= 5 && uiEvent.detail.substring(0,5) == 'Error'){
-       strip
-       .addClass('error')
-       .removeClass('regular');
+    }else{
+        strip.find(".detail")
+            .html(uiEvent.detail);
     }
 }
 
