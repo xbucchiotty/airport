@@ -51,8 +51,8 @@ object Settings {
     outOfKerozenTimeout = 10000,
     ackMaxDuration = 500,
     radioFability = 1,
-    objective = 50,
-    planeGenerationInterval = 5000
+    objective = 20,
+    planeGenerationInterval = 8500
   )
 
   lazy val TEST = new Settings(

@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{Terminated, ActorLogging, Props, Actor}
+import akka.actor.{Cancellable, Terminated, ActorLogging, Props, Actor}
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
@@ -16,6 +16,8 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   val groundControl = context.actorOf(Props(classOf[GroundControl], taxiway, gate), "groundControl")
   val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runway), "airTrafficControl")
 
+  var planeGeneration: Cancellable = null
+
   var score = 0
 
   override def preStart() {
@@ -24,7 +26,7 @@ class Game(settings: Settings) extends Actor with ActorLogging {
     context watch gate
 
     import context.dispatcher
-    context.system.scheduler.schedule(settings.planeGenerationInterval milliseconds, settings.planeGenerationInterval milliseconds, self, NewPlane)
+    planeGeneration = context.system.scheduler.schedule(1 second, settings.planeGenerationInterval milliseconds, self, NewPlane)
 
     context.system.eventStream.subscribe(self, classOf[PlaneStatus])
 
@@ -57,6 +59,9 @@ class Game(settings: Settings) extends Actor with ActorLogging {
 
     if (score == settings.objective) {
       context.system.eventStream.publish(GameEnd)
+      planeGeneration.cancel()
+
+      context stop self
     }
   }
 
