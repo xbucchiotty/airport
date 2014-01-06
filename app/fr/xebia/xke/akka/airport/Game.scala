@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorLogging, Props, ActorRef, Actor}
+import akka.actor.{Terminated, ActorLogging, Props, Actor}
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
@@ -15,11 +15,12 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   val groundControl = context.actorOf(Props(classOf[GroundControl], taxiway, gate), "groundControl")
   val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runway), "airTrafficControl")
 
-  var planes = Vector.empty[ActorRef]
-
   var score = 0
 
   override def preStart() {
+    context watch runway
+    context watch taxiway
+    context watch gate
     /*import context.dispatcher
     context.system.scheduler.schedule(1 second, 5 seconds, self, NewPlane)*/
 
@@ -31,19 +32,35 @@ class Game(settings: Settings) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case PlaneStatus("done", _, _, _) =>
-      score += 5
-      publishScore()
+      gain()
 
     case PlaneStatus(_, _, _, error) if error.nonEmpty =>
-      score -= 2
-      publishScore()
+      loose()
+
+    case Terminated(_) =>
+      context.system.eventStream.publish(GameOver)
+      context stop self
 
     case NewPlane =>
-      context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 10000 }")
+      context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 100000 }")
   }
 
   private def publishScore() {
-    context.system.eventStream.publish(Score(score, 50))
+    context.system.eventStream.publish(Score(score, settings.objective))
+  }
+
+  private def gain() {
+    score = Math.min(score + 2, settings.objective)
+    publishScore()
+
+    if (score == settings.objective) {
+      context.system.eventStream.publish(GameEnd)
+    }
+  }
+
+  private def loose() {
+    score = Math.max(score - 3, 0)
+    publishScore()
   }
 
 }

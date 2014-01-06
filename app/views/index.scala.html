@@ -1,33 +1,35 @@
+@(settings: fr.xebia.xke.akka.airport.Settings)
+
 @main("XKE Akka slot") {
 
-<div id="score">
-    <h1 style="text-align: right;">Score <p id="counter"></p></h1>
-    <div class="progress progress-success progress-striped">
-        <div class="bar" style="width: 0%;"></div>
+    <div id="score">
+        <h1 style="text-align: right;">Score <p id="counter"></p></h1>
+        <div class="progress progress-success progress-striped">
+            <div class="bar" style="width: 0%;"></div>
+        </div>
     </div>
-</div>
 
-<div>
-    <h2>Incoming</h2>
-    <ul id="incoming"></ul>
-</div>
-<div>
-    <h2>Runway</h2>
-    <ul id="runway"></ul>
-</div>
-<div>
-    <h2>Taxiway</h2>
-    <ul id="taxiway"></ul>
-</div>
-<div>
-    <h2>Gate</h2>
-    <ul id="gate"></ul>
-</div>
-<div>
-    <h2>Done</h2>
-    <ul id="done"></ul>
-</div>
+    <div>
+        <h2>Incoming</h2>
+        <ul id="incoming"></ul>
+    </div>
+    <div>
+        <h2>Runway</h2>
+        <ul id="runway"></ul>
+    </div>
+    <div>
+        <h2>Taxiway</h2>
+        <ul id="taxiway"></ul>
+    </div>
+    <div>
+        <h2>Gate</h2>
+        <ul id="gate"></ul>
+    </div>
+    <div>
+        <h2>Done</h2>
+        <ul id="done"></ul>
+    </div>
 
-<script src="/assets/javascripts/game.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/game.js" type="text/javascript"></script>
 
-}
+    }

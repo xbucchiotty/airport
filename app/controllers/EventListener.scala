@@ -1,7 +1,7 @@
 package controllers
 
 import akka.actor.Actor
-import fr.xebia.xke.akka.airport.{Score, GameOver}
+import fr.xebia.xke.akka.airport.{GameEnd, Score, GameOver}
 import scala.collection.immutable.Queue
 
 class EventListener extends Actor {
@@ -14,6 +14,10 @@ class EventListener extends Actor {
 
     case GameOver =>
       buffer = buffer enqueue gameOver
+      context.system.eventStream.unsubscribe(self)
+
+    case GameEnd =>
+      buffer = buffer enqueue gameEnd
       context.system.eventStream.unsubscribe(self)
 
     case newScore: Score =>
@@ -43,7 +47,12 @@ class EventListener extends Actor {
 
   def gameOver: String =
     s"""{
-      "type" : "GameOver" ,
+      "type" : "GameOver"
+   }""".stripMargin
+
+  def gameEnd: String =
+    s"""{
+      "type" : "GameEnd"
    }""".stripMargin
 
   def score(score: Score): String = {

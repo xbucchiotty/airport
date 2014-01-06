@@ -21,7 +21,9 @@ object Application extends Controller {
       game = null
     }
 
-    game = system.actorOf(Props(classOf[Game], Settings.EASY))
+    val settings = Settings.EASY
+
+    game = system.actorOf(Props(classOf[Game], settings))
 
     if (listener != null) {
       system.eventStream.unsubscribe(listener)
@@ -33,7 +35,7 @@ object Application extends Controller {
     system.eventStream.subscribe(listener, classOf[PlaneStatus])
     system.eventStream.subscribe(listener, classOf[GameEvent])
 
-    Ok(views.html.index())
+    Ok(views.html.index(settings))
   }
 
   def events = WebSocket.using[String] {

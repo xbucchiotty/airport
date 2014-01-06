@@ -18,11 +18,19 @@ function onMessage(evt) {
     else if (uiEvent.type === 'GameOver'){
         onGameOver(uiEvent);
     }
+    else if (uiEvent.type === 'GameEnd'){
+        onGameEnd(uiEvent);
+    }
 }
 
 function onGameOver(uiEvent){
     websocket.close();
     alert("Looser");
+}
+
+function onGameEnd(uiEvent){
+    websocket.close();
+    alert("You won");
 }
 
 function onScore(newScore){
@@ -55,6 +63,10 @@ function onPlaneStatus(uiEvent){
             .removeClass('regular')
             .find(".detail")
             .html(uiEvent.error);
+
+        var done = $("#done");
+
+        done.append(strip.detach());
 
     }else{
         strip.find(".detail")
