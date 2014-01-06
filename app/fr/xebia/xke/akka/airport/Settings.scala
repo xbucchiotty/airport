@@ -7,6 +7,7 @@ case class Settings(
                      nrOfRunways: Int,
                      taxiwayCapacity: Int,
                      nrOfGates: Int,
+                     nrOfTaxiways: Int,
                      landingMaxDuration: Int,
                      taxiingDuration: Int,
                      unloadingPassengersMaxDuration: Int,
@@ -43,6 +44,7 @@ case class Settings(
 object Settings {
   lazy val EASY = new Settings(
     nrOfRunways = 1,
+    nrOfTaxiways = 1,
     taxiingDuration = 1500,
     taxiwayCapacity = 1,
     nrOfGates = 1,
@@ -57,6 +59,7 @@ object Settings {
 
   lazy val TEST = new Settings(
     nrOfRunways = 1,
+    nrOfTaxiways = 1,
     taxiingDuration = 10,
     taxiwayCapacity = 1,
     nrOfGates = 1,

@@ -1,32 +1,40 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{Cancellable, Terminated, ActorLogging, Props, Actor}
+import akka.actor.{ActorRef, Cancellable, Terminated, ActorLogging, Props, Actor}
+import concurrent.duration._
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
 import scala.util.Random
-import concurrent.duration._
 
 class Game(settings: Settings) extends Actor with ActorLogging {
 
-  val runway = context.actorOf(Props[Runway], "runway-1")
-  val taxiway = context.actorOf(Props(classOf[Taxiway], settings), "taxiway-Z")
-  val gate = context.actorOf(Props[Gate], "gate-1")
+  import settings._
 
-  val groundControl = context.actorOf(Props(classOf[GroundControl], taxiway, gate), "groundControl")
-  val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runway), "airTrafficControl")
+  val runways: Seq[ActorRef] =
+    for (i <- 0 to nrOfRunways) yield context.actorOf(Props[Runway], s"runway-$i")
+
+  val taxiways: Seq[ActorRef] =
+    for (i <- 0 to nrOfTaxiways) yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
+
+  val gates: Seq[ActorRef] =
+    for (i <- 0 to nrOfRunways) yield context.actorOf(Props[Gate], s"gate-$i")
+
+
+  val groundControl = context.actorOf(Props(classOf[GroundControl], taxiways, gates), "groundControl")
+  val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runways), "airTrafficControl")
 
   var planeGeneration: Cancellable = null
 
   var score = 0
 
   override def preStart() {
-    context watch runway
-    context watch taxiway
-    context watch gate
+    runways.foreach(context.watch)
+    taxiways.foreach(context.watch)
+    gates.foreach(context.watch)
 
     import context.dispatcher
-    planeGeneration = context.system.scheduler.schedule(1 second, settings.planeGenerationInterval milliseconds, self, NewPlane)
+    planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
     context.system.eventStream.subscribe(self, classOf[PlaneStatus])
 
@@ -50,14 +58,14 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   }
 
   private def publishScore() {
-    context.system.eventStream.publish(Score(score, settings.objective))
+    context.system.eventStream.publish(Score(score, objective))
   }
 
   private def gain() {
-    score = Math.min(score + 2, settings.objective)
+    score = Math.min(score + 2, objective)
     publishScore()
 
-    if (score == settings.objective) {
+    if (score == objective) {
       context.system.eventStream.publish(GameEnd)
       planeGeneration.cancel()
 

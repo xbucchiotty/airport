@@ -11,21 +11,21 @@ trait WaitingToPark extends PlaneState {
 
   def waitingToPark(runway: ActorRef) = GameReceive {
     case Contact(groundControl) =>
-      replyTo(airControl) {
+      replyTo(airControl, Contact(groundControl).toString) {
         groundControl ! Incoming
       }
 
     case TaxiAndPark(taxiway, gate) =>
       val groundControl = sender
 
-      replyTo(groundControl) {
+      replyTo(groundControl, TaxiAndPark(taxiway, gate).toString) {
 
         runway ! HasLeft
         airControl ! HasLeft
         taxiway ! Taxiing
         groundControl ! Taxiing
 
-        updateStep("taxiway", s"on taxiway ${taxiway.path.name} for ${gate.path.name}")
+        updateStep("taxiway", s"on ${taxiway.path.name} for ${gate.path.name}")
         context become taxiing(groundControl, taxiway, gate)
       }
   }

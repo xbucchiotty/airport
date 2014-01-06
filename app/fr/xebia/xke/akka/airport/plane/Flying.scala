@@ -15,7 +15,7 @@ trait Flying extends PlaneState {
 
   val flying = GameReceive {
     case Land(runway) =>
-      replyTo(airControl) {
+      replyTo(airControl,Land(runway).toString) {
         import context.dispatcher
         outOfKerozenCrash.cancel()
         context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
@@ -25,7 +25,7 @@ trait Flying extends PlaneState {
       airControl ! HasLanded
       runway ! HasLanded
 
-      updateStep("runway", s"On runway ${runway.path.name}")
+      updateStep("runway", s"On ${runway.path.name}")
 
       context become waitingToPark(runway)
 

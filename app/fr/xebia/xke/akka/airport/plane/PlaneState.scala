@@ -19,14 +19,14 @@ trait PlaneState extends Actor with ActorLogging {
 
   private var lastReply: Cancellable = null
 
-  protected def replyTo(target: ActorRef)(command: => Unit) {
+  protected def replyTo(target: ActorRef, detail: String)(command: => Unit) {
     if (settings.isRadioOk) {
       import context.dispatcher
       lastReply = context.system.scheduler.scheduleOnce(settings.aRandomAckDuration, new Runnable {
         def run() {
           target ! Ack
 
-          updateStatus("Ack")
+          updateStatus(s"Ack $detail")
 
           command
         }
@@ -44,8 +44,8 @@ trait PlaneState extends Actor with ActorLogging {
     publishState()
   }
 
-  protected def updateStep(newStep: String, detail: String) {
-    status = status.copy(step = newStep)
+  protected def updateStep(newStep: String, newDetail: String) {
+    status = status.copy(step = newStep, detail = newDetail)
     publishState()
   }
 

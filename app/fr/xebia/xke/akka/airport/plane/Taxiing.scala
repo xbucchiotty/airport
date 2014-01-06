@@ -11,7 +11,7 @@ trait Taxiing extends PlaneState {
       groundControl ! HasParked
       gate ! HasParked
 
-      updateStep("gate", s"At gate ${gate.path.name}")
+      updateStep("gate", s"At ${gate.path.name}")
       context become unloadingPassengers(groundControl, gate)
 
 
