@@ -25,33 +25,34 @@ function onMessage(evt) {
 
 function onGameOver(uiEvent){
     websocket.close();
-    alert("Looser");
+    $("#gameInfo").find("#modal-message").html("GAME OVER!!!")
+    $("#gameInfo").modal();
 }
 
 function onGameEnd(uiEvent){
     websocket.close();
-    alert("You won");
+    $("#gameInfo").find("#modal-message").html("Congratulation, you won!!!")
+    $("#gameInfo").modal();
 }
 
 function onScore(newScore){
     $("#score")
-    .find("#counter")
-    .html(newScore.current + " / " + newScore.objective);
+        .find("#counter")
+        .html(newScore.current + " / " + newScore.objective);
 
-    $("#score").find(".bar").css('width',''+ (100 * newScore.current / newScore.objective) + '%');
+    $("#score")
+        .find(".bar")
+        .css('width',''+ (100 * newScore.current / newScore.objective) + '%');
 }
 
 function onPlaneStatus(uiEvent){
     var strip;
 
-    if(uiEvent.step != ''){
-        strip = detachOrCreate(uiEvent.flightName);
+    strip = detachOrCreate(uiEvent.flightName);
 
-        var zone = $("#"+uiEvent.step);
+    findStep(uiEvent.flightName,uiEvent.step)
+        .append(strip);
 
-        zone.append(strip);
-
-    }
 
     if(strip == undefined){
         strip = find(uiEvent.flightName);
@@ -64,9 +65,8 @@ function onPlaneStatus(uiEvent){
             .find(".detail")
             .html(uiEvent.error);
 
-        var done = $("#done");
-
-        done.append(strip.detach());
+        findStep(uiEvent.flightName,'done')
+          .prepend(strip.detach());
 
     }else{
         strip.find(".detail")
@@ -79,15 +79,25 @@ function doSend(message) {
 }
 
 function create(flightName){
-   return  $('<li>',{
+    var tableLine = $('<tr>',{
+            html: '<td class="incoming"></td><td class="runway"></td><td class="taxiway"></td><td class="gate"></td><td class="done"></td>',
+            id: flightName
+    });
+
+    $('#strips').prepend(tableLine);
+
+   return  $('<div>',{
         html: '</i><p class="id"><i class="icon-plane"></i> '+flightName+'</p><p class="detail"></p>',
-        id: flightName,
-        class: 'strip'
+        class: 'strip strip-'+flightName
     }).addClass('regular');
 }
 
+function findStep(flightName,step){
+    return $('#'+flightName).find('.'+step);
+}
+
 function find(flightName){
-    return $('#'+flightName);
+    return $('#' + flightName).find('.strip-' + flightName);
 }
 
 function detach(flightName){

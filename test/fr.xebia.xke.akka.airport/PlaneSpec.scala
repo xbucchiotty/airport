@@ -45,7 +45,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
               val airControl = TestProbe()
 
               for (_ <- 1 to 10) {
-                val plane = system.actorOf(Props(classOf[Plane], airControl.ref, TestProbe().ref, settings.copy(radioFability = 0.5, ackMaxDuration = 10)))
+                val plane = system.actorOf(Props(classOf[Plane], airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 10)))
 
                 TestProbe().send(plane, Land(TestProbe().ref))
 

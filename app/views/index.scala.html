@@ -9,25 +9,34 @@
         </div>
     </div>
 
-    <div>
-        <h2>Incoming</h2>
-        <ul id="incoming"></ul>
-    </div>
-    <div>
-        <h2>Runway</h2>
-        <ul id="runway"></ul>
-    </div>
-    <div>
-        <h2>Taxiway</h2>
-        <ul id="taxiway"></ul>
-    </div>
-    <div>
-        <h2>Gate</h2>
-        <ul id="gate"></ul>
-    </div>
-    <div>
-        <h2>Done</h2>
-        <ul id="done"></ul>
+
+    <table id='strips'>
+        <thead>
+            <tr>
+                <th class="header">Incoming</th>
+                <th class="header">Runway</th>
+                <th class="header">Taxiway</th>
+                <th class="header">Gate</th>
+                <th class="header">Done</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <div class="modal hide fade" id="gameInfo">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Xebia International Airport</h3>
+        </div>
+        <div class="modal-body">
+            <p id="modal-message"></p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
+            <a href="@routes.Application.index()" class="btn btn-primary">Restart</a>
+        </div>
     </div>
 
     <script src="/assets/javascripts/game.js" type="text/javascript"></script>

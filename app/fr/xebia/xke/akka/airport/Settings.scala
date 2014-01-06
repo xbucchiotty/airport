@@ -12,7 +12,7 @@ case class Settings(
                      unloadingPassengersMaxDuration: Int,
                      outOfKerozenTimeout: Int,
                      ackMaxDuration: Int,
-                     radioFability: Double,
+                     radioReliability: Double,
                      objective: Int,
                      planeGenerationInterval: Int) {
 
@@ -36,7 +36,7 @@ case class Settings(
     aRandomDuration(ackMaxDuration)
 
   def isRadioOk =
-    Random.nextDouble() <= radioFability
+    Random.nextDouble() <= radioReliability
 
 }
 
@@ -50,7 +50,7 @@ object Settings {
     unloadingPassengersMaxDuration = 5000,
     outOfKerozenTimeout = 10000,
     ackMaxDuration = 500,
-    radioFability = 1,
+    radioReliability = 1,
     objective = 20,
     planeGenerationInterval = 8500
   )
@@ -64,7 +64,7 @@ object Settings {
     unloadingPassengersMaxDuration = 500,
     outOfKerozenTimeout = 1000,
     ackMaxDuration = 100,
-    radioFability = 1,
+    radioReliability = 1,
     objective = 20,
     planeGenerationInterval = 200
   )
