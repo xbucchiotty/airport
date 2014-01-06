@@ -5,6 +5,7 @@ import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
 import scala.util.Random
+import concurrent.duration._
 
 class Game(settings: Settings) extends Actor with ActorLogging {
 
@@ -21,8 +22,9 @@ class Game(settings: Settings) extends Actor with ActorLogging {
     context watch runway
     context watch taxiway
     context watch gate
-    /*import context.dispatcher
-    context.system.scheduler.schedule(1 second, 5 seconds, self, NewPlane)*/
+
+    import context.dispatcher
+    context.system.scheduler.schedule(settings.planeGenerationInterval milliseconds, settings.planeGenerationInterval milliseconds, self, NewPlane)
 
     context.system.eventStream.subscribe(self, classOf[PlaneStatus])
 

@@ -29,8 +29,8 @@ class TaxiwaySpec extends ActorSpecs with ShouldMatchers {
 
               plane send(taxiway, TaxiingToGate(gate.ref))
 
-              plane.expectMsg(settings.taxiingMaxDuration.milliseconds, HasParked)
-              gate.expectMsg(settings.taxiingMaxDuration.milliseconds, HasParked)
+              plane.expectMsg(settings.taxiingDuration.milliseconds, HasParked)
+              gate.expectMsg(settings.taxiingDuration.milliseconds, HasParked)
             }
           }
         }

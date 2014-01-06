@@ -1,10 +1,9 @@
 package controllers
 
-import akka.actor.{Inbox, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Game.NewPlane
 import fr.xebia.xke.akka.airport.{GameEvent, Settings, Game}
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Enumerator.TreatCont1
@@ -16,6 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 object Application extends Controller {
 
   def index = Action {
+
     if (game != null) {
       system.stop(game)
       game = null
@@ -58,16 +58,6 @@ object Application extends Controller {
       }
 
       (in, out)
-  }
-
-  def newPlane = Action {
-    if (game != null) {
-      val inbox = Inbox.create(system)
-      inbox.send(game, NewPlane)
-      Ok
-    } else {
-      Redirect(routes.Application.index())
-    }
   }
 
   import play.api.Play.current

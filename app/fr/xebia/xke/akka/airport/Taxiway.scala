@@ -4,6 +4,7 @@ import akka.actor.{ActorLogging, Actor, ActorRef}
 import fr.xebia.xke.akka.airport.PlaneEvent.{Collision, TaxiingToGate, HasParked}
 import languageFeature.postfixOps
 import scala.collection.immutable.Queue
+import concurrent.duration._
 
 class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
@@ -55,7 +56,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
       }
 
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(settings.aRandomTaxiingDuration, self, Tick)
+      context.system.scheduler.scheduleOnce(settings.taxiingDuration milliseconds , self, Tick)
 
   }
 
@@ -70,6 +71,6 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   override def preStart() {
     import context.dispatcher
 
-    context.system.scheduler.scheduleOnce(settings.aRandomTaxiingDuration, self, Tick)
+    context.system.scheduler.scheduleOnce(settings.taxiingDuration milliseconds, self, Tick)
   }
 }

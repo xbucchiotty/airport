@@ -8,12 +8,13 @@ case class Settings(
                      taxiwayCapacity: Int,
                      nrOfGates: Int,
                      landingMaxDuration: Int,
-                     taxiingMaxDuration: Int,
+                     taxiingDuration: Int,
                      unloadingPassengersMaxDuration: Int,
                      outOfKerozenTimeout: Int,
                      ackMaxDuration: Int,
                      radioFability: Double,
-                     objective: Int) {
+                     objective: Int,
+                     planeGenerationInterval: Int) {
 
   private def aRandomDuration(maxDurationInMillis: Int): FiniteDuration = {
     val minDuration = maxDurationInMillis / 2
@@ -31,9 +32,6 @@ case class Settings(
   def anUnloadingPassengersDuration =
     aRandomDuration(unloadingPassengersMaxDuration)
 
-  def aRandomTaxiingDuration =
-    aRandomDuration(taxiingMaxDuration)
-
   def aRandomAckDuration =
     aRandomDuration(ackMaxDuration)
 
@@ -45,7 +43,7 @@ case class Settings(
 object Settings {
   lazy val EASY = new Settings(
     nrOfRunways = 1,
-    taxiingMaxDuration = 10,
+    taxiingDuration = 1500,
     taxiwayCapacity = 1,
     nrOfGates = 1,
     landingMaxDuration = 3000,
@@ -53,11 +51,13 @@ object Settings {
     outOfKerozenTimeout = 10000,
     ackMaxDuration = 500,
     radioFability = 1,
-    objective = 50)
+    objective = 50,
+    planeGenerationInterval = 5000
+  )
 
   lazy val TEST = new Settings(
     nrOfRunways = 1,
-    taxiingMaxDuration = 10,
+    taxiingDuration = 10,
     taxiwayCapacity = 1,
     nrOfGates = 1,
     landingMaxDuration = 300,
@@ -65,5 +65,7 @@ object Settings {
     outOfKerozenTimeout = 1000,
     ackMaxDuration = 100,
     radioFability = 1,
-    objective = 20)
+    objective = 20,
+    planeGenerationInterval = 200
+  )
 }
