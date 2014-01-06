@@ -17,8 +17,8 @@ class Gate extends Actor with ActorLogging {
     case HasParked => {
       val newPlane = sender
 
-      plane ! Collision(newPlane)
-      newPlane ! Collision(plane)
+      plane ! Collision(newPlane, self)
+      newPlane ! Collision(plane, self)
 
       log.error("Collision on gate <{}> between <{}> and <{}>", self.path.name, plane.path.name, newPlane.path.name)
       context stop self

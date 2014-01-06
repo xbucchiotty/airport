@@ -16,23 +16,21 @@ object PlaneEvent {
 
   case object HasParked extends PlaneEvent
 
-  case object StartTaxi extends PlaneEvent
-
   case object HasLeft extends PlaneEvent
 
-  case class Collision(otherPlane: ActorRef) extends PlaneError {
-    val message = s"Collision with ${otherPlane.path.name}"
+  case class Collision(otherPlane: ActorRef, location: ActorRef) extends PlaneError {
+    val message = s"Collision on ${location.path.name} with ${otherPlane.path.name}"
   }
 
-  case class TaxiingToGate(gate: ActorRef) extends PlaneEvent {
-    override def toString = s"Taxiing to ${gate.path.name}"
-  }
+  case object Taxiing extends PlaneEvent
+
+  case object EndOfTaxi extends PlaneEvent
 
   case object Incoming extends PlaneEvent
 
   case object Done extends PlaneEvent
 
-  case object OutOfKerozen extends PlaneError{
+  case object OutOfKerozen extends PlaneError {
     val message = "Out of kerozen"
   }
 

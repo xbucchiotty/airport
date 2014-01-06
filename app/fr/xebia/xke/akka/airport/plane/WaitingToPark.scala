@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.ActorRef
 import fr.xebia.xke.akka.airport.Command.{TaxiAndPark, Contact}
-import fr.xebia.xke.akka.airport.PlaneEvent.{StartTaxi, HasLeft, Incoming, TaxiingToGate}
+import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, Incoming, Taxiing}
 
 trait WaitingToPark extends PlaneState {
 
@@ -22,10 +22,10 @@ trait WaitingToPark extends PlaneState {
 
         runway ! HasLeft
         airControl ! HasLeft
-        taxiway ! TaxiingToGate(gate)
-        groundControl ! StartTaxi
+        taxiway ! Taxiing
+        groundControl ! Taxiing
 
-        updateStep("taxiway")
+        updateStep("taxiway", s"on taxiway ${taxiway.path.name} for ${gate.path.name}")
         context become taxiing(groundControl, taxiway, gate)
       }
   }

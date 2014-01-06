@@ -25,7 +25,7 @@ trait Flying extends PlaneState {
       airControl ! HasLanded
       runway ! HasLanded
 
-      updateStep("runway")
+      updateStep("runway", s"On runway ${runway.path.name}")
 
       context become waitingToPark(runway)
 
@@ -37,7 +37,7 @@ trait Flying extends PlaneState {
   override def preStart() {
     airControl ! Incoming
 
-    updateStep("incoming")
+    updateStep("incoming", "Hello there")
 
     import context.dispatcher
     outOfKerozenCrash = context.system.scheduler.scheduleOnce(settings.outOfKerozenTimeout milliseconds, self, OutOfKerozen)
@@ -46,7 +46,7 @@ trait Flying extends PlaneState {
 
   def waitingToPark(runway: ActorRef): GameReceive
 
-  private case class Landed(runway: ActorRef) extends PlaneEvent{
+  private case class Landed(runway: ActorRef) extends PlaneEvent {
     override def toString = s"Landed"
   }
 

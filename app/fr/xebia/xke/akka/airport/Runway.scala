@@ -32,8 +32,8 @@ class Runway extends Actor with ActorLogging {
     case HasLanded =>
       val other = sender
 
-      staying ! Collision(other)
-      other ! Collision(staying)
+      staying ! Collision(other, self)
+      other ! Collision(staying, self)
 
       log.error("Collision on runway <{}> between <{}> and <{}>", self.path.name, staying.path.name, other.path.name)
 

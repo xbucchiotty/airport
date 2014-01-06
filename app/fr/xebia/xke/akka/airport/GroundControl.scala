@@ -1,8 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, ActorLogging, Actor}
-import fr.xebia.xke.akka.airport.PlaneEvent.{HasParked, HasLeft, StartTaxi, Incoming}
-import fr.xebia.xke.akka.airport.Command.TaxiAndPark
+import fr.xebia.xke.akka.airport.PlaneEvent.{Taxiing, HasParked, HasLeft, Incoming}
 
 class GroundControl(taxiway: ActorRef, gate: ActorRef) extends Actor with ActorLogging {
 
@@ -10,7 +9,7 @@ class GroundControl(taxiway: ActorRef, gate: ActorRef) extends Actor with ActorL
     case Incoming =>
       //sender ! TaxiAndPark(taxiway, gate)
 
-    case StartTaxi =>
+    case Taxiing =>
 
     case HasParked =>
 

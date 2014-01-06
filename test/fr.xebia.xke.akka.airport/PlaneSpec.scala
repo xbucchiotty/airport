@@ -4,7 +4,7 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.Command.{Land, Ack, Contact}
-import fr.xebia.xke.akka.airport.PlaneEvent.{HasParked, TaxiingToGate, HasLeft, StartTaxi, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasParked, Taxiing, HasLeft, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
@@ -174,8 +174,8 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             runway expectMsg HasLeft
             airControl expectMsg HasLeft
-            taxiway expectMsg TaxiingToGate(gate.ref)
-            groundControl expectMsg StartTaxi
+            taxiway expectMsg Taxiing
+            groundControl expectMsg Taxiing
           }
         }
       }
@@ -205,13 +205,14 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl reply Command.TaxiAndPark(taxiway.ref, gate.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl expectMsg StartTaxi
+            groundControl expectMsg Taxiing
 
             //When
-            taxiway.send(plane, HasParked)
+            taxiway.send(plane, EndOfTaxi)
 
             //Then
             groundControl expectMsg HasParked
+            gate expectMsg HasParked
           }
         }
       }
@@ -243,9 +244,10 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg Incoming
             groundControl reply Command.TaxiAndPark(taxiway.ref, gate.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl expectMsg StartTaxi
-            taxiway.send(plane, HasParked)
+            groundControl expectMsg Taxiing
+            taxiway.send(plane, EndOfTaxi)
             groundControl expectMsg HasParked
+            gate expectMsg HasParked
 
             //Then
             probe expectTerminated(plane, 2 * settings.landingMaxDuration.milliseconds)

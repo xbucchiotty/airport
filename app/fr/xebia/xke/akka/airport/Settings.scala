@@ -61,11 +61,11 @@ object Settings {
     taxiwayCapacity = 1,
     nrOfGates = 1,
     landingMaxDuration = 300,
-    unloadingPassengersMaxDuration = 500,
-    outOfKerozenTimeout = 1000,
-    ackMaxDuration = 100,
+    unloadingPassengersMaxDuration = 300,
+    outOfKerozenTimeout = 500,
+    ackMaxDuration = 300,
     radioReliability = 1,
     objective = 20,
-    planeGenerationInterval = 200
+    planeGenerationInterval = 300
   )
 }

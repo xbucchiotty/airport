@@ -44,7 +44,7 @@ trait PlaneState extends Actor with ActorLogging {
     publishState()
   }
 
-  protected def updateStep(newStep: String) {
+  protected def updateStep(newStep: String, detail: String) {
     status = status.copy(step = newStep)
     publishState()
   }
@@ -89,4 +89,5 @@ trait PlaneState extends Actor with ActorLogging {
         context stop self
     }
   }
+
 }

@@ -12,8 +12,7 @@ trait Parking extends PlaneState {
       groundControl ! HasLeft
       gate ! HasLeft
 
-      updateStatus("Passengers unloaded")
-      updateStep("done")
+      updateStep("done", "Passengers unloaded")
 
       context stop self
   }

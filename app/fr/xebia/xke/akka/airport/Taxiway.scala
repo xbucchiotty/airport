@@ -1,23 +1,22 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
-import fr.xebia.xke.akka.airport.PlaneEvent.{Collision, TaxiingToGate, HasParked}
+import concurrent.duration._
+import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, Taxiing, Collision}
 import languageFeature.postfixOps
 import scala.collection.immutable.Queue
-import concurrent.duration._
 
 class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
-  private var queue = Queue.empty[(ActorRef, ActorRef)]
+  private var queue = Queue.empty[ActorRef]
 
   private var free = settings.taxiwayCapacity
 
   val acceptNewPlane: Receive = {
-    case msg@TaxiingToGate(gate) =>
-
+    case Taxiing =>
       val plane = sender
       log.info("Plane <{}> runs on taxiway <{}>", plane.path.name, self.path.name)
-      this.queue = queue enqueue(plane, msg.gate)
+      this.queue = queue enqueue plane
 
       free -= 1
       if (free < 1) {
@@ -29,10 +28,10 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   }
 
   val rejectNewPlane: Receive = {
-    case msg: TaxiingToGate =>
+    case Taxiing =>
       val plane = sender
 
-      plane ! Collision(self)
+      plane ! Collision(queue.last, self)
 
       log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
 
@@ -43,12 +42,12 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   val dequeueAPlane: Receive = {
     case this.Tick =>
       if (queue.nonEmpty) {
-        val ((plane, gate), newQueue) = queue.dequeue
+        val (plane, newQueue) = queue.dequeue
         this.queue = newQueue
 
         log.info("Plane <{}> leaves taxiway <{}>", plane.path.name, self.path.name)
-        gate.tell(HasParked, sender = plane)
-        plane ! HasParked
+
+        plane ! EndOfTaxi
 
         free += 1
 
@@ -56,7 +55,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
       }
 
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(settings.taxiingDuration milliseconds , self, Tick)
+      context.system.scheduler.scheduleOnce(settings.taxiingDuration milliseconds, self, Tick)
 
   }
 
