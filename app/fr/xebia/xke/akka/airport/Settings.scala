@@ -69,7 +69,22 @@ object Settings {
     ackMaxDuration = 500,
     radioReliability = 1,
     objective = 20,
-    planeGenerationInterval = 8500
+    planeGenerationInterval = 4000
+  )
+
+  lazy val HARD = new Settings(
+    nrOfRunways = 4,
+    nrOfTaxiways = 2,
+    taxiingDuration = 1500,
+    taxiwayCapacity = 5,
+    nrOfGates = 10,
+    landingMaxDuration = 3000,
+    unloadingPassengersMaxDuration = 5000,
+    outOfKerozenTimeout = 10000,
+    ackMaxDuration = 500,
+    radioReliability = 0.9,
+    objective = 20,
+    planeGenerationInterval = 1000
   )
 
   lazy val TEST = new Settings(

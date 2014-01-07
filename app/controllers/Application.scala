@@ -14,14 +14,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object Application extends Controller {
 
-  def index = Action {
+  private val steps = Seq(
+    Settings.EASY,
+    Settings.MEDIUM,
+    Settings.HARD
+  )
+
+  def newGame(level: Int) = Action {
 
     if (game != null) {
       system.stop(game)
       game = null
     }
 
-    val settings = Settings.EASY
+    val settings = steps(level)
 
     game = system.actorOf(Props(classOf[Game], settings))
 
@@ -35,7 +41,11 @@ object Application extends Controller {
     system.eventStream.subscribe(listener, classOf[PlaneStatus])
     system.eventStream.subscribe(listener, classOf[GameEvent])
 
-    Ok(views.html.index(settings)(1))
+    Ok(views.html.index(settings)(level, if (level < steps.length) Some(level + 1) else None))
+  }
+
+  def index = Action {
+    Redirect(routes.Application.newGame(0))
   }
 
   def events = WebSocket.using[String] {
