@@ -3,6 +3,10 @@ var wsUri = "ws://localhost:9000/events";
 function init() {
     websocket = new WebSocket(wsUri);
     websocket.onmessage = function(evt) { onMessage(evt) };
+
+    $('body').tooltip({
+          selector: "a[data-toggle=tooltip]"
+    });
 }
 function onMessage(evt) {
     console.log(evt.data);

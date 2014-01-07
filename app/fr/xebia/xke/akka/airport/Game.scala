@@ -34,7 +34,7 @@ class Game(settings: Settings) extends Actor with ActorLogging {
     gates.foreach(context.watch)
 
     import context.dispatcher
-    planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+    //planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
     context.system.eventStream.subscribe(self, classOf[PlaneStatus])
 

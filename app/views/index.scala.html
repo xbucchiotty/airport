@@ -9,14 +9,25 @@
         </div>
     </div>
 
-
     <table id='strips'>
         <thead>
             <tr>
-                <th class="header">Incoming</th>
-                <th class="header">Runway</th>
-                <th class="header">Taxiway</th>
-                <th class="header">Gate</th>
+                <th class="header">
+                    <a href="#" data-toggle="tooltip" data-placement="top" title=""
+                       data-original-title="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
+                </th>
+                <th class="header">
+                    <a href="#" data-toggle="tooltip" data-placement="top" title=""
+                       data-original-title="@settings.nrOfRunways runways with @settings.landingMaxDuration  millis max to land">Runway</a>
+                </th>
+                <th class="header">
+                    <a href="#" data-toggle="tooltip" data-placement="top" title=""
+                       data-original-title="@settings.nrOfTaxiways taxiways with a capacity of @settings.taxiwayCapacity planes and @settings.taxiingDuration millis max to taxi">Taxiway</a>
+                </th>
+                <th class="header">
+                    <a href="#" data-toggle="tooltip" data-placement="top" title=""
+                       data-original-title="@settings.nrOfGates gates and @settings.unloadingPassengersMaxDuration millis to unload passengers">Gate</a>
+                </th>
                 <th class="header">Done</th>
             </tr>
         </thead>
