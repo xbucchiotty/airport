@@ -45,3 +45,7 @@ body > .navbar .brand {
 table > thead tr .header {
     min-width: 210px;
 }
+
+.popover-content{
+   font-weight: lighter;
+}

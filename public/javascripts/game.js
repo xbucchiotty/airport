@@ -4,8 +4,10 @@ function init() {
     websocket = new WebSocket(wsUri);
     websocket.onmessage = function(evt) { onMessage(evt) };
 
-    $('body').tooltip({
-          selector: "a[data-toggle=tooltip]"
+    $('a[data-toggle=popover]')
+    .popover({trigger: 'hover',placement: 'top'})
+    .click(function(e) {
+        e.preventDefault()
     });
 }
 function onMessage(evt) {
