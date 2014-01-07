@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(level:Int)(content: Html)
 <!DOCTYPE html>
 
 <html lang="en">
@@ -15,6 +15,8 @@
 <div class="navbar">
     <div class="navbar-inner">
         <div class="container">
+            </div>
+            <div class="brand">Level <span class="badge">@level</span></div>
             <div class="brand">Xebia International Airport</div>
             <ul class="nav">
                 <li><a href="@routes.Application.index()">Start a new game</a></li>

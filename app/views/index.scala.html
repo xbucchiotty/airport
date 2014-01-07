@@ -1,6 +1,6 @@
-@(settings: fr.xebia.xke.akka.airport.Settings)
+@(settings: fr.xebia.xke.akka.airport.Settings)(level:Int)
 
-@main("XKE Akka slot") {
+@main("XKE Akka slot")(level) {
 
     <div id="score">
         <h1 style="text-align: right;">Score <p id="counter"></p></h1>
@@ -25,17 +25,31 @@
         </tbody>
     </table>
 
-    <div class="modal hide fade" id="gameInfo">
+    <div class="modal hide fade" id="GameOver">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h3>Xebia International Airport</h3>
         </div>
         <div class="modal-body">
-            <p id="modal-message"></p>
+            <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTWy_nDEGPAkcXKSwy85J0fw90r_QxDBQzzBZSIb6JEtjUCbi_v" class="img-polaroid">
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Close</a>
-            <a href="@routes.Application.index()" class="btn btn-primary">Restart</a>
+            <a href="@routes.Application.index()" class="btn btn-primary">Try again</a>
+        </div>
+    </div>
+
+    <div class="modal hide fade" id="GameEnded">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Xebia International Airport</h3>
+        </div>
+        <div class="modal-body">
+            <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTqpTcRmT_eRzP2oH-ClUTgoy2MdBsZzygCKvKq1xpIW3J8T51u" class="img-polaroid">
+            <p>Well done!</p>
+        </div>
+        <div class="modal-footer">
+            <a href="@routes.Application.index()" class="btn btn-primary">Next</a>
         </div>
     </div>
 

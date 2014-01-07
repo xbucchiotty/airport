@@ -25,14 +25,12 @@ function onMessage(evt) {
 
 function onGameOver(uiEvent){
     websocket.close();
-    $("#gameInfo").find("#modal-message").html("GAME OVER!!!")
-    $("#gameInfo").modal();
+    $("#GameOver").modal();
 }
 
 function onGameEnd(uiEvent){
     websocket.close();
-    $("#gameInfo").find("#modal-message").html("Congratulation, you won!!!")
-    $("#gameInfo").modal();
+    $("#GameEnded").modal();
 }
 
 function onScore(newScore){
@@ -72,10 +70,6 @@ function onPlaneStatus(uiEvent){
         strip.find(".detail")
             .html(uiEvent.detail);
     }
-}
-
-function doSend(message) {
-    websocket.send(message);
 }
 
 function create(flightName){

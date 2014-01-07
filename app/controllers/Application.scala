@@ -35,7 +35,7 @@ object Application extends Controller {
     system.eventStream.subscribe(listener, classOf[PlaneStatus])
     system.eventStream.subscribe(listener, classOf[GameEvent])
 
-    Ok(views.html.index(settings))
+    Ok(views.html.index(settings)(1))
   }
 
   def events = WebSocket.using[String] {

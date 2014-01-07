@@ -53,6 +53,21 @@ object Settings {
     outOfKerozenTimeout = 10000,
     ackMaxDuration = 500,
     radioReliability = 1,
+    objective = 10,
+    planeGenerationInterval = 8500
+  )
+
+  lazy val MEDIUM = new Settings(
+    nrOfRunways = 2,
+    nrOfTaxiways = 1,
+    taxiingDuration = 1500,
+    taxiwayCapacity = 5,
+    nrOfGates = 2,
+    landingMaxDuration = 3000,
+    unloadingPassengersMaxDuration = 5000,
+    outOfKerozenTimeout = 10000,
+    ackMaxDuration = 500,
+    radioReliability = 1,
     objective = 20,
     planeGenerationInterval = 8500
   )
