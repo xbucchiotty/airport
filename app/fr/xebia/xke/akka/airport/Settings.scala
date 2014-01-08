@@ -82,8 +82,8 @@ object Settings {
     unloadingPassengersMaxDuration = 5000,
     outOfKerozenTimeout = 10000,
     ackMaxDuration = 500,
-    radioReliability = 0.9,
-    objective = 20,
+    radioReliability = 1,
+    objective = 50,
     planeGenerationInterval = 1000
   )
 

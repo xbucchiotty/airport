@@ -22,7 +22,6 @@ trait WaitingForTaxiway extends PlaneState {
         runway ! HasLeft
         airControl ! HasLeft
         taxiway ! Taxiing
-        groundControl ! Taxiing
 
         updateStep("taxiway", s"on ${taxiway.path.name}")
         context become taxiing(groundControl, taxiway)

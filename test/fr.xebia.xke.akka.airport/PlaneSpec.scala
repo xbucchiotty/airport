@@ -175,7 +175,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             runway expectMsg HasLeft
             airControl expectMsg HasLeft
             taxiway expectMsg Taxiing
-            groundControl expectMsg Taxiing
+            
           }
         }
       }
@@ -205,7 +205,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl reply Command.Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl expectMsg Taxiing
+            
             taxiway expectMsg Taxiing
 
             //When
@@ -242,7 +242,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg Incoming
             groundControl reply Command.Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl expectMsg Taxiing
+            
             taxiway expectMsg Taxiing
             taxiway.send(plane, EndOfTaxi)
             groundControl expectMsg EndOfTaxi
@@ -286,7 +286,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg Incoming
             groundControl reply Command.Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl expectMsg Taxiing
+            
             taxiway expectMsg Taxiing
             taxiway.send(plane, EndOfTaxi)
             groundControl expectMsg EndOfTaxi
