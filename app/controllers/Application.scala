@@ -41,7 +41,7 @@ object Application extends Controller {
     system.eventStream.subscribe(listener, classOf[PlaneStatus])
     system.eventStream.subscribe(listener, classOf[GameEvent])
 
-    Ok(views.html.index(settings)(level, if (level < steps.length) Some(level + 1) else None))
+    Ok(views.html.index(settings)(level, if (level < steps.length - 1) Some(level + 1) else None))
   }
 
   def index = Action {
