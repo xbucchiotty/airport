@@ -14,8 +14,12 @@ object Command {
     override def toString = s"Contact ${target.path.name}"
   }
 
-  case class TaxiAndPark(taxiway: ActorRef, gate: ActorRef) extends Command {
-    override def toString = s"Taxi to ${gate.path.name} through ${taxiway.path.name}"
+  case class Taxi(taxiway: ActorRef) extends Command {
+    override def toString = s"Taxi through ${taxiway.path.name}"
+  }
+
+  case class ParkAt(gate: ActorRef) extends Command {
+    override def toString = s"Part at ${gate.path.name}"
   }
 
   case object Ack

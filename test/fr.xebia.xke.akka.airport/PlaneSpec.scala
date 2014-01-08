@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Land, Ack, Contact}
+import fr.xebia.xke.akka.airport.Command.{ParkAt, Land, Ack, Contact}
 import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasParked, Taxiing, HasLeft, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
@@ -168,7 +168,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg Incoming
 
             //When
-            groundControl reply Command.TaxiAndPark(taxiway.ref, gate.ref)
+            groundControl reply Command.Taxi(taxiway.ref)
 
             //Then
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -188,7 +188,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
 
         "When the plane exits from the taxiway" - {
 
-          "Then it should informs the groundcontrol of its movement" in {
+          "Then it should ask the groundcontrol for a gate" in {
             //Given
             val game = TestProbe()
             val airControl = TestProbe()
@@ -203,16 +203,58 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             airControl reply Contact(groundControl.ref)
             groundControl expectMsg Incoming
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl reply Command.TaxiAndPark(taxiway.ref, gate.ref)
+            groundControl reply Command.Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl expectMsg Taxiing
+            taxiway expectMsg Taxiing
 
             //When
             taxiway.send(plane, EndOfTaxi)
 
             //Then
-            groundControl expectMsg HasParked
+            groundControl expectMsg EndOfTaxi
+          }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a parked plane" - {
+
+        "When the plane is requested to park" - {
+
+          "Then it should leave the taxiway and park at the gate" in {
+            //Given
+            val game = TestProbe()
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val taxiway = TestProbe()
+            val gate = TestProbe()
+            val plane = system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            airControl expectMsg Incoming
+            airControl reply Command.Land(TestProbe().ref)
+            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
+            airControl reply Contact(groundControl.ref)
+            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            groundControl expectMsg Incoming
+            groundControl reply Command.Taxi(taxiway.ref)
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            groundControl expectMsg Taxiing
+            taxiway expectMsg Taxiing
+            taxiway.send(plane, EndOfTaxi)
+            groundControl expectMsg EndOfTaxi
+
+            //When
+            groundControl reply ParkAt(gate.ref)
+
+            //Then
+            taxiway expectMsg HasLeft
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             gate expectMsg HasParked
+            groundControl expectMsg HasParked
           }
         }
       }
@@ -242,17 +284,22 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             airControl reply Contact(groundControl.ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl expectMsg Incoming
-            groundControl reply Command.TaxiAndPark(taxiway.ref, gate.ref)
+            groundControl reply Command.Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl expectMsg Taxiing
+            taxiway expectMsg Taxiing
             taxiway.send(plane, EndOfTaxi)
-            groundControl expectMsg HasParked
+            groundControl expectMsg EndOfTaxi
+            groundControl reply ParkAt(gate.ref)
+            taxiway expectMsg HasLeft
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             gate expectMsg HasParked
+            groundControl expectMsg HasParked
 
             //Then
-            probe expectTerminated(plane, 2 * settings.landingMaxDuration.milliseconds)
-            gate expectMsg HasLeft
+            probe expectTerminated(plane, 2 * settings.unloadingPassengersMaxDuration.milliseconds)
             groundControl expectMsg HasLeft
+            gate expectMsg HasLeft
           }
         }
       }

@@ -5,21 +5,16 @@ import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasParked}
 
 trait Taxiing extends PlaneState {
 
-  def taxiing(groundControl: ActorRef, taxiway: ActorRef, gate: ActorRef) = GameReceive {
+  def taxiing(groundControl: ActorRef, taxiway: ActorRef) = GameReceive {
     case EndOfTaxi =>
 
-      groundControl ! HasParked
-      gate ! HasParked
+      groundControl ! EndOfTaxi
 
-      updateStep("gate", s"At ${gate.path.name}")
-      context become unloadingPassengers(groundControl, gate)
-
-
-      import context.dispatcher
-      context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, Done)
+      context become waitingToPark(taxiway, groundControl)
   }
 
-  def unloadingPassengers(groundControl: ActorRef, destination: ActorRef): GameReceive
+
+  def waitingToPark(taxiway: ActorRef, groundControl: ActorRef): GameReceive
 
 }
 
