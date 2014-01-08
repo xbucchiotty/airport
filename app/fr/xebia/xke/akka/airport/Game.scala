@@ -21,8 +21,8 @@ class Game(settings: Settings) extends Actor with ActorLogging {
     for (i <- 1 to nrOfRunways) yield context.actorOf(Props[Gate], s"gate-$i")
 
 
-  val groundControl = context.actorOf(Props(classOf[GroundControl], taxiways, gates), "groundControl")
-  val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runways), "airTrafficControl")
+  val groundControl = context.actorOf(Props.create(classOf[GroundControlJava], taxiways, gates), "groundControl")
+  val airTrafficControl = context.actorOf(Props.create(classOf[AirTrafficControlJava], groundControl, runways), "airTrafficControl")
 
   var planeGeneration: Cancellable = null
 
