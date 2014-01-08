@@ -12,13 +12,13 @@ class Game(settings: Settings) extends Actor with ActorLogging {
   import settings._
 
   val runways: Seq[ActorRef] =
-    for (i <- 0 to nrOfRunways) yield context.actorOf(Props[Runway], s"runway-$i")
+    for (i <- 1 to nrOfRunways) yield context.actorOf(Props[Runway], s"runway-$i")
 
   val taxiways: Seq[ActorRef] =
-    for (i <- 0 to nrOfTaxiways) yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
+    for (i <- 1 to nrOfTaxiways) yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
 
   val gates: Seq[ActorRef] =
-    for (i <- 0 to nrOfRunways) yield context.actorOf(Props[Gate], s"gate-$i")
+    for (i <- 1 to nrOfRunways) yield context.actorOf(Props[Gate], s"gate-$i")
 
 
   val groundControl = context.actorOf(Props(classOf[GroundControl], taxiways, gates), "groundControl")
