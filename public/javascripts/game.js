@@ -69,9 +69,6 @@ function onPlaneStatus(uiEvent){
             .find(".detail")
             .html(uiEvent.error);
 
-        findStep(uiEvent.flightName,'done')
-          .prepend(strip.detach());
-
     }else{
         strip.find(".detail")
             .html(uiEvent.detail);
