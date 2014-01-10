@@ -19,7 +19,7 @@ object Command {
   }
 
   case class ParkAt(gate: ActorRef) extends Command {
-    override def toString = s"Part at ${gate.path.name}"
+    override def toString = s"Park at ${gate.path.name}"
   }
 
   case object Ack
