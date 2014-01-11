@@ -57,9 +57,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
   val dequeueAPlane: Receive = {
     case this.Tick =>
-      log.warning("Tick")
       if (queue.nonEmpty) {
-        log.warning("Queue non empty")
         val plane = queue.head
 
         plane ! EndOfTaxi

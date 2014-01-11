@@ -1,4 +1,8 @@
-@(settings: fr.xebia.xke.akka.airport.Settings)(level:Int, nextLevel: Option[Int])
+@(strategy: controllers.GameStrategy)(level:Int, nextLevel: Option[Int])
+
+@stepClass(step:String) =@{
+if(strategy.activeSteps.contains(step)) "active" else "inactive"
+}
 
 @main("XKE Akka slot")(level) {
 
@@ -12,22 +16,23 @@
     <table id='strips'>
         <thead>
             <tr>
-                <th class="header">
+                <th class="header active">
                     <a href="#" data-toggle="popover" title="Incoming"
-                       data-content="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
+                       data-content="@strategy.settings.planeGenerationInterval millis between each plane and @strategy.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
                 </th>
-                <th class="header">
+                <th class="header @stepClass("Runway") ">
                     <a href="#" data-toggle="popover" title="Runway"
-                       data-content="@settings.nrOfRunways runways with @settings.landingMaxDuration  millis max to land">Runway</a>
+                       data-content="@strategy.settings.nrOfRunways runways with @strategy.settings.landingMaxDuration  millis max to land">Runway</a>
                 </th>
-                <th class="header">
+                <th class="header @stepClass("Taxiway") ">
                     <a href="#" data-toggle="popover" title="Taxiway"
-                       data-content="@settings.nrOfTaxiways taxiways with a capacity of @settings.taxiwayCapacity planes and @settings.taxiingDuration millis max to taxi">Taxiway</a>
+                       data-content="@strategy.settings.nrOfTaxiways taxiways with a capacity of @strategy.settings.taxiwayCapacity planes and @strategy.settings.taxiingDuration millis max to taxi">Taxiway</a>
                 </th>
-                <th class="header">
+                <th class="header @stepClass("Gate") ">
                     <a href="#" data-toggle="popover" title="Gate"
-                       data-content="@settings.nrOfGates gates and @settings.unloadingPassengersMaxDuration millis to unload passengers">Gate</a>
+                       data-content="@strategy.settings.nrOfGates gates and @strategy.settings.unloadingPassengersMaxDuration millis to unload passengers">Gate</a>
                 </th>
+
                 <th class="header">Done</th>
             </tr>
         </thead>

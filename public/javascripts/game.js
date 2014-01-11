@@ -4,7 +4,8 @@ function init() {
     websocket = new WebSocket(wsUri);
     websocket.onmessage = function(evt) { onMessage(evt) };
 
-    $('a[data-toggle=popover]')
+    $('.active')
+    .find('a[data-toggle=popover]')
     .popover({trigger: 'hover',placement: 'top'})
     .click(function(e) {
         e.preventDefault()

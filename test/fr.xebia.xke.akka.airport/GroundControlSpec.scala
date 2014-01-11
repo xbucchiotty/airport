@@ -110,7 +110,6 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
   }
 
   describe("A ground control in gate management") {
-    pending
 
     it("should tell the plane to park when there is a free gate") {
       Given("a ground control with 1 gate")

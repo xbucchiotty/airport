@@ -49,3 +49,22 @@ table > thead tr .header {
 .popover-content{
    font-weight: lighter;
 }
+
+.inactive{
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.20) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.20) 50%,
+        rgba(255, 255, 255, 0.20) 75%,
+        transparent 75%,
+        rgba(255, 255, 255, 0.20));
+    background-color: #9C9C9C;
+    background-repeat: repeat-x;
+    pointer-events: none;
+}
+
+.inactive > a {
+    color: #F1F1F1;
+}

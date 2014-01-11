@@ -31,3 +31,22 @@ trait WaitingForTaxiway extends PlaneState {
   def taxiing(groundControl: ActorRef, taxiway: ActorRef): GameReceive
 
 }
+
+trait LandingAsLastStep extends PlaneState {
+
+  def airControl: ActorRef
+
+  def waitingToPark(runway: ActorRef) = GameReceive {
+    case Contact(groundControl) =>
+      replyTo(airControl, "Done") {
+
+        runway ! HasLeft
+        airControl ! HasLeft
+
+        updateStep("done", "Runway left")
+
+        context stop self
+      }
+
+  }
+}

@@ -9,7 +9,7 @@ import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
 
-class PlaneSpec extends ActorSpecs with ShouldMatchers {
+class FullPlaneSpec extends ActorSpecs with ShouldMatchers {
 
   val settings = Settings.TEST
 
@@ -24,7 +24,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
 
-            system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
 
             airControl expectMsg Incoming
           }
@@ -45,7 +45,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
               val airControl = TestProbe()
 
               for (_ <- 1 to 10) {
-                val plane = system.actorOf(Props(classOf[Plane], airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 10)))
+                val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 10)))
 
                 TestProbe().send(plane, Land(TestProbe().ref))
 
@@ -73,7 +73,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
           "Then it should terminates" in {
             val game = TestProbe()
             val airControl = TestProbe()
-            val plane = system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
 
             val probe = TestProbe()
             probe watch plane
@@ -96,7 +96,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
             val runway = TestProbe()
-            system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
             airControl expectMsg Incoming
 
             //When
@@ -123,7 +123,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
             val groundControl = TestProbe()
-            val plane = system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
 
             airControl expectMsg Incoming
             airControl reply Command.Land(TestProbe().ref)
@@ -157,7 +157,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val taxiway = TestProbe()
             val runway = TestProbe()
             val gate = TestProbe()
-            system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
             airControl expectMsg Incoming
             airControl reply Command.Land(runway.ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -195,7 +195,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val gate = TestProbe()
-            val plane = system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
             airControl expectMsg Incoming
             airControl reply Command.Land(TestProbe().ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -232,7 +232,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val gate = TestProbe()
-            val plane = system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
             airControl expectMsg Incoming
             airControl reply Command.Land(TestProbe().ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -274,7 +274,7 @@ class PlaneSpec extends ActorSpecs with ShouldMatchers {
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val gate = TestProbe()
-            val plane = system.actorOf(Props(classOf[Plane], airControl.ref, game.ref, settings), "plane")
+            val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, game.ref, settings), "plane")
             val probe = TestProbe()
             probe watch plane
             airControl expectMsg Incoming

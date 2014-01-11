@@ -7,7 +7,7 @@ import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
 import scala.util.Random
 
-class Game(settings: Settings) extends Actor with ActorLogging {
+class Game(settings: Settings, planeType: Class[Plane]) extends Actor with ActorLogging {
 
   import settings._
 
@@ -54,7 +54,7 @@ class Game(settings: Settings) extends Actor with ActorLogging {
       context stop self
 
     case NewPlane =>
-      context.actorOf(Props(classOf[Plane], airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 100000 }")
+      context.actorOf(Props(planeType, airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 100000 }")
   }
 
   private def publishScore() {
