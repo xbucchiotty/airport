@@ -1,11 +1,15 @@
 .strip{
     width: 210px;
     min-height: 50px;
-    border: 1px solid #d4d4d4;
+//    border: 1px solid #d4d4d4;
 }
 
 .regular{
     background-color: rgba(255, 238, 0, 0.1);
+    background-image: url(http://piq.codeus.net/static/media/userpics/piq_50761.png);
+    background-repeat:no-repeat;
+    background-position-x: 140px;
+    background-size: 70px;
 }
 
 .error{

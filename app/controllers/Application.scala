@@ -15,8 +15,25 @@ import scala.concurrent.{ExecutionContext, Future}
 object Application extends Controller {
 
   private val steps: Seq[GameStrategy] = Seq(
-    GameStrategy(Settings.EASY, Seq("Runway"), classOf[JustLandingPlane]),
-    GameStrategy(Settings.MEDIUM, Seq("Runway"), classOf[JustLandingPlane]),
+
+    GameStrategy(Settings.EASY.copy(
+      nrOfRunways = 1,
+      landingMaxDuration = 1500,
+      planeGenerationInterval = 1500
+    ), Seq("Runway"), classOf[JustLandingPlane]),
+
+    GameStrategy(Settings.EASY.copy(
+      nrOfRunways = 2,
+      landingMaxDuration = 1500,
+      planeGenerationInterval = 750),
+      Seq("Runway"), classOf[JustLandingPlane]),
+
+    GameStrategy(Settings.EASY.copy(
+      nrOfRunways = 2,
+      landingMaxDuration = 1500,
+      planeGenerationInterval = 300),
+      Seq("Runway"), classOf[JustLandingPlane]),
+
     GameStrategy(Settings.HARD, Seq("Runway"), classOf[JustLandingPlane])
   )
 
