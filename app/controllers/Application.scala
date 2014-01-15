@@ -4,37 +4,39 @@ import akka.actor.{ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.{Plane, JustLandingPlane, FullStepPlane, GameEvent, Settings, Game}
+import fr.xebia.xke.akka.airport.{Plane, JustLandingPlane, GameEvent, Settings, Game}
 import play.api.libs.concurrent.Akka
-import play.api.libs.iteratee.Enumerator.TreatCont1
-import play.api.libs.iteratee.{Input, Enumerator, Iteratee}
+import play.api.libs.iteratee.Iteratee
 import play.api.mvc._
 import scala.Some
-import scala.concurrent.{ExecutionContext, Future}
 
 object Application extends Controller {
 
   private val steps: Seq[GameStrategy] = Seq(
 
-    GameStrategy(Settings.EASY.copy(
+    GameStrategy(Settings(
       nrOfRunways = 1,
       landingMaxDuration = 1500,
-      planeGenerationInterval = 1500
-    ), Seq("Runway"), classOf[JustLandingPlane]),
-
-    GameStrategy(Settings.EASY.copy(
-      nrOfRunways = 2,
-      landingMaxDuration = 1500,
-      planeGenerationInterval = 750),
+      planeGenerationInterval = 3000,
+      objective = 20,
+      ackMaxDuration = 500),
       Seq("Runway"), classOf[JustLandingPlane]),
 
-    GameStrategy(Settings.EASY.copy(
+    GameStrategy(Settings(
       nrOfRunways = 2,
       landingMaxDuration = 1500,
-      planeGenerationInterval = 300),
+      planeGenerationInterval = 1250,
+      objective = 20,
+      ackMaxDuration = 500),
       Seq("Runway"), classOf[JustLandingPlane]),
 
-    GameStrategy(Settings.HARD, Seq("Runway"), classOf[JustLandingPlane])
+    GameStrategy(Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      ackMaxDuration = 100),
+      Seq("Runway"), classOf[JustLandingPlane])
   )
 
   def newGame(level: Int) = Action {

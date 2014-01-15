@@ -12,21 +12,28 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
   import settings._
 
   val runways: Seq[ActorRef] =
-    for (i <- 1 to nrOfRunways) yield context.actorOf(Props[Runway], s"runway-$i")
+    for (i <- 1 to nrOfRunways)
+    yield context.actorOf(Props[Runway], s"runway-$i")
 
   val taxiways: Seq[ActorRef] =
-    for (i <- 1 to nrOfTaxiways) yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
+    for (i <- 1 to nrOfTaxiways)
+    yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
 
   val gates: Seq[ActorRef] =
-    for (i <- 1 to nrOfRunways) yield context.actorOf(Props[Gate], s"gate-$i")
+    for (i <- 1 to nrOfRunways)
+    yield context.actorOf(Props[Gate], s"gate-$i")
 
+  val groundControl =
+    context.actorOf(Props(classOf[GroundControl], taxiways, gates, taxiwayCapacity), "groundControl")
 
-  val groundControl = context.actorOf(Props(classOf[GroundControl], taxiways, gates, taxiwayCapacity), "groundControl")
-  val airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl, runways), "airTrafficControl")
+  val airTrafficControl =
+    context.actorOf(Props(classOf[AirTrafficControl], groundControl, runways), "airTrafficControl")
 
   var planeGeneration: Cancellable = null
 
   var score = 0
+
+  var planesToGenerate: Int = settings.objective / 2
 
   override def preStart() {
     runways.foreach(context.watch)
@@ -53,8 +60,9 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
       context.system.eventStream.publish(GameOver)
       context stop self
 
-    case NewPlane =>
+    case NewPlane if planesToGenerate > 0 =>
       context.actorOf(Props(planeType, airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 100000 }")
+      planesToGenerate -= 1
   }
 
   private def publishScore() {

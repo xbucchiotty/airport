@@ -4,18 +4,18 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 case class Settings(
-                     nrOfRunways: Int,
-                     taxiwayCapacity: Int,
-                     nrOfGates: Int,
-                     nrOfTaxiways: Int,
-                     landingMaxDuration: Int,
-                     taxiingDuration: Int,
-                     unloadingPassengersMaxDuration: Int,
-                     outOfKerozenTimeout: Int,
-                     ackMaxDuration: Int,
-                     radioReliability: Double,
-                     objective: Int,
-                     planeGenerationInterval: Int) {
+                     nrOfRunways: Int = 1,
+                     landingMaxDuration: Int = 3000,
+                     nrOfTaxiways: Int = 1,
+                     taxiingDuration: Int = 1500,
+                     taxiwayCapacity: Int = 1,
+                     nrOfGates: Int = 1,
+                     unloadingPassengersMaxDuration: Int = 5000,
+                     outOfKerozenTimeout: Int = 10000,
+                     ackMaxDuration: Int = 500,
+                     radioReliability: Double = 1,
+                     objective: Int = 20,
+                     planeGenerationInterval: Int = 8500) {
 
   private def aRandomDuration(maxDurationInMillis: Int): FiniteDuration = {
     val minDuration = maxDurationInMillis / 2
@@ -42,50 +42,6 @@ case class Settings(
 }
 
 object Settings {
-  lazy val EASY = new Settings(
-    nrOfRunways = 1,
-    nrOfTaxiways = 1,
-    taxiingDuration = 1500,
-    taxiwayCapacity = 1,
-    nrOfGates = 1,
-    landingMaxDuration = 3000,
-    unloadingPassengersMaxDuration = 5000,
-    outOfKerozenTimeout = 10000,
-    ackMaxDuration = 500,
-    radioReliability = 1,
-    objective = 10,
-    planeGenerationInterval = 8500
-  )
-
-  lazy val MEDIUM = new Settings(
-    nrOfRunways = 2,
-    nrOfTaxiways = 1,
-    taxiingDuration = 1500,
-    taxiwayCapacity = 5,
-    nrOfGates = 2,
-    landingMaxDuration = 3000,
-    unloadingPassengersMaxDuration = 5000,
-    outOfKerozenTimeout = 10000,
-    ackMaxDuration = 500,
-    radioReliability = 1,
-    objective = 20,
-    planeGenerationInterval = 4000
-  )
-
-  lazy val HARD = new Settings(
-    nrOfRunways = 4,
-    nrOfTaxiways = 2,
-    taxiingDuration = 1500,
-    taxiwayCapacity = 5,
-    nrOfGates = 10,
-    landingMaxDuration = 3000,
-    unloadingPassengersMaxDuration = 5000,
-    outOfKerozenTimeout = 10000,
-    ackMaxDuration = 500,
-    radioReliability = 1,
-    objective = 50,
-    planeGenerationInterval = 1000
-  )
 
   lazy val TEST = new Settings(
     nrOfRunways = 1,

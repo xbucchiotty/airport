@@ -38,15 +38,21 @@ trait LandingAsLastStep extends PlaneState {
 
   def waitingToPark(runway: ActorRef) = GameReceive {
     case Contact(groundControl) =>
-      replyTo(airControl, "Done") {
+      import context.dispatcher
+      context.system.scheduler.scheduleOnce(settings.aLandingDuration, new Runnable {
 
-        runway ! HasLeft
-        airControl ! HasLeft
+        def run() {
+          replyTo(airControl, "Done") {
 
-        updateStep("done", "Runway left")
+            runway ! HasLeft
+            airControl ! HasLeft
 
-        context stop self
-      }
+            updateStep("done", "Runway left")
 
+            context stop self
+          }
+
+        }
+      })
   }
 }
