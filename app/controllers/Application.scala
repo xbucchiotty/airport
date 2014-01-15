@@ -1,54 +1,58 @@
 package controllers
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{Inbox, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.{Plane, JustLandingPlane, GameEvent, Settings, Game}
+import fr.xebia.xke.akka.airport.{GameStart, Plane, JustLandingPlane, GameEvent, Settings, Game}
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Iteratee
 import play.api.mvc._
-import scala.Some
+import play.api.templates.HtmlFormat
 
 object Application extends Controller {
 
-  private val steps: Seq[GameStrategy] = Seq(
-
-    GameStrategy(Settings(
+  def level0 = Action {
+    val settings = Settings(
       nrOfRunways = 1,
       landingMaxDuration = 1500,
       planeGenerationInterval = 3000,
       objective = 20,
-      ackMaxDuration = 500),
-      Seq("Runway"), classOf[JustLandingPlane]),
+      ackMaxDuration = 500)
 
-    GameStrategy(Settings(
+    newGame(settings, views.html.level_0(settings), classOf[JustLandingPlane])
+  }
+
+  def level1 = Action {
+    val settings = Settings(
       nrOfRunways = 2,
       landingMaxDuration = 1500,
       planeGenerationInterval = 1250,
       objective = 20,
-      ackMaxDuration = 500),
-      Seq("Runway"), classOf[JustLandingPlane]),
+      ackMaxDuration = 500)
 
-    GameStrategy(Settings(
+    newGame(settings, views.html.level_1(settings), classOf[JustLandingPlane])
+  }
+
+  def level2 = Action {
+    val settings = Settings(
       nrOfRunways = 4,
       landingMaxDuration = 2500,
       planeGenerationInterval = 500,
       objective = 50,
-      ackMaxDuration = 100),
-      Seq("Runway"), classOf[JustLandingPlane])
-  )
+      ackMaxDuration = 100)
 
-  def newGame(level: Int) = Action {
+    newGame(settings, views.html.level_2(settings), classOf[JustLandingPlane])
+  }
+
+  private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {
 
     if (game != null) {
       system.stop(game)
       game = null
     }
 
-    val strategy = steps(level)
-
-    game = system.actorOf(Props(classOf[Game], strategy.settings, strategy.planeType))
+    game = system.actorOf(Props(classOf[Game], settings, planeType))
 
     if (listener != null) {
       system.eventStream.unsubscribe(listener)
@@ -60,11 +64,11 @@ object Application extends Controller {
     system.eventStream.subscribe(listener, classOf[PlaneStatus])
     system.eventStream.subscribe(listener, classOf[GameEvent])
 
-    Ok(views.html.index(strategy)(level, if (level < steps.length - 1) Some(level + 1) else None))
+    Ok(template)
   }
 
   def index = Action {
-    Redirect(routes.Application.newGame(0))
+    Redirect(routes.Application.level0)
   }
 
   def events = WebSocket.using[String] {
@@ -72,9 +76,9 @@ object Application extends Controller {
 
     // Log events to the console
       import scala.concurrent.ExecutionContext.Implicits.global
-      val in = Iteratee.foreach[String](println).map {
-        _ =>
-          println("Disconnected")
+      val in = Iteratee.foreach[String] {
+        case "start" =>
+          game.tell(GameStart, Inbox.create(system).getRef())
       }
 
       val out = Enumerator2.infiniteUnfold(listener) {
@@ -98,5 +102,3 @@ object Application extends Controller {
 }
 
 case object DequeueEvents
-
-case class GameStrategy(settings: Settings, activeSteps: Seq[String], planeType: Class[_ <: Plane])

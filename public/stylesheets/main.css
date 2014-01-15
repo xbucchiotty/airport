@@ -1,7 +1,6 @@
 .strip{
     width: 210px;
     min-height: 50px;
-//    border: 1px solid #d4d4d4;
 }
 
 .regular{
@@ -69,6 +68,6 @@ table > thead tr .header {
     pointer-events: none;
 }
 
-.inactive > a {
+.inactive {
     color: #F1F1F1;
 }

@@ -4,13 +4,21 @@ function init() {
     websocket = new WebSocket(wsUri);
     websocket.onmessage = function(evt) { onMessage(evt) };
 
+    initialized = false;
+
     $('.active')
-    .find('a[data-toggle=popover]')
-    .popover({trigger: 'hover',placement: 'top'})
-    .click(function(e) {
-        e.preventDefault()
-    });
+        .find('a[data-toggle=popover]')
+        .popover({trigger: 'hover',placement: 'top'})
+        .click(function(e) {
+            e.preventDefault()
+        }
+    );
 }
+
+function startGame(){
+     websocket.send('start');
+}
+
 function onMessage(evt) {
     console.log(evt.data);
 
@@ -48,6 +56,15 @@ function onScore(newScore){
     $("#score")
         .find(".bar")
         .css('width',''+ (100 * newScore.current / newScore.objective) + '%');
+
+    if(initialized == false){
+        var intro = introJs();
+        intro.onexit(startGame);
+        intro.oncomplete(startGame);
+        intro.start();
+
+        initialized = true;
+    }
 }
 
 function onPlaneStatus(uiEvent){

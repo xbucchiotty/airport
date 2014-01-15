@@ -41,7 +41,6 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
     gates.foreach(context.watch)
 
     import context.dispatcher
-    planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
     context.system.eventStream.subscribe(self, classOf[PlaneStatus])
 
@@ -50,6 +49,10 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
 
 
   def receive: Receive = {
+    case GameStart =>
+      import context.dispatcher
+      planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+
     case PlaneStatus("done", _, _, _) =>
       gain()
 
