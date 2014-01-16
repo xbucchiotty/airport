@@ -13,6 +13,15 @@ function init() {
             e.preventDefault()
         }
     );
+
+    if(initialized == false){
+            var intro = introJs();
+            intro.onexit(startGame);
+            intro.oncomplete(startGame);
+            intro.start();
+
+            initialized = true;
+        }
 }
 
 function startGame(){
@@ -57,14 +66,6 @@ function onScore(newScore){
         .find(".bar")
         .css('width',''+ (100 * newScore.current / newScore.objective) + '%');
 
-    if(initialized == false){
-        var intro = introJs();
-        intro.onexit(startGame);
-        intro.oncomplete(startGame);
-        intro.start();
-
-        initialized = true;
-    }
 }
 
 function onPlaneStatus(uiEvent){

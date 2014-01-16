@@ -15,11 +15,21 @@ trait Flying extends PlaneState {
 
   val flying = GameReceive {
     case Land(runway) =>
-      replyTo(airControl,Land(runway).toString) {
-        import context.dispatcher
+      reply(detail = Land(runway).toString)(newState = landing) {
         outOfKerozenCrash.cancel()
+
+        import context.dispatcher
         context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
       }
+
+    case OutOfKerozen =>
+      log.error("Plane {} is out of kerozen, it crashes", self.path.name)
+      context stop self
+  }
+
+  def landing: Receive = {
+
+    case Land(_) =>
 
     case this.Landed(runway) =>
       airControl ! HasLanded
@@ -28,10 +38,6 @@ trait Flying extends PlaneState {
       updateStep("runway", s"On ${runway.path.name}")
 
       context become waitingToPark(runway)
-
-    case OutOfKerozen =>
-      log.error("Plane {} is out of kerozen, it crashes", self.path.name)
-      context stop self
   }
 
   override def preStart() {

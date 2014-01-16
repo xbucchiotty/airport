@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Ack, Contact}
+import fr.xebia.xke.akka.airport.Command.Ack
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
@@ -102,7 +102,7 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             runway expectMsg HasLanded
 
             //When
-            airControl reply Contact(groundControl.ref)
+            airControl reply Command.Contact(groundControl.ref)
 
             //Then
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)

@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.airport
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.Land
+import fr.xebia.xke.akka.airport.Command.{Ack, Land}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded, Incoming}
 import language.postfixOps
 import org.scalatest.{ShouldMatchers, GivenWhenThen, FunSpec}
@@ -17,7 +17,7 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       Given("an air traffic control with 1 runway")
       implicit val system = ActorSystem()
       val runway = TestProbe()
-      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway.ref)), "airTrafficControl")
+      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway.ref), 100), "airTrafficControl")
 
       When("a new plane incomes")
       val plane = TestProbe()
@@ -25,6 +25,7 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
 
       Then("air traffic control should tell the plane to land on the free runway")
       plane.expectMsg(max = 100 milliseconds, Land(runway.ref))
+      plane reply Ack
     }
 
     it("should alternate the runway allocated to a new incoming plane") {
@@ -34,7 +35,7 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       implicit val system = ActorSystem()
       val runway1 = TestProbe()
       val runway2 = TestProbe()
-      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway1.ref, runway2.ref)), "airTrafficControl")
+      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway1.ref, runway2.ref), 100), "airTrafficControl")
 
       When("a new 2 planes income")
       val plane1 = TestProbe()
@@ -45,6 +46,9 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       Then("air traffic control should allocate one of the two free runways to each plane")
       val allocation1: Land = plane1.expectMsgAllClassOf(classOf[Land]).head
       val allocation2: Land = plane2.expectMsgAllClassOf(classOf[Land]).head
+
+      plane1 reply Ack
+      plane2 reply Ack
 
       allocation1.runway should (equal(runway1.ref) or equal(runway2.ref))
       allocation2.runway should (equal(runway1.ref) or equal(runway2.ref))
@@ -58,12 +62,13 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       Given("an air traffic control with 1 runway")
       implicit val system = ActorSystem()
       val runway = TestProbe()
-      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway.ref)), "airTrafficControl")
+      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway.ref), 100), "airTrafficControl")
 
       Given("a first plane has landed on the runway")
       val firstPlane = TestProbe()
       firstPlane.send(airTrafficControl, Incoming)
       firstPlane.expectMsg(100 milliseconds, Land(runway.ref))
+      firstPlane reply Ack
       firstPlane reply HasLanded
 
       When("when a new plane incomes")
@@ -78,6 +83,29 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
 
       Then("air traffic control should tell the plane to land on the free runway")
       plane.expectMsg(max = 100 milliseconds, Land(runway.ref))
+      plane reply Ack
+    }
+
+    it("should repeat message until it's successfully received") {
+      pending
+
+      Given("an air traffic control with 1 runway")
+      implicit val system = ActorSystem()
+      val runway = TestProbe()
+      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref, Seq(runway.ref), 100), "airTrafficControl")
+
+      When("when a new plane incomes")
+      val plane = TestProbe()
+      plane.send(airTrafficControl, Incoming)
+
+      Then("air traffic control should repeat the order until it's successfully acked by plane")
+      plane.expectMsg(max = 150.milliseconds, Land(runway.ref))
+      plane.expectMsg(max = 150.milliseconds, Land(runway.ref))
+      plane.expectMsg(max = 150.milliseconds, Land(runway.ref))
+
+      plane.reply(Ack)
+      plane.expectNoMsg(150.milliseconds)
+
     }
   }
 }

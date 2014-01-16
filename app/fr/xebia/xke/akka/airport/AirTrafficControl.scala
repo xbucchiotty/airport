@@ -4,7 +4,7 @@ import akka.actor.{ActorLogging, ActorRef, Actor}
 import fr.xebia.xke.akka.airport.Command.{Contact, Land}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, Incoming, HasLanded}
 
-class AirTrafficControl(groundControl: ActorRef, runways: Seq[ActorRef]) extends Actor with ActorLogging {
+class AirTrafficControl(groundControl: ActorRef, runways: Seq[ActorRef], ackMaxTimeout: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
 

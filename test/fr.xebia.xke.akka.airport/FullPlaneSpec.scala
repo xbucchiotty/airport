@@ -45,13 +45,13 @@ class FullPlaneSpec extends ActorSpecs with ShouldMatchers {
               val airControl = TestProbe()
 
               for (_ <- 1 to 10) {
-                val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 10)))
+                val plane = system.actorOf(Props(classOf[FullStepPlane], airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 50)))
 
-                TestProbe().send(plane, Land(TestProbe().ref))
+                airControl.send(plane, Land(TestProbe().ref))
 
               }
 
-              airControl.receiveWhile(200 milliseconds) {
+              airControl.receiveWhile(1000 milliseconds) {
                 case Ack => 1
                 case _ => 0
               }.sum should (be < 10 and be > 0)

@@ -78,6 +78,24 @@ object Application extends Controller {
     newGame(settings, views.html.level_4(settings), classOf[FullStepPlane])
   }
 
+  def level5 = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      nrOfTaxiways = 2,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 10,
+      nrOfGates = 2,
+      unloadingPassengersMaxDuration = 5000,
+      ackMaxDuration = 100,
+      radioReliability = 0.8,
+      outOfKerozenTimeout = 30000)
+
+    newGame(settings, views.html.level_5(settings), classOf[FullStepPlane])
+  }
+
   private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {
 
     if (game != null) {
@@ -94,9 +112,6 @@ object Application extends Controller {
 
     listener = system.actorOf(Props[EventListener])
 
-    system.eventStream.subscribe(listener, classOf[PlaneStatus])
-    system.eventStream.subscribe(listener, classOf[GameEvent])
-
     Ok(template)
   }
 
@@ -111,6 +126,8 @@ object Application extends Controller {
       import scala.concurrent.ExecutionContext.Implicits.global
       val in = Iteratee.foreach[String] {
         case "start" =>
+          system.eventStream.subscribe(listener, classOf[PlaneStatus])
+          system.eventStream.subscribe(listener, classOf[GameEvent])
           game.tell(GameStart, Inbox.create(system).getRef())
       }
 

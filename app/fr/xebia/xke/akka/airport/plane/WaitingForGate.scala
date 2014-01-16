@@ -10,7 +10,7 @@ trait WaitingForGate extends PlaneState {
 
     case Command.ParkAt(gate) =>
 
-      replyTo(groundControl, Command.ParkAt(gate).toString) {
+      reply(detail = Command.ParkAt(gate).toString)(newState = parking) {
 
         taxiway ! HasLeft
         groundControl ! HasParked
@@ -24,6 +24,11 @@ trait WaitingForGate extends PlaneState {
         context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, Done)
       }
 
+
+  }
+
+  def parking: Receive = {
+    case Command.ParkAt(_) =>
   }
 
   def unloadingPassengers(groundControl: ActorRef, destination: ActorRef): GameReceive

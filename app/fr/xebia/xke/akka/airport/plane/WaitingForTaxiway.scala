@@ -10,14 +10,16 @@ trait WaitingForTaxiway extends PlaneState {
 
   def waitingToPark(runway: ActorRef) = GameReceive {
     case Contact(groundControl) =>
-      replyTo(airControl, Contact(groundControl).toString) {
+      reply(detail = Contact(groundControl).toString)(newState = incoming(runway, groundControl)) {
         groundControl ! Incoming
       }
+  }
+
+  def incoming(runway: ActorRef, groundControl: ActorRef): Receive = {
+    case Contact(_) =>
 
     case Taxi(taxiway) =>
-      val groundControl = sender
-
-      replyTo(groundControl, Taxi(taxiway).toString) {
+      reply(detail = Taxi(taxiway).toString)(newState = leavingRunway) {
 
         runway ! HasLeft
         airControl ! HasLeft
@@ -27,6 +29,11 @@ trait WaitingForTaxiway extends PlaneState {
         context become taxiing(groundControl, taxiway)
       }
   }
+
+  def leavingRunway: Receive = {
+    case Taxi(_) =>
+  }
+
 
   def taxiing(groundControl: ActorRef, taxiway: ActorRef): GameReceive
 
@@ -38,21 +45,18 @@ trait LandingAsLastStep extends PlaneState {
 
   def waitingToPark(runway: ActorRef) = GameReceive {
     case Contact(groundControl) =>
-      import context.dispatcher
-      context.system.scheduler.scheduleOnce(settings.aLandingDuration, new Runnable {
+      reply(detail = "Done")(newState = incoming) {
 
-        def run() {
-          replyTo(airControl, "Done") {
+        runway ! HasLeft
+        airControl ! HasLeft
 
-            runway ! HasLeft
-            airControl ! HasLeft
+        updateStep("done", "Runway left")
 
-            updateStep("done", "Runway left")
+        context stop self
+      }
+  }
 
-            context stop self
-          }
-
-        }
-      })
+  def incoming: Receive = {
+    case Contact(_) =>
   }
 }

@@ -10,6 +10,7 @@ GET     /1                          controllers.Application.level1
 GET     /2                          controllers.Application.level2
 GET     /3                          controllers.Application.level3
 GET     /4                          controllers.Application.level4
+GET     /5                          controllers.Application.level5
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

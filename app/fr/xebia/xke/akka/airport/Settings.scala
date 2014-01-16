@@ -37,7 +37,7 @@ case class Settings(
     aRandomDuration(ackMaxDuration)
 
   def isRadioOk =
-    Random.nextDouble() <= radioReliability
+    Random.nextDouble() < radioReliability
 
 }
 

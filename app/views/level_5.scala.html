@@ -9,7 +9,9 @@
             <a href="#"
                title="Incoming"
                data-toggle="popover"
-               data-content="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
+               data-content="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen"
+               data-intro='Now radio communication with planes is fuzzy. Some orders may not be received by planes. Controllers should received <b>Ack</b> messages after each order. They <b>should repeat</b> the message until successfully received. You should use the pattern Actor per request.'
+               data-step='1'>Incoming</a>
         </th>
         <th class="header active">
             <a href="#"
@@ -18,20 +20,16 @@
                data-content="@settings.nrOfRunways runways with @settings.landingMaxDuration  millis max to land">Runway</a>
         </th>
         <th class="header active">
-        <a href="#"
+            <a href="#"
                title="Taxiway"
                data-toggle="popover"
-               data-content="@settings.nrOfTaxiways taxiways with a capacity of @settings.taxiwayCapacity planes and @settings.taxiingDuration millis max to taxi"
-               data-intro='More taxiways'
-               data-step='1'>Taxiway</a>
+               data-content="@settings.nrOfTaxiways taxiways with a capacity of @settings.taxiwayCapacity planes and @settings.taxiingDuration millis max to taxi">Taxiway</a>
         </th>
         <th class="header active">
-        <a href="#"
+            <a href="#"
                title="Gate"
                data-toggle="popover"
-               data-content="@settings.nrOfGates gates and @settings.unloadingPassengersMaxDuration millis to unload passengers"
-               data-intro='And now you have to manage boarding gates. <b>@settings.nrOfGates</b> gates and <b>@settings.unloadingPassengersMaxDuration millis</b> to unload passengers.'
-               data-step='2'>Gate</a>
+               data-content="@settings.nrOfGates gates and @settings.unloadingPassengersMaxDuration millis to unload passengers">Gate</a>
         </th>
         <th class="header">Done</th>
     </tr>
@@ -49,11 +47,11 @@
     <div class="modal-body">
         <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTqpTcRmT_eRzP2oH-ClUTgoy2MdBsZzygCKvKq1xpIW3J8T51u" class="img-polaroid">
 
-        <p>Well done!</p>
+        <p>You mastered the game! Congratulation!!!!</p>
 
     </div>
     <div class="modal-footer">
-        <a href="/5" class="btn btn-primary">Next</a>
+        <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
     </div>
 </div>
 

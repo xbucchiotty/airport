@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorRef, Cancellable, Terminated, ActorLogging, Props, Actor}
+import akka.actor.{OneForOneStrategy, SupervisorStrategy, ActorRef, Cancellable, Terminated, ActorLogging, Props, Actor}
 import concurrent.duration._
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
@@ -24,10 +24,10 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
     yield context.actorOf(Props[Gate], s"gate-$i")
 
   val groundControl =
-    context.actorOf(Props(classOf[GroundControl], taxiways, gates, taxiwayCapacity), "groundControl")
+    context.actorOf(Props(classOf[GroundControl], taxiways, gates, taxiwayCapacity, settings.ackMaxDuration), "groundControl")
 
   val airTrafficControl =
-    context.actorOf(Props(classOf[AirTrafficControl], groundControl, runways), "airTrafficControl")
+    context.actorOf(Props(classOf[AirTrafficControl], groundControl, runways, settings.ackMaxDuration), "airTrafficControl")
 
   var planeGeneration: Cancellable = null
 
@@ -40,13 +40,14 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
     taxiways.foreach(context.watch)
     gates.foreach(context.watch)
 
-    import context.dispatcher
-
     context.system.eventStream.subscribe(self, classOf[PlaneStatus])
 
     publishScore()
   }
 
+  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
+    case _ => SupervisorStrategy.Stop
+  }
 
   def receive: Receive = {
     case GameStart =>
