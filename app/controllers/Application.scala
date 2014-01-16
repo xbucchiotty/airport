@@ -4,7 +4,7 @@ import akka.actor.{Inbox, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.{JustTaxiingPlane, GameStart, Plane, JustLandingPlane, GameEvent, Settings, Game}
+import fr.xebia.xke.akka.airport.{FullStepPlane, JustTaxiingPlane, GameStart, Plane, JustLandingPlane, GameEvent, Settings, Game}
 import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Iteratee
 import play.api.mvc._
@@ -59,6 +59,23 @@ object Application extends Controller {
       outOfKerozenTimeout = 30000)
 
     newGame(settings, views.html.level_3(settings), classOf[JustTaxiingPlane])
+  }
+
+  def level4 = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      nrOfTaxiways = 2,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 10,
+      nrOfGates = 2,
+      unloadingPassengersMaxDuration = 5000,
+      ackMaxDuration = 100,
+      outOfKerozenTimeout = 30000)
+
+    newGame(settings, views.html.level_4(settings), classOf[FullStepPlane])
   }
 
   private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {

@@ -20,7 +20,7 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
     yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
 
   val gates: Seq[ActorRef] =
-    for (i <- 1 to nrOfRunways)
+    for (i <- 1 to nrOfGates)
     yield context.actorOf(Props[Gate], s"gate-$i")
 
   val groundControl =
