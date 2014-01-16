@@ -46,7 +46,7 @@ object Settings {
   lazy val TEST = new Settings(
     nrOfRunways = 1,
     nrOfTaxiways = 1,
-    taxiingDuration = 10,
+    taxiingDuration = 1000,
     taxiwayCapacity = 1,
     nrOfGates = 1,
     landingMaxDuration = 300,

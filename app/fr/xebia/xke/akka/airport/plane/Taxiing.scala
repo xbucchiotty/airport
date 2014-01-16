@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.ActorRef
-import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasParked}
+import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, EndOfTaxi, HasParked}
 
 trait Taxiing extends PlaneState {
 
@@ -15,6 +15,22 @@ trait Taxiing extends PlaneState {
 
 
   def waitingToPark(taxiway: ActorRef, groundControl: ActorRef): GameReceive
+
+}
+
+trait EndOfTaxiAsLastStep extends PlaneState {
+
+  def taxiing(groundControl: ActorRef, taxiway: ActorRef) = GameReceive {
+
+    case EndOfTaxi =>
+
+      groundControl ! HasParked
+      taxiway ! HasLeft
+
+      updateStep("done", "End of taxi")
+
+      context stop self
+  }
 
 }
 
