@@ -3,8 +3,8 @@ package fr.xebia.xke.akka.airport
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Ack, Land}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.command.{Ack, Land}
 import language.postfixOps
 import org.scalatest.{ShouldMatchers, GivenWhenThen, FunSpec}
 

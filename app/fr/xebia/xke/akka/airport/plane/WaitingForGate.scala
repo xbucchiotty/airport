@@ -1,16 +1,16 @@
 package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.ActorRef
-import fr.xebia.xke.akka.airport.Command
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasParked}
+import fr.xebia.xke.akka.airport.command.{ParkAt, Command}
 
 trait WaitingForGate extends PlaneState {
 
   def waitingToPark(taxiway: ActorRef, groundControl: ActorRef): GameReceive = {
 
-    case Command.ParkAt(gate) =>
+    case ParkAt(gate) =>
 
-      reply(detail = Command.ParkAt(gate).toString)(newState = parking) {
+      reply(detail = ParkAt(gate).toString)(newState = parking) {
 
         taxiway ! HasLeft
         groundControl ! HasParked
@@ -28,7 +28,7 @@ trait WaitingForGate extends PlaneState {
   }
 
   def parking: Receive = {
-    case Command.ParkAt(_) =>
+    case ParkAt(_) =>
   }
 
   def unloadingPassengers(groundControl: ActorRef, destination: ActorRef): GameReceive

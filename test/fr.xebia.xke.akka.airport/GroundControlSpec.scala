@@ -3,10 +3,10 @@ package fr.xebia.xke.akka.airport
 import akka.actor.{ActorRef, Props, ActorSystem}
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Ack, ParkAt, Taxi}
 import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasLeft, HasParked, Incoming}
 import language.postfixOps
 import org.scalatest._
+import fr.xebia.xke.akka.airport.command.{ParkAt, Ack, Taxi}
 
 class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
 

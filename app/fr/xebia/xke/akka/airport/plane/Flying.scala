@@ -2,10 +2,10 @@ package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.{Cancellable, ActorRef}
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.Land
-import fr.xebia.xke.akka.airport.PlaneEvent.{OutOfKerozen, HasLanded, Incoming}
-import languageFeature.postfixOps
 import fr.xebia.xke.akka.airport.PlaneEvent
+import fr.xebia.xke.akka.airport.PlaneEvent.{OutOfKerozen, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.command.Land
+import languageFeature.postfixOps
 
 trait Flying extends PlaneState {
 

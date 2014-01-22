@@ -1,9 +1,9 @@
 package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.{Cancellable, ActorLogging, ActorRef, Actor}
-import fr.xebia.xke.akka.airport.Command.Ack
-import fr.xebia.xke.akka.airport.{PlaneError, Command, PlaneEvent, Settings}
 import controllers.PlaneStatus
+import fr.xebia.xke.akka.airport.command.{Command, Ack}
+import fr.xebia.xke.akka.airport.{PlaneError, PlaneEvent, Settings}
 
 trait PlaneState extends Actor with ActorLogging {
 

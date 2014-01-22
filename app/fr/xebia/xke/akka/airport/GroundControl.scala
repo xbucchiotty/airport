@@ -1,8 +1,8 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, ActorLogging, Actor}
-import fr.xebia.xke.akka.airport.Command.{ParkAt, Taxi}
 import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasParked, HasLeft, Incoming}
+import fr.xebia.xke.akka.airport.command.{ParkAt, Taxi}
 
 class GroundControl(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxTimeout: Int) extends Actor with ActorLogging {
 

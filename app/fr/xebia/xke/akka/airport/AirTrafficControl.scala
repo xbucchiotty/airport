@@ -1,8 +1,8 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, ActorRef, Actor}
-import fr.xebia.xke.akka.airport.Command.{Contact, Land}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, Incoming, HasLanded}
+import fr.xebia.xke.akka.airport.command.{Contact, Land}
 
 class AirTrafficControl(groundControl: ActorRef, runways: Seq[ActorRef], ackMaxTimeout: Int) extends Actor with ActorLogging {
 

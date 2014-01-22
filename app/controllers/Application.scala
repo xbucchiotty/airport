@@ -1,16 +1,18 @@
 package controllers
 
-import akka.actor.{Inbox, ActorRef, Props}
+import akka.actor.{ActorSystem, Inbox, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.{FullStepPlane, JustTaxiingPlane, GameStart, Plane, JustLandingPlane, GameEvent, Settings, Game}
-import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Iteratee
 import play.api.mvc._
 import play.api.templates.HtmlFormat
 
 object Application extends Controller {
+
+  private var gameCounter = 0
 
   def level0 = Action {
     val settings = Settings(
@@ -103,7 +105,8 @@ object Application extends Controller {
       game = null
     }
 
-    game = system.actorOf(Props(classOf[Game], settings, planeType))
+    game = system.actorOf(Props(classOf[Game], settings, planeType), s"game-session-$gameCounter")
+    gameCounter += 1
 
     if (listener != null) {
       system.eventStream.unsubscribe(listener)
@@ -143,9 +146,9 @@ object Application extends Controller {
       (in, out)
   }
 
-  import play.api.Play.current
-
-  val system = Akka.system
+  val system = {
+    ActorSystem.create("infrastructure", ConfigFactory.load().getConfig("infra"))
+  }
 
   var listener: ActorRef = null
   var game: ActorRef = null

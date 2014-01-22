@@ -1,8 +1,8 @@
 package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.ActorRef
-import fr.xebia.xke.akka.airport.Command.{Taxi, Contact}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, Incoming, Taxiing}
+import fr.xebia.xke.akka.airport.command.{Taxi, Contact}
 
 trait WaitingForTaxiway extends PlaneState {
 

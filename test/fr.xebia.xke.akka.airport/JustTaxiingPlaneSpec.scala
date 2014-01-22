@@ -3,8 +3,8 @@ package fr.xebia.xke.akka.airport
 import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.Command.{Ack, Contact}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasParked, EndOfTaxi, Taxiing, HasLeft, HasLanded, Incoming}
+import fr.xebia.xke.akka.airport.command.{Taxi, Ack, Land, Contact}
 import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
@@ -48,7 +48,7 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
             airControl expectMsg Incoming
 
             //When
-            airControl reply Command.Land(runway.ref)
+            airControl reply Land(runway.ref)
 
             //Then
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -74,7 +74,7 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val plane = system.actorOf(Props(classOf[JustTaxiingPlane], airControl.ref, game.ref, settings), "plane")
 
             airControl expectMsg Incoming
-            airControl reply Command.Land(TestProbe().ref)
+            airControl reply Land(TestProbe().ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
 
@@ -107,7 +107,7 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val gate = TestProbe()
             system.actorOf(Props(classOf[JustTaxiingPlane], airControl.ref, game.ref, settings), "plane")
             airControl expectMsg Incoming
-            airControl reply Command.Land(runway.ref)
+            airControl reply Land(runway.ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
             runway expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
@@ -116,7 +116,7 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg Incoming
 
             //When
-            groundControl reply Command.Taxi(taxiway.ref)
+            groundControl reply Taxi(taxiway.ref)
 
             //Then
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -146,13 +146,13 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val probe = TestProbe()
             probe watch plane
             airControl expectMsg Incoming
-            airControl reply Command.Land(TestProbe().ref)
+            airControl reply Land(TestProbe().ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
             airControl reply Contact(groundControl.ref)
             groundControl expectMsg Incoming
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
-            groundControl reply Command.Taxi(taxiway.ref)
+            groundControl reply Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
 
             taxiway expectMsg Taxiing
