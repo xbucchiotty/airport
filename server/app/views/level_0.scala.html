@@ -1,0 +1,54 @@
+@(settings: fr.xebia.xke.akka.airport.Settings)
+
+@game(0){
+
+<table id='strips'>
+    <thead>
+    <tr>
+        <th class="header active">
+            <a href="#"
+               title="Incoming"
+               data-toggle="popover"
+               data-content="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen"
+               data-intro='Hey there! Here is the list of incoming planes. There is <b>@settings.planeGenerationInterval millis</b> between each plane. They need to be told to <b>land on a runway</b>!'
+               data-step='1'>Incoming</a>
+        </th>
+        <th class="header active">
+            <a href="#"
+               title="Runway"
+               data-toggle="popover"
+               data-content="@settings.nrOfRunways runways with @settings.landingMaxDuration millis max to land"
+               data-intro='Here stays landed planes until there are asked to contact ground control. There is <b>@settings.nrOfRunways runways</b> with <b>@settings.landingMaxDuration millis</b> max to land. Here planes need to be told to <b>contact ground control</b>.'
+               data-step='2'>Runway</a>
+        </th>
+        <th class="header inactive">Taxiway</th>
+        <th class="header inactive ">Gate</th>
+        <th class="header">
+            <a href="#"
+               title="Done"
+               data-intro='List of planes successfully landed.'
+               data-step='3'>Done</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<div class="modal hide fade" id="GameEnded">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Xebia International Airport</h3>
+    </div>
+    <div class="modal-body">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTqpTcRmT_eRzP2oH-ClUTgoy2MdBsZzygCKvKq1xpIW3J8T51u" class="img-polaroid">
+
+        <p>Well done!</p>
+
+    </div>
+    <div class="modal-footer">
+        <a href="/1" class="btn btn-primary">Next</a>
+    </div>
+</div>
+
+}

@@ -1,0 +1,295 @@
+2014-01-28 19:10:37,112 - [INFO] - from play in pool-4-thread-2 
+Listening for HTTP on /0:0:0:0:0:0:0:0%0:9000
+
+19:10:39.913 [INFO] - Application started (Dev)
+19:10:40.221 [INFO] - Slf4jLogger started
+19:10:40.300 [INFO] - Starting remoting
+19:10:40.419 [INFO] - Remoting started; listening on addresses :[akka.tcp://airportSystem@127.0.0.1:2554]
+19:10:40.438 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Starting up...
+19:10:40.738 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Registered cluster JMX MBean [akka:type=Cluster]
+19:10:40.738 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Started up successfully
+19:10:40.753 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Metrics will be retreived from MBeans, and may be incorrect on some platforms. To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate platform-specific native libary to 'java.library.path'. Reason: java.lang.ClassNotFoundException: org.hyperic.sigar.Sigar
+19:10:40.759 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Metrics collection has started successfully
+19:10:40.773 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Node [akka.tcp://airportSystem@127.0.0.1:2554] is JOINING, roles [infrastructure]
+19:10:40.844 [INFO] - Slf4jLogger started
+19:10:41.776 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is moving node [akka.tcp://airportSystem@127.0.0.1:2554] to [Up]
+19:11:24.648 [INFO] - Application started (Prod)
+19:12:43.237 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.242 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.247 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.314 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.318 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.321 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.325 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.345 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.349 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.352 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:43.355 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.315 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.319 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.323 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.327 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.344 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.347 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.351 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:44.353 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.318 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.323 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.326 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.329 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.344 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.347 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.350 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.353 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.976 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.979 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.982 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:45.985 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.319 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.324 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.328 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.332 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.344 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.347 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.350 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:46.353 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59178]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59178]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59178
+]
+19:12:47.312 [ERROR] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Marking node(s) as UNREACHABLE [Member(address = akka.tcp://airportSystem@127.0.0.1:59178, status = Up)]
+19:13:36.002 [ERROR] - Collision on runway <runway-1> between <AF-40106> and <AF--13529>
+19:13:41.688 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:41.692 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:41.697 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.314 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.317 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.319 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.322 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.344 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.347 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.350 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:42.353 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.316 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.320 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.324 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.327 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.343 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.346 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.349 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:43.351 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.313 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.316 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.319 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.321 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.344 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.347 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.350 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:44.352 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:45.311 [ERROR] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Marking node(s) as UNREACHABLE [Member(address = akka.tcp://airportSystem@127.0.0.1:59225, status = Up)]
+19:13:45.314 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:45.316 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]
+19:13:45.319 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@127.0.0.1:59225]: Error [Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@127.0.0.1:59225]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: /127.0.0.1:59225
+]

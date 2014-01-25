@@ -1,8 +1,7 @@
-// Comment to get more information during initialization
-logLevel := Level.Warn
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.5.1")
 
-// The Typesafe repository 
-resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+resolvers += Resolver.url(
+  "http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases/",
+  new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases/")
+)(Resolver.ivyStylePatterns)
 
-// Use the Play sbt plugin for Play projects
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.2.1")

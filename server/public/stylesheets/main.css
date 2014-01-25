@@ -1,0 +1,84 @@
+.strip{
+    width: 210px;
+    min-height: 50px;
+}
+
+.regular{
+    background-color: rgba(255, 238, 0, 0.1);
+    background-image: url(http://piq.codeus.net/static/media/userpics/piq_50761.png);
+    background-repeat:no-repeat;
+    background-position-x: 140px;
+    background-size: 70px;
+}
+
+.error{
+    background-color: rgba(255, 0, 0, 0.4);
+    -webkit-transition: all .6s ease-in;
+    -moz-transition: all .6s ease-in;
+    -o-transition: all .6s ease-in;
+    transition: all .6s ease-in;
+}
+
+li > .id {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+li > .detail {
+    font-style: italic;
+}
+
+li > p {
+    margin: 0 0 0px;
+}
+
+body > .navbar .brand {
+    padding-right: 0;
+    padding-left: 0;
+    margin-left: 20px;
+    float: right;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 1px 0 rgba(255,255,255,.1), 0 0 30px rgba(255,255,255,.125);
+    -webkit-transition: all .2s linear;
+    -moz-transition: all .2s linear;
+    transition: all .2s linear;
+}
+
+table > thead tr .header {
+    min-width: 210px;
+}
+
+.popover-content{
+   font-weight: lighter;
+}
+
+.inactive{
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.20) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.20) 50%,
+        rgba(255, 255, 255, 0.20) 75%,
+        transparent 75%,
+        rgba(255, 255, 255, 0.20));
+    background-color: #9C9C9C;
+    background-repeat: repeat-x;
+    pointer-events: none;
+}
+
+.inactive {
+    color: #F1F1F1;
+}
+
+#playerAddress{
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: normal;
+    margin-top: 4px;
+}
+
+.playerDown{
+    color: rgba(255, 0, 0, 0.4);
+}
