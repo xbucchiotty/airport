@@ -1,0 +1,16 @@
+@(hostName:String)
+
+@main("XKE Akka slot")(0){
+
+<div class="container">
+    <div class="hero">
+        Please note that your Player system should be declared with akka.netty.tcp.hostname="@hostName"
+    </div>
+
+    <form action="@routes.Application.register" method="POST" class="form-inline">
+        <input type="email" placeholder="Email" name="email" id="email">
+        <button type="submit" class="btn">Sign in</button>
+    </form>
+</div>
+
+}
