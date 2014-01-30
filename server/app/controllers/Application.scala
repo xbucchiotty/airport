@@ -5,7 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import concurrent.duration._
 import fr.xebia.xke.akka.airport._
-import play.api.libs.iteratee.Iteratee
+import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.mvc._
 import play.api.templates.HtmlFormat
 import fr.xebia.xke.akka.airport.PlayerDown
@@ -126,74 +126,100 @@ object Application extends SecuredController with AirportActorSystem {
       import scala.concurrent.ExecutionContext.Implicits.global
       val in = Iteratee.foreach[String] {
         case "start" => {
+          println("start")
           startGame(teamMail)
         }
       }
 
-      val out = Enumerator2.infiniteUnfold(listener) {
-        listener =>
-          ask(listener, DequeueEvents)(Timeout(1 second))
-            .mapTo[Option[String]]
-            .map(replyOption => replyOption.map(reply => (listener, reply))
-          )
+      val optionalOutput: Option[Enumerator[String]] = for {
+        user <- currentUser(session)
+        context <- contexts.get(user.mail)
+      } yield {
+        Enumerator2.infiniteUnfold(context.listener) {
+          listener => {
+            ask(context.listener, DequeueEvents)(Timeout(1 second))
+              .mapTo[Option[String]]
+              .map(replyOption => replyOption.map(reply => (listener, reply))
+            )
+          }
+        }
       }
+
+      val out = optionalOutput.getOrElse(Enumerator.empty[String])
 
       (in, out)
   }
 
-  private def startGame(teamMail: Option[String]) {
+  private def startGame(teamMail: Option[TeamMail]) {
+    println(s"teammail " + teamMail)
+    println("user: ")
+    users.get(teamMail.get).foreach(println)
+
+    println("systemAddress: ")
+    users.get(teamMail.get).map(user => user.playerSystemAddress).foreach(println)
+
+    println("gameContext: ")
+    users.get(teamMail.get).map(user => contexts.get(user.mail)).foreach(println)
+
     for {
       key <- teamMail
       user <- users.get(key)
       address <- user.playerSystemAddress
+      gameContext <- contexts.get(user.mail)
     } {
+
       val airTrafficControl = airportActorSystem.actorSelection(
         ActorPath.fromString(address.toString) / "user" / "airTrafficControl")
 
       val groundControl = airportActorSystem.actorSelection(
         ActorPath.fromString(address.toString) / "user" / "groundControl")
 
-      airportActorSystem.eventStream.subscribe(listener, classOf[PlaneStatus])
+      airportActorSystem.eventStream.subscribe(gameContext.listener, classOf[PlaneStatus])
 
-      game.tell(GameStart(airTrafficControl, groundControl), Inbox.create(airportActorSystem).getRef())
+      gameContext.game.tell(GameStart(airTrafficControl, groundControl), Inbox.create(airportActorSystem).getRef())
     }
 
   }
 
   private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
-
-    if (game != null) {
-      airportActorSystem.stop(game)
-      game = null
-    }
-
-    game = airportActorSystem.actorOf(Props(classOf[Game], settings, planeType), s"game-session-$gameCounter")
-    gameCounter += 1
-
-    if (listener != null) {
-      airportActorSystem.eventStream.unsubscribe(listener)
-      airportActorSystem.stop(listener)
-    }
-
-    listener = airportActorSystem.actorOf(Props[EventListener])
-
-    airportActorSystem.eventStream.subscribe(listener, classOf[GameEvent])
-
     for {
       user <- currentUser(session)
-      address <- user.playerSystemAddress
     } {
-      airportActorSystem.eventStream.publish(PlayerUp(address))
+
+      println(s"Context before ${contexts.get(user.mail).foreach(println)}")
+
+      for (gameContext <- contexts.get(user.mail)) {
+        airportActorSystem.stop(gameContext.game)
+        airportActorSystem.eventStream.unsubscribe(gameContext.listener)
+        airportActorSystem.stop(gameContext.listener)
+
+        contexts -= user.mail
+        println("Removing old game context")
+
+      }
+
+      val newGame = airportActorSystem.actorOf(Props(classOf[Game], settings, planeType), s"game-session-$gameCounter")
+      gameCounter += 1
+
+      val newListener = airportActorSystem.actorOf(Props[EventListener])
+      airportActorSystem.eventStream.subscribe(newListener, classOf[GameEvent])
+
+      for (address <- user.playerSystemAddress) {
+        airportActorSystem.eventStream.publish(PlayerUp(address))
+      }
+
+      contexts += (user.mail -> GameContext(newListener, newGame))
+      println("Creating new context")
+
+      println(s"Context after ${contexts.get(user.mail)}")
     }
 
     Ok(template)
   }
 
-  private var gameCounter = 0
-
   def playerOnline(address: Address) {
 
-    systems += (address.host.get -> address)
+    systems += ((HostName from address) -> address)
 
     for (user <- findUserBy(address)) {
       users = users.updated(user.mail, user.copy(playerSystemAddress = Some(address)))
@@ -204,7 +230,7 @@ object Application extends SecuredController with AirportActorSystem {
 
   def playerOffline(address: Address) {
 
-    systems -= address.host.get
+    systems -= (HostName from address)
 
     for {
       user <- findUserBy(address)
@@ -216,11 +242,11 @@ object Application extends SecuredController with AirportActorSystem {
   }
 
   private def findUserBy(address: Address): Option[UserInfo] = {
-    users.values.find(_.host == address.host.get)
+    users.values.find(_.host == HostName.from(address))
   }
 
-  private var listener: ActorRef = null
-  private var game: ActorRef = null
+  private var gameCounter = 0
+  private var contexts: Contexts = Contexts.empty
 }
 
 case object DequeueEvents

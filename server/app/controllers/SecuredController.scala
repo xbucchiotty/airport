@@ -13,7 +13,7 @@ trait SecuredController extends Controller {
 
   def currentUser(session: play.api.mvc.Session) =
     for {teamMail <- session.get("email")
-         userInfo <- users.get(teamMail)
+         userInfo <- users.get(TeamMail(teamMail))
     } yield userInfo
 
 
@@ -23,7 +23,7 @@ trait SecuredController extends Controller {
         case Some(user) =>
           checkedAction(user)(request)
         case None =>
-          Ok(views.html.register(currentHost(request)))
+          Ok(views.html.register(HostName.from(request)))
       }
   }
 
@@ -39,20 +39,20 @@ trait SecuredController extends Controller {
         case None => {
 
           val form: Form[String] = Form(single("email" -> email))
-          val teamMail = form.bindFromRequest().get
+          val teamMail = TeamMail(form.bindFromRequest().get)
 
           if (users.contains(teamMail)) {
 
-            Conflict(views.html.register(currentHost(request)))
+            Conflict(views.html.register(HostName.from(request)))
 
           } else {
 
-            val userHost = currentHost(request)
+            val userHost = HostName.from(request)
             val userInfo = UserInfo(teamMail, userHost, systems.get(userHost))
 
             users += (teamMail -> userInfo)
 
-            Redirect(routes.Application.level0).withSession("email" -> teamMail)
+            Redirect(routes.Application.level0).withSession("email" -> teamMail.value)
           }
         }
       }
@@ -60,9 +60,7 @@ trait SecuredController extends Controller {
   }
 
 
-  def currentHost(request: play.api.mvc.Request[_]): String = {
-    request.host.split(":").head
-  }
+
 
   def index: Action[AnyContent]
 }

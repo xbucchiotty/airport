@@ -1,21 +1,350 @@
-2014-01-29 20:02:29,381 - [INFO] - from play in pool-4-thread-3 
+2014-01-30 08:53:21,080 - [INFO] - from play in pool-7-thread-1 
 Listening for HTTP on /0:0:0:0:0:0:0:0%0:9000
 
-20:02:32.031 [INFO] - Application started (Dev)
-20:02:32.346 [INFO] - Slf4jLogger started
-20:02:32.426 [INFO] - Starting remoting
-20:02:32.558 [INFO] - Remoting started; listening on addresses :[akka.tcp://airportSystem@127.0.0.1:2554]
-20:02:32.581 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Starting up...
-20:02:32.906 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Registered cluster JMX MBean [akka:type=Cluster]
-20:02:32.907 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Started up successfully
-20:02:32.923 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Metrics will be retreived from MBeans, and may be incorrect on some platforms. To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate platform-specific native libary to 'java.library.path'. Reason: java.lang.ClassNotFoundException: org.hyperic.sigar.Sigar
-20:02:32.930 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Metrics collection has started successfully
-20:02:32.941 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Node [akka.tcp://airportSystem@127.0.0.1:2554] is JOINING, roles [infrastructure]
-20:02:33.046 [INFO] - Slf4jLogger started
-20:02:33.943 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is moving node [akka.tcp://airportSystem@127.0.0.1:2554] to [Up]
-20:02:35.635 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Node [akka.tcp://airportSystem@localhost:61243] is JOINING, roles [player]
-20:02:35.944 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is moving node [akka.tcp://airportSystem@localhost:61243] to [Up]
-20:02:40.855 [INFO] - Plane <AF--89120> landed on runway <runway-1>
-20:02:41.176 [INFO] - Plane <AF--89120> has left runway <runway-1>
-20:02:43.934 [INFO] - Plane <AF-46238> landed on runway <runway-1>
-20:02:44.215 [INFO] - Plane <AF-46238> has left runway <runway-1>
+08:53:25.029 [INFO] - Application started (Dev)
+08:53:25.329 [INFO] - Slf4jLogger started
+08:53:25.390 [INFO] - Starting remoting
+08:53:25.487 [INFO] - Remoting started; listening on addresses :[akka.tcp://airportSystem@127.0.0.1:2554]
+08:53:25.507 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Starting up...
+08:53:25.774 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Registered cluster JMX MBean [akka:type=Cluster]
+08:53:25.775 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Started up successfully
+08:53:25.786 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Metrics will be retreived from MBeans, and may be incorrect on some platforms. To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate platform-specific native libary to 'java.library.path'. Reason: java.lang.ClassNotFoundException: org.hyperic.sigar.Sigar
+08:53:25.790 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Metrics collection has started successfully
+08:53:25.808 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Node [akka.tcp://airportSystem@127.0.0.1:2554] is JOINING, roles [infrastructure]
+08:53:25.886 [INFO] - Slf4jLogger started
+08:53:26.806 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is moving node [akka.tcp://airportSystem@127.0.0.1:2554] to [Up]
+08:53:39.696 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Node [akka.tcp://airportSystem@localhost:62346] is JOINING, roles [player]
+08:53:39.807 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is moving node [akka.tcp://airportSystem@localhost:62346] to [Up]
+08:53:42.821 [INFO] - Plane <AF-99032> landed on runway <runway-1>
+08:53:43.150 [INFO] - Plane <AF-99032> has left runway <runway-1>
+08:53:45.909 [INFO] - Plane <AF--34812> landed on runway <runway-1>
+08:53:46.428 [INFO] - Plane <AF--34812> has left runway <runway-1>
+08:53:49.110 [INFO] - Plane <AF-52093> landed on runway <runway-1>
+08:53:49.409 [INFO] - Plane <AF-52093> has left runway <runway-1>
+08:53:51.609 [INFO] - Plane <AF-23831> landed on runway <runway-1>
+08:53:51.919 [INFO] - Plane <AF-23831> has left runway <runway-1>
+08:53:54.648 [INFO] - Plane <AF-34577> landed on runway <runway-1>
+08:53:55.128 [INFO] - Plane <AF-34577> has left runway <runway-1>
+08:53:57.669 [INFO] - Plane <AF--68848> landed on runway <runway-1>
+08:53:58.188 [INFO] - Plane <AF--68848> has left runway <runway-1>
+08:54:00.458 [INFO] - Plane <AF--50132> landed on runway <runway-1>
+08:54:00.979 [INFO] - Plane <AF--50132> has left runway <runway-1>
+08:54:03.428 [INFO] - Plane <AF--19884> landed on runway <runway-1>
+08:54:03.769 [INFO] - Plane <AF--19884> has left runway <runway-1>
+08:54:06.758 [INFO] - Plane <AF-11818> landed on runway <runway-1>
+08:54:07.060 [INFO] - Plane <AF-11818> has left runway <runway-1>
+08:54:09.558 [INFO] - Plane <AF--80069> landed on runway <runway-1>
+08:54:10.078 [INFO] - Plane <AF--80069> has left runway <runway-1>
+08:54:15.909 [INFO] - Plane <AF-82676> landed on runway <runway-1>
+08:54:16.219 [INFO] - Plane <AF-82676> has left runway <runway-1>
+08:54:17.549 [INFO] - Plane <AF--53561> landed on runway <runway-1>
+08:54:17.949 [INFO] - Plane <AF--53561> has left runway <runway-1>
+08:54:18.568 [INFO] - Plane <AF--75151> landed on runway <runway-1>
+08:54:18.969 [INFO] - Plane <AF--75151> has left runway <runway-1>
+08:54:19.678 [INFO] - Plane <AF--52096> landed on runway <runway-1>
+08:54:20.161 [INFO] - Plane <AF--52096> has left runway <runway-1>
+08:54:21.149 [INFO] - Plane <AF-48584> landed on runway <runway-1>
+08:54:21.558 [INFO] - Plane <AF-48584> has left runway <runway-1>
+08:54:22.368 [INFO] - Plane <AF--48094> landed on runway <runway-1>
+08:54:22.729 [INFO] - Plane <AF--48094> has left runway <runway-1>
+08:54:23.498 [INFO] - Plane <AF-16483> landed on runway <runway-1>
+08:54:23.970 [INFO] - Plane <AF-16483> has left runway <runway-1>
+08:54:24.958 [INFO] - Plane <AF-11540> landed on runway <runway-1>
+08:54:25.469 [INFO] - Plane <AF-11540> has left runway <runway-1>
+08:54:26.548 [INFO] - Plane <AF-94667> landed on runway <runway-1>
+08:54:27.029 [INFO] - Plane <AF-94667> has left runway <runway-1>
+08:54:27.729 [INFO] - Plane <AF--58257> landed on runway <runway-1>
+08:54:28.029 [INFO] - Plane <AF--58257> has left runway <runway-1>
+08:54:36.529 [INFO] - Plane <AF-90703> landed on runway <runway-1>
+08:54:36.619 [INFO] - Plane <AF-90703> has left runway <runway-1>
+08:54:37.119 [INFO] - Plane <AF--60041> landed on runway <runway-1>
+08:54:37.199 [INFO] - Plane <AF--60041> has left runway <runway-1>
+08:54:37.249 [INFO] - Plane <AF--85031> landed on runway <runway-1>
+08:54:37.359 [INFO] - Plane <AF--85031> has left runway <runway-1>
+08:54:37.508 [INFO] - Plane <AF--12157> landed on runway <runway-1>
+08:54:37.589 [INFO] - Plane <AF--12157> has left runway <runway-1>
+08:54:38.219 [INFO] - Plane <AF-76683> landed on runway <runway-1>
+08:54:38.291 [ERROR] - Collision on runway <runway-1> between <AF-76683> and <AF-39217>
+08:54:46.728 [INFO] - Plane <AF-98698> landed on runway <runway-1>
+08:54:46.829 [INFO] - Plane <AF-98698> has left runway <runway-1>
+08:54:47.569 [INFO] - Plane <AF--63751> landed on runway <runway-1>
+08:54:47.660 [INFO] - Plane <AF--63751> has left runway <runway-1>
+08:54:48.169 [INFO] - Plane <AF-92303> landed on runway <runway-1>
+08:54:48.219 [ERROR] - Collision on runway <runway-1> between <AF-92303> and <AF-72976>
+08:55:04.079 [INFO] - Plane <AF--42297> landed on runway <runway-1>
+08:55:04.519 [INFO] - Plane <AF--42297> has left runway <runway-1>
+08:55:06.633 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.637 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.641 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.802 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.805 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.808 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.812 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.832 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.834 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.836 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:06.839 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.258 [INFO] - Plane <AF-42339> landed on runway <runway-1>
+08:55:07.264 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.268 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.272 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.275 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.793 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.795 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.798 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.800 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.832 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.834 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.837 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:07.839 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.802 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.804 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.810 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.813 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.831 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.834 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.836 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.838 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.933 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.935 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.938 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:08.941 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.801 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.804 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.806 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.809 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.831 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.834 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.836 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:09.839 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.801 [ERROR] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Marking node(s) as UNREACHABLE [Member(address = akka.tcp://airportSystem@localhost:62346, status = Up)]
+08:55:10.803 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.807 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.810 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.813 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.834 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.837 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.840 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:10.844 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62346]: Error [Association failed with [akka.tcp://airportSystem@localhost:62346]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62346]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62346
+]
+08:55:11.800 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is marking unreachable node [akka.tcp://airportSystem@localhost:62346] as [Down]
+08:55:11.801 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is removing unreachable node [akka.tcp://airportSystem@localhost:62346]
+08:55:11.802 [INFO] - Address [akka.tcp://airportSystem@localhost:62346] is now quarantined, all messages to this address will be delivered to dead letters.
+08:55:25.533 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Node [akka.tcp://airportSystem@localhost:62406] is JOINING, roles [player]
+08:55:25.800 [INFO] - Cluster Node [akka.tcp://airportSystem@127.0.0.1:2554] - Leader is moving node [akka.tcp://airportSystem@localhost:62406] to [Up]
+08:55:28.149 [INFO] - Plane <AF-97777> landed on runway <runway-1>
+08:55:28.668 [INFO] - Plane <AF-97777> has left runway <runway-1>
+08:55:31.768 [INFO] - Plane <AF--88232> landed on runway <runway-1>
+08:55:32.259 [INFO] - Plane <AF--88232> has left runway <runway-1>
+08:55:34.348 [INFO] - Plane <AF-1775> landed on runway <runway-1>
+08:55:34.708 [INFO] - Plane <AF-1775> has left runway <runway-1>
+08:55:37.649 [INFO] - Plane <AF--32214> landed on runway <runway-1>
+08:55:38.089 [INFO] - Plane <AF--32214> has left runway <runway-1>
+08:55:40.428 [INFO] - Plane <AF--10044> landed on runway <runway-1>
+08:55:40.768 [INFO] - Plane <AF--10044> has left runway <runway-1>
+08:55:43.148 [INFO] - Plane <AF--16504> landed on runway <runway-1>
+08:55:43.449 [INFO] - Plane <AF--16504> has left runway <runway-1>
+08:55:46.688 [INFO] - Plane <AF--73672> landed on runway <runway-1>
+08:55:47.200 [INFO] - Plane <AF--73672> has left runway <runway-1>
+08:55:49.539 [INFO] - Plane <AF-54403> landed on runway <runway-1>
+08:55:49.908 [INFO] - Plane <AF-54403> has left runway <runway-1>
+08:55:52.239 [INFO] - Plane <AF-34413> landed on runway <runway-1>
+08:55:52.729 [INFO] - Plane <AF-34413> has left runway <runway-1>
+08:55:55.709 [INFO] - Plane <AF--62453> landed on runway <runway-1>
+08:55:56.048 [INFO] - Plane <AF--62453> has left runway <runway-1>
+08:56:26.117 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.120 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.124 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.802 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.804 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.806 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.809 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.831 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.833 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.835 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
+08:56:26.837 [ERROR] - AssociationError [akka.tcp://airportSystem@127.0.0.1:2554] -> [akka.tcp://airportSystem@localhost:62406]: Error [Association failed with [akka.tcp://airportSystem@localhost:62406]] [
+akka.remote.EndpointAssociationException: Association failed with [akka.tcp://airportSystem@localhost:62406]
+Caused by: akka.remote.transport.netty.NettyTransport$$anonfun$associate$1$$anon$2: Connection refused: localhost/127.0.0.1:62406
+]
