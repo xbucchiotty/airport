@@ -1,8 +1,12 @@
-@(hostName:controllers.HostName)
+@(hostName:controllers.HostName)(message:Option[String])
 
 @main("XKE Akka slot")(0){
 
 <div class="container">
+    <div class="info">
+        @message
+    </div>
+
     <div class="hero">
         Check your client config for value <strong>akka.netty.tcp.hostname="@hostName.value"</strong>
     </div>

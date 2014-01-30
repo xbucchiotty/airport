@@ -4,3 +4,4 @@ target/
 logs/application.log
 .DS_Store
 RUNNING_PID
+logs/

@@ -126,7 +126,6 @@ object Application extends SecuredController with AirportActorSystem {
       import scala.concurrent.ExecutionContext.Implicits.global
       val in = Iteratee.foreach[String] {
         case "start" => {
-          println("start")
           startGame(teamMail)
         }
       }
@@ -151,16 +150,6 @@ object Application extends SecuredController with AirportActorSystem {
   }
 
   private def startGame(teamMail: Option[TeamMail]) {
-    println(s"teammail " + teamMail)
-    println("user: ")
-    users.get(teamMail.get).foreach(println)
-
-    println("systemAddress: ")
-    users.get(teamMail.get).map(user => user.playerSystemAddress).foreach(println)
-
-    println("gameContext: ")
-    users.get(teamMail.get).map(user => contexts.get(user.mail)).foreach(println)
-
     for {
       key <- teamMail
       user <- users.get(key)
@@ -182,11 +171,7 @@ object Application extends SecuredController with AirportActorSystem {
   }
 
   private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
-    for {
-      user <- currentUser(session)
-    } {
-
-      println(s"Context before ${contexts.get(user.mail).foreach(println)}")
+    for (user <- currentUser(session)) {
 
       for (gameContext <- contexts.get(user.mail)) {
         airportActorSystem.stop(gameContext.game)
@@ -194,8 +179,6 @@ object Application extends SecuredController with AirportActorSystem {
         airportActorSystem.stop(gameContext.listener)
 
         contexts -= user.mail
-        println("Removing old game context")
-
       }
 
       val newGame = airportActorSystem.actorOf(Props(classOf[Game], settings, planeType), s"game-session-$gameCounter")
@@ -209,9 +192,6 @@ object Application extends SecuredController with AirportActorSystem {
       }
 
       contexts += (user.mail -> GameContext(newListener, newGame))
-      println("Creating new context")
-
-      println(s"Context after ${contexts.get(user.mail)}")
     }
 
     Ok(template)

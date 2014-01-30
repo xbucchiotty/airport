@@ -23,7 +23,7 @@ trait SecuredController extends Controller {
         case Some(user) =>
           checkedAction(user)(request)
         case None =>
-          Ok(views.html.register(HostName.from(request)))
+          Ok(views.html.register(HostName.from(request))(None))
       }
   }
 
@@ -42,10 +42,12 @@ trait SecuredController extends Controller {
           val teamMail = TeamMail(form.bindFromRequest().get)
 
           if (users.contains(teamMail)) {
-
-            Conflict(views.html.register(HostName.from(request)))
-
-          } else {
+            Conflict(views.html.register(HostName.from(request))(Some("A team is already registered with this email.")))
+          }
+          else if (systems.contains(HostName.from(request))) {
+            Conflict(views.html.register(HostName.from(request))(Some("A team is already registered with this hostname.")))
+          }
+          else {
 
             val userHost = HostName.from(request)
             val userInfo = UserInfo(teamMail, userHost, systems.get(userHost))
@@ -58,8 +60,6 @@ trait SecuredController extends Controller {
       }
     }
   }
-
-
 
 
   def index: Action[AnyContent]
