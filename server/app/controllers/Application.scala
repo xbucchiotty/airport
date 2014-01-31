@@ -29,7 +29,7 @@ object Application extends SecuredController with AirportActorSystem {
           landingMaxDuration = 1500,
           planeGenerationInterval = 3000,
           objective = 20,
-          ackMaxDuration = 500)
+          ackMaxDuration = 1000)
 
         newGame(settings, views.html.level_0(settings), classOf[JustLandingPlane])
 
@@ -43,7 +43,7 @@ object Application extends SecuredController with AirportActorSystem {
           landingMaxDuration = 1500,
           planeGenerationInterval = 1250,
           objective = 20,
-          ackMaxDuration = 500)
+          ackMaxDuration = 1000)
 
         newGame(settings, views.html.level_1(settings), classOf[JustLandingPlane])
   }
@@ -56,7 +56,7 @@ object Application extends SecuredController with AirportActorSystem {
           landingMaxDuration = 2500,
           planeGenerationInterval = 500,
           objective = 50,
-          ackMaxDuration = 100,
+          ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
         newGame(settings, views.html.level_2(settings), classOf[JustLandingPlane])
@@ -73,7 +73,7 @@ object Application extends SecuredController with AirportActorSystem {
           nrOfTaxiways = 1,
           taxiingDuration = 1000,
           taxiwayCapacity = 5,
-          ackMaxDuration = 100,
+          ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
         newGame(settings, views.html.level_3(settings), classOf[JustTaxiingPlane])
@@ -92,7 +92,7 @@ object Application extends SecuredController with AirportActorSystem {
           taxiwayCapacity = 10,
           nrOfGates = 2,
           unloadingPassengersMaxDuration = 5000,
-          ackMaxDuration = 100,
+          ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
         newGame(settings, views.html.level_4(settings), classOf[FullStepPlane])
@@ -111,7 +111,7 @@ object Application extends SecuredController with AirportActorSystem {
           taxiwayCapacity = 10,
           nrOfGates = 2,
           unloadingPassengersMaxDuration = 5000,
-          ackMaxDuration = 100,
+          ackMaxDuration = 1000,
           radioReliability = 0.8,
           outOfKerozenTimeout = 30000)
 
@@ -173,7 +173,6 @@ object Application extends SecuredController with AirportActorSystem {
 
 
       for (address <- user.playerSystemAddress) {
-        println("Event published")
         eventStream publish PlayerUp(address)
       }
 

@@ -92,6 +92,7 @@ trait PlaneState extends Actor with ActorLogging {
 
     private def registerError: Receive = {
       case msg =>
+        log.warning(s"${self.path.name} received a wrong order $msg}")
         context stop self
     }
   }
