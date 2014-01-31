@@ -42,10 +42,10 @@ trait SecuredController extends Controller {
           val teamMail = TeamMail(form.bindFromRequest().get)
 
           if (users.contains(teamMail)) {
-            Conflict(views.html.register(HostName.from(request))(Some("A team is already registered with this email.")))
+            Ok(views.html.register(HostName.from(request))(Some("A team is already registered with this email.")))
           }
-          else if (systems.contains(HostName.from(request))) {
-            Conflict(views.html.register(HostName.from(request))(Some("A team is already registered with this hostname.")))
+          else if (users.values.exists(_.host == HostName.from(request))) {
+            Ok(views.html.register(HostName.from(request))(Some("A team is already registered with this hostname.")))
           }
           else {
 

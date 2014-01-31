@@ -1,4 +1,5 @@
 import akka.actor.{ActorRef, Address}
+import akka.event.{EventStream, EventBus}
 
 package object controllers {
 
@@ -39,6 +40,6 @@ package object controllers {
 
   case class UserInfo(mail: TeamMail, host: HostName, playerSystemAddress: Option[Address] = None)
 
-  case class GameContext(listener: ActorRef, game: ActorRef)
+  case class GameContext(listener: ActorRef, game: ActorRef, eventBus: EventStream)
 
 }

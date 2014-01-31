@@ -1,14 +1,14 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorSelection, OneForOneStrategy, SupervisorStrategy, ActorRef, Cancellable, Terminated, ActorLogging, Props, Actor}
-import akka.remote.RemoteScope
+import akka.actor.{OneForOneStrategy, SupervisorStrategy, ActorRef, Cancellable, Terminated, ActorLogging, Props, Actor}
 import concurrent.duration._
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
 import scala.util.Random
+import akka.event.EventStream
 
-class Game(settings: Settings, planeType: Class[Plane]) extends Actor with ActorLogging {
+class Game(settings: Settings, planeType: Class[Plane], eventStream: EventStream) extends Actor with ActorLogging {
 
   import settings._
 
@@ -35,7 +35,7 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
     taxiways.foreach(context.watch)
     gates.foreach(context.watch)
 
-    context.system.eventStream.subscribe(self, classOf[PlaneStatus])
+    eventStream.subscribe(self, classOf[PlaneStatus])
 
     publishScore()
   }
@@ -87,17 +87,17 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
       loose()
 
     case Terminated(_) =>
-      context.system.eventStream.publish(GameOver)
+      eventStream.publish(GameOver)
       context stop self
 
     case NewPlane if planesToGenerate > 0 =>
-      context.actorOf(Props(planeType, airTrafficControl, self, settings), s"AF-${ Random.nextLong() % 100000 }")
+      context.actorOf(Props(planeType, airTrafficControl, self, settings, eventStream), s"AF-${ Random.nextLong() % 100000 }")
       planesToGenerate -= 1
 
   }
 
   private def publishScore() {
-    context.system.eventStream.publish(Score(score, objective))
+    eventStream.publish(Score(score, objective))
   }
 
   private def gain() {
@@ -105,7 +105,7 @@ class Game(settings: Settings, planeType: Class[Plane]) extends Actor with Actor
     publishScore()
 
     if (score == objective) {
-      context.system.eventStream.publish(GameEnd)
+      eventStream.publish(GameEnd)
       planeGeneration.cancel()
 
       context stop self

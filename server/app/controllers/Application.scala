@@ -14,6 +14,7 @@ import fr.xebia.xke.akka.airport.JustLandingPlane
 import fr.xebia.xke.akka.airport.GameStart
 import fr.xebia.xke.akka.airport.JustTaxiingPlane
 import fr.xebia.xke.akka.airport.FullStepPlane
+import akka.event.EventStream
 
 object Application extends SecuredController with AirportActorSystem {
 
@@ -149,6 +150,39 @@ object Application extends SecuredController with AirportActorSystem {
       (in, out)
   }
 
+  private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
+    for (user <- currentUser(session)) {
+
+      for (gameContext <- contexts.get(user.mail)) {
+        airportActorSystem.stop(gameContext.game)
+        airportActorSystem.stop(gameContext.listener)
+
+        contexts -= user.mail
+      }
+
+      val eventStream = new EventStream(false)
+
+      val listener = airportActorSystem.actorOf(Props(classOf[EventListener], eventStream))
+
+      eventStream.subscribe(listener, classOf[GameEvent])
+      eventStream.subscribe(listener, classOf[PlaneStatus])
+
+
+      val game = airportActorSystem.actorOf(Props(classOf[Game], settings, planeType, eventStream), s"game-session-$gameCounter")
+      gameCounter += 1
+
+
+      for (address <- user.playerSystemAddress) {
+        println("Event published")
+        eventStream publish PlayerUp(address)
+      }
+
+      contexts += (user.mail -> GameContext(listener, game, eventStream))
+    }
+
+    Ok(template)
+  }
+
   private def startGame(teamMail: Option[TeamMail]) {
     for {
       key <- teamMail
@@ -163,48 +197,22 @@ object Application extends SecuredController with AirportActorSystem {
       val groundControl = airportActorSystem.actorSelection(
         ActorPath.fromString(address.toString) / "user" / "groundControl")
 
-      airportActorSystem.eventStream.subscribe(gameContext.listener, classOf[PlaneStatus])
-
       gameContext.game.tell(GameStart(airTrafficControl, groundControl), Inbox.create(airportActorSystem).getRef())
     }
 
-  }
-
-  private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
-    for (user <- currentUser(session)) {
-
-      for (gameContext <- contexts.get(user.mail)) {
-        airportActorSystem.stop(gameContext.game)
-        airportActorSystem.eventStream.unsubscribe(gameContext.listener)
-        airportActorSystem.stop(gameContext.listener)
-
-        contexts -= user.mail
-      }
-
-      val newGame = airportActorSystem.actorOf(Props(classOf[Game], settings, planeType), s"game-session-$gameCounter")
-      gameCounter += 1
-
-      val newListener = airportActorSystem.actorOf(Props[EventListener])
-      airportActorSystem.eventStream.subscribe(newListener, classOf[GameEvent])
-
-      for (address <- user.playerSystemAddress) {
-        airportActorSystem.eventStream.publish(PlayerUp(address))
-      }
-
-      contexts += (user.mail -> GameContext(newListener, newGame))
-    }
-
-    Ok(template)
   }
 
   def playerOnline(address: Address) {
 
     systems += ((HostName from address) -> address)
 
-    for (user <- findUserBy(address)) {
+    for {
+      user <- findUserBy(address)
+      gameContext <- contexts.get(user.mail)
+    } {
       users = users.updated(user.mail, user.copy(playerSystemAddress = Some(address)))
 
-      airportActorSystem.eventStream.publish(PlayerUp(address))
+      gameContext.eventBus.publish(PlayerUp(address))
     }
   }
 
@@ -215,9 +223,10 @@ object Application extends SecuredController with AirportActorSystem {
     for {
       user <- findUserBy(address)
       playerSystemAddress <- user.playerSystemAddress if address == playerSystemAddress
+      gameContext <- contexts.get(user.mail)
     } {
       users = users.updated(user.mail, user.copy(playerSystemAddress = None))
-      airportActorSystem.eventStream.publish(PlayerDown(address))
+      gameContext.eventBus.publish(PlayerDown(address))
     }
   }
 

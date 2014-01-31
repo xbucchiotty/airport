@@ -4,6 +4,7 @@ import akka.actor.{Cancellable, ActorLogging, ActorRef, Actor}
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.command.{Command, Ack}
 import fr.xebia.xke.akka.airport.{PlaneError, PlaneEvent, Settings}
+import akka.event.EventStream
 
 trait PlaneState extends Actor with ActorLogging {
 
@@ -11,7 +12,7 @@ trait PlaneState extends Actor with ActorLogging {
 
   protected def game: ActorRef
 
-  protected def eventStream = context.system.eventStream
+  def eventStream: EventStream
 
   protected val plane = self
 

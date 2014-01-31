@@ -6,10 +6,15 @@ import scala.collection.immutable.Queue
 import fr.xebia.xke.akka.airport.Score
 import fr.xebia.xke.akka.airport.PlayerUp
 import scala.Some
+import akka.event.EventStream
 
-class EventListener extends Actor {
+class EventListener(eventStream: EventStream) extends Actor {
 
   private var buffer = Queue.empty[String]
+
+  override def postStop() {
+    eventStream.unsubscribe(self)
+  }
 
   def receive = {
     case status: PlaneStatus =>
@@ -17,11 +22,11 @@ class EventListener extends Actor {
 
     case GameOver =>
       buffer = buffer enqueue gameOver
-      context.system.eventStream.unsubscribe(self)
+      eventStream.unsubscribe(self)
 
     case GameEnd =>
       buffer = buffer enqueue gameEnd
-      context.system.eventStream.unsubscribe(self)
+      eventStream.unsubscribe(self)
 
     case newScore: Score =>
       buffer = buffer enqueue score(newScore)
