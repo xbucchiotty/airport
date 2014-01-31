@@ -158,7 +158,7 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       plane reply Ack
     }
 
-    it("should alternate the runway allocated to a new incoming plane") {
+    it("should alternate the gates allocated to a new incoming plane") {
       pending
 
       Given("a ground control with 2 gates")
@@ -223,7 +223,7 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
     it("should repeat message until it's successfully received") {
       pending
 
-      Given("an air traffic control with 1 runway")
+      Given("an ground control with 1 taxiway and 1 gate")
       implicit val system = testActorSystem()
       val gate = TestProbe()
       val taxiway = TestProbe()
