@@ -1,4 +1,4 @@
-package fr.xebia.xke.akka.airport
+package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.Props
 import akka.testkit.TestProbe
@@ -9,6 +9,7 @@ import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
 import fr.xebia.xke.akka.airport.command.{Contact, Land, Ack}
 import akka.event.EventStream
+import fr.xebia.xke.akka.airport.Settings
 
 class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
 

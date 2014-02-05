@@ -7,8 +7,9 @@ import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
 import scala.util.Random
 import akka.event.EventStream
+import fr.xebia.xke.akka.airport.plane.{PlaneListener, Plane}
 
-class Game(settings: Settings, planeType: Class[Plane], eventStream: EventStream) extends Actor with ActorLogging {
+class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream) extends Actor with ActorLogging {
 
   import settings._
 
@@ -35,7 +36,7 @@ class Game(settings: Settings, planeType: Class[Plane], eventStream: EventStream
     taxiways.foreach(context.watch)
     gates.foreach(context.watch)
 
-    eventStream.subscribe(self, classOf[PlaneStatus])
+    gameEventStream.subscribe(self, classOf[PlaneStatus])
 
     publishScore()
   }
@@ -87,17 +88,23 @@ class Game(settings: Settings, planeType: Class[Plane], eventStream: EventStream
       loose()
 
     case Terminated(_) =>
-      eventStream.publish(GameOver)
+      gameEventStream.publish(GameOver)
       context stop self
 
     case NewPlane if planesToGenerate > 0 =>
-      context.actorOf(Props(planeType, airTrafficControl, self, settings, eventStream), s"AF-${ Random.nextLong() % 100000 }")
+      val planeEventStream = new EventStream()
+
+      val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"AF-${ Random.nextLong() % 100000 }")
+      val listener = context.actorOf(Props(classOf[PlaneListener], plane, gameEventStream))
+
+      planeEventStream.subscribe(listener, classOf[Any])
+
       planesToGenerate -= 1
 
   }
 
   private def publishScore() {
-    eventStream.publish(Score(score, objective))
+    gameEventStream.publish(Score(score, objective))
   }
 
   private def gain() {
@@ -105,7 +112,7 @@ class Game(settings: Settings, planeType: Class[Plane], eventStream: EventStream
     publishScore()
 
     if (score == objective) {
-      eventStream.publish(GameEnd)
+      gameEventStream.publish(GameEnd)
       planeGeneration.cancel()
 
       context stop self

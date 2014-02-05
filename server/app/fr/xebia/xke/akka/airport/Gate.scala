@@ -8,7 +8,7 @@ class Gate extends Actor with ActorLogging {
   def free: Receive = {
     case HasParked =>
       val plane = sender
-      log.info("Plane <{}> parked on gate <{}>", plane.path.name, self.path.name)
+      log.debug("Plane <{}> parked on gate <{}>", plane.path.name, self.path.name)
 
       context become occupied(plane)
   }
@@ -20,12 +20,12 @@ class Gate extends Actor with ActorLogging {
       plane ! Collision(newPlane, self)
       newPlane ! Collision(plane, self)
 
-      log.error("Collision on gate <{}> between <{}> and <{}>", self.path.name, plane.path.name, newPlane.path.name)
+      log.debug("Collision on gate <{}> between <{}> and <{}>", self.path.name, plane.path.name, newPlane.path.name)
       context stop self
     }
 
     case HasLeft if sender == plane => {
-      log.info("Plane <{}> leaves gate <{}>", plane.path.name, self.path.name)
+      log.debug("Plane <{}> leaves gate <{}>", plane.path.name, self.path.name)
       context become free
     }
   }

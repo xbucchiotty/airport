@@ -10,11 +10,9 @@ import play.api.mvc._
 import play.api.templates.HtmlFormat
 import fr.xebia.xke.akka.airport.PlayerDown
 import fr.xebia.xke.akka.airport.PlayerUp
-import fr.xebia.xke.akka.airport.JustLandingPlane
 import fr.xebia.xke.akka.airport.GameStart
-import fr.xebia.xke.akka.airport.JustTaxiingPlane
-import fr.xebia.xke.akka.airport.FullStepPlane
 import akka.event.EventStream
+import fr.xebia.xke.akka.airport.plane.{Plane, JustTaxiingPlane, JustLandingPlane, FullStepPlane}
 
 object Application extends SecuredController with AirportActorSystem {
 

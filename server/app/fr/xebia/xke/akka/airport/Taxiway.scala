@@ -18,7 +18,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
       this.queue = newQueue
 
 
-      log.info("Plane <{}> leaves taxiway <{}>", plane.path.name, self.path.name)
+      log.debug("Plane <{}> leaves taxiway <{}>", plane.path.name, self.path.name)
 
       free += 1
 
@@ -31,15 +31,15 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   val acceptNewPlane: Receive = {
     case Taxiing =>
       val plane = sender
-      log.info("Plane <{}> runs on taxiway <{}>", plane.path.name, self.path.name)
+      log.debug("Plane <{}> runs on taxiway <{}>", plane.path.name, self.path.name)
       this.queue = queue enqueue plane
 
       free -= 1
       if (free < 1) {
-        log.info("Taxiway {} is now full", self.path.name)
+        log.debug("Taxiway {} is now full", self.path.name)
         context become full
       } else {
-        log.info("Remains {} places on taxiway {}", free, self.path.name)
+        log.debug("Remains {} places on taxiway {}", free, self.path.name)
       }
   }
 
@@ -49,7 +49,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
       plane ! Collision(queue.last, self)
 
-      log.error("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
+      log.debug("Plane <{}> runs on a full taxiway <{}>", plane.path.name, self.path.name)
 
       context stop self
 
