@@ -4,6 +4,7 @@ import akka.actor.ActorContext
 import akka.actor.Actor.Receive
 import akka.event.{LoggingAdapter, EventStream}
 import fr.xebia.xke.akka.airport.plane.event.{StateChanged, ErrorHappened, DetailChanged}
+import fr.xebia.xke.akka.airport.PlaneError
 
 private[plane] trait StateMachine {
 
@@ -48,6 +49,10 @@ private[plane] trait StateMachine {
       }
 
     private def publishEvent: (Any => Any) = {
+      case msg: PlaneError =>
+        terminateInError(msg.toString())
+        msg
+
       case msg: Any =>
         updateStatus(msg.toString)
         msg
