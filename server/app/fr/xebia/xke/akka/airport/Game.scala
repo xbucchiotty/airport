@@ -52,16 +52,16 @@ class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventSt
       context become waitingForTheGameReady(null, null)
   }
 
-  def waitingForTheGameReady(airTrafficControl: ActorRef, groundControl: ActorRef): Receive = {
+  def waitingForTheGameReady(_airTrafficControl: ActorRef, _groundControl: ActorRef): Receive = {
     case AirTrafficControlReady =>
       val airTrafficControl = sender
       context watch airTrafficControl
 
-      if (groundControl != null) {
-        import context.dispatcher
+      if (_groundControl != null) {
+          import context.dispatcher
         planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
-        context become started(airTrafficControl, groundControl)
+        context become started(airTrafficControl, _groundControl)
       } else {
         context become waitingForTheGameReady(airTrafficControl, null)
       }
@@ -70,11 +70,11 @@ class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventSt
       val groundControl = sender
       context watch groundControl
 
-      if (airTrafficControl != null) {
+      if (_airTrafficControl != null) {
         import context.dispatcher
         planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
-        context become started(airTrafficControl, groundControl)
+        context become started(_airTrafficControl, groundControl)
       } else {
         context become waitingForTheGameReady(null, groundControl)
       }
