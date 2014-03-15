@@ -7,6 +7,7 @@ import fr.xebia.xke.akka.airport._
 import languageFeature.postfixOps
 import org.scalatest.FreeSpec
 import com.typesafe.config.ConfigFactory
+import fr.xebia.xke.akka.NextStep
 
 trait ActorSpecs extends FreeSpec {
 

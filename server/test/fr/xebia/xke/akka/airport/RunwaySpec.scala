@@ -4,7 +4,7 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded}
-import fr.xebia.xke.akka.airport.specs.{ActorSpecs}
+import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 
 class RunwaySpec extends ActorSpecs {
