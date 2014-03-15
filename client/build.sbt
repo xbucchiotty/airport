@@ -15,3 +15,5 @@ libraryDependencies ++= Seq(
 )
  
 fork in run := true
+
+mainClass in (Compile,run) := Some("Launcher")
