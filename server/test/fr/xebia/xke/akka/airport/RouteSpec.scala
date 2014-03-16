@@ -5,34 +5,26 @@ import org.scalatest.{ShouldMatchers, FunSpec}
 class RouteSpec extends FunSpec with ShouldMatchers {
 
   describe("Routes") {
-    it("should be able to find route CDG -> HKG by AF with 0 stop") {
-      val result: Option[Route] = Route.find("CDG", "HKG")
 
-      result should be(defined)
+    it("should be able to find routes from CDG with a route to HKG by AF with 0 stop") {
+      val routesFromCDG = Route.routesFrom("CDG")
 
-      result.map(route => {
-        route.from should equal("CDG")
-        route.to should equal("HKG")
-        route.stops should equal(0)
-        route.airline should equal("AF")
-      })
+      routesFromCDG should not(be(empty))
+      routesFromCDG.exists(_.from != "CDG") should equal(false)
+
+      routesFromCDG should contain(Route(from = "CDG", to = "HKG", stops = 0, airline = "AF"))
+
     }
-  }
-}
 
+    it("should be able to find routes to CDG with a route from JFK by AF with 0 stop") {
+      val routesFromCDG = Route.routesTo("CDG")
 
-case class Route(from: String, to: String, stops: Int, airline: String)
+      routesFromCDG should not(be(empty))
+      routesFromCDG.exists(_.to != "CDG") should equal(false)
 
-object Route {
+      routesFromCDG should contain(Route(from = "JFK", to = "CDG", stops = 0, airline = "AF"))
 
-  lazy val routes: Set[Route] = scala.io.Source.fromInputStream(ClassLoader.getSystemResourceAsStream("data/routes.dat"))
-    .getLines()
-    .filter(_.nonEmpty)
-    .map(line => line.split(','))
-    .map(data => Route(from = data(2), to = data(4), stops = data(7).toInt, airline = data(0)))
-    .toSet
+    }
 
-  def find(from: String, to: String): Option[Route] = {
-    routes.find(route => route.from == from && route.to == to)
   }
 }
