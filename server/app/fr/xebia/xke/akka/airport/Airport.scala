@@ -7,7 +7,7 @@ object Airport {
     .filter(_.nonEmpty)
     .map(_.replaceAll("\"", ""))
     .map(line => line.split(','))
-    .map(data => Airport(data(2), data(4), data(6), data(7)))
+    .map(data => Airport(city = data(2), code = data(4), latitude = data(6), longitude = data(7)))
     .toSet
 
   def fromCode(code: String): Option[Airport] = airports.find(_.code == code)

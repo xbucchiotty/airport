@@ -2,7 +2,7 @@ package fr.xebia.xke.akka.airport
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 
-class AirportsSpec extends FunSpec with ShouldMatchers {
+class AirportSpec extends FunSpec with ShouldMatchers {
 
   describe("Airports") {
 
