@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /registered                 controllers.Application.registered
 GET     /events                     controllers.Application.events
 GET     /0                          controllers.Application.level0
 GET     /1                          controllers.Application.level1

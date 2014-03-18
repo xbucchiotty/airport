@@ -1,13 +1,12 @@
 import akka.actor.{ActorRef, Address}
 import akka.event.{EventStream, EventBus}
+import fr.xebia.xke.akka.airport.Airport
 
 package object controllers {
 
-  type Users = collection.immutable.Map[TeamMail, UserInfo]
-  type Systems = collection.immutable.Map[HostName, Address]
-  type Contexts = collection.immutable.Map[TeamMail, GameContext]
-
-  case class TeamMail(value: String) extends AnyVal
+  case class TeamMail(value: String) extends AnyVal{
+    override def toString = value
+  }
 
   case class HostName(value: String) extends AnyVal
 
@@ -20,25 +19,9 @@ package object controllers {
       HostName(request.host.split(":").head)
     }
   }
-
-  object Systems {
-
-    def empty: Systems = Map.empty[HostName, Address]
+  case class UserInfo(userId: TeamMail, airport: Airport, playerSystemAddress: Option[Address] = None){
+    def airportCode = airport.code
   }
-
-  object Users {
-
-    def empty: Users = Map.empty[TeamMail, UserInfo]
-
-  }
-
-  object Contexts {
-
-    def empty: Contexts = Map.empty[TeamMail, GameContext]
-
-  }
-
-  case class UserInfo(mail: TeamMail, host: HostName, playerSystemAddress: Option[Address] = None)
 
   case class GameContext(listener: ActorRef, game: ActorRef, eventBus: EventStream)
 

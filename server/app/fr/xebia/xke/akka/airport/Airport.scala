@@ -6,7 +6,7 @@ object Airport {
     val routesFrom = Route.routesFrom
     val routesTo = Route.routesTo
 
-    scala.io.Source.fromInputStream(ClassLoader.getSystemResourceAsStream("data/airports.dat"))
+    scala.io.Source.fromInputStream(classOf[Airport].getClassLoader.getResourceAsStream("data/airports.dat"))
       .getLines()
       .filter(_.nonEmpty)
       .map(_.replaceAll("\"", ""))
@@ -29,12 +29,14 @@ object Airport {
     }).toSet
   }
 
-  lazy val top100 = airports
+  lazy val top100: Set[Airport] = airports
     .map(airport => (airport, airport.departures.size + airport.arrivals.size))
     .toList
     .sortBy(_._2)
+    .map(_._1)
     .reverse
     .take(100)
+    .toSet
 
   def fromCode(code: String): Option[Airport] = airports.find(_.code == code)
 }

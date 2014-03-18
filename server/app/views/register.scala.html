@@ -1,14 +1,14 @@
 @(hostName:controllers.HostName)(message:Option[String])
 
-@main("XKE Akka slot")(0){
+@main("XKE Akka slot")(0)(None){
 
 <div class="container">
     <div class="info">
-        @message
+        Welcome! Please register with an email to be assigned a free aiport to manage and start the game.
     </div>
 
-    <div class="hero">
-        Hello <strong>@hostName.value</strong>. Check that your client config <strong>akka.netty.tcp.hostname="@hostName.value"</strong> before start playing!
+    <div class="warn">
+        @message
     </div>
 
     <form action="@routes.Application.register" method="POST" class="form-inline">

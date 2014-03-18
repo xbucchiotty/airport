@@ -1,6 +1,6 @@
-@(level:Int)(content: Html)
+@(level:Int,airport: fr.xebia.xke.akka.airport.Airport)(content: Html)
 
-@main("XKE Akka slot")(level){
+@main("XKE Akka slot")(level)(Some(airport)){
 
     <div id="score">
         <h1 style="text-align: right;">Score <p id="counter"></p></h1>

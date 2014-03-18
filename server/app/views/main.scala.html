@@ -1,4 +1,4 @@
-@(title: String)(level:Int)(content: Html)
+@(title: String)(level:Int)(airport:Option[fr.xebia.xke.akka.airport.Airport])(content: Html)
 <!DOCTYPE html>
 
 <html lang="en">
@@ -14,7 +14,7 @@
     <div class="navbar-inner">
         <div class="container">
             <div class="brand">Level <span class="badge">@level</span></div>
-            <div class="brand">Xebia International Airport</div>
+            <div class="brand">@airport.map(airport => airport.code + ": " + airport.city).getOrElse("Xebia International Airport")</div>
             <ul class="nav">
                 <li><a href="@routes.Application.index()">Start a new game</a></li>
             </ul>

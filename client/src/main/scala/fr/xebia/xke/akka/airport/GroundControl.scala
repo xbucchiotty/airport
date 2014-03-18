@@ -8,10 +8,13 @@ class GroundControl extends Actor with ActorLogging {
 
   def receive = uninitialized
 
+  log.info("GroundCountrol created")
+
   def uninitialized: Receive = {
     case InitGroundControl(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int) =>
       sender ! GroundControlReady
       context become (ready(taxiways, gates, taxiwayCapacity, ackMaxDuration) orElse uninitialized)
+      log.info("GroundCountrol ready")
   }
 
   def ready(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int): Receive = {

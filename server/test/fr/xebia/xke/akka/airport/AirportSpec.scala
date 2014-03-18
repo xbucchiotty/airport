@@ -25,7 +25,7 @@ class AirportSpec extends FunSpec with ShouldMatchers {
     it("should find top 100 of biggest airport by routes") {
       val airports = Airport.top100
 
-      airports.foreach(println)
+      airports.find(_.code == "CDG") should be(defined)
     }
   }
 

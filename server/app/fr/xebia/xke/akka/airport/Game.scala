@@ -1,13 +1,14 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{OneForOneStrategy, SupervisorStrategy, ActorRef, Cancellable, Terminated, ActorLogging, Props, Actor}
+import akka.actor._
 import concurrent.duration._
 import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
-import scala.util.Random
 import akka.event.EventStream
 import fr.xebia.xke.akka.airport.plane.{PlaneListener, Plane}
+import scala.util.Random
+import scala.Some
 
 class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream) extends Actor with ActorLogging {
 
@@ -44,39 +45,43 @@ class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventSt
   def receive = idle
 
   def idle: Receive = {
-    case GameStart(airTrafficControlLookup, groundControlLookup) =>
+    case InitGame(airTrafficControlLookup, groundControlLookup) =>
 
       airTrafficControlLookup ! InitAirTrafficControl(runways, settings.ackMaxDuration)
       groundControlLookup ! InitGroundControl(taxiways, gates, taxiwayCapacity, settings.ackMaxDuration)
 
-      context become waitingForTheGameReady(null, null)
+      context become waitingForTheGameReady(None, None)
   }
 
-  def waitingForTheGameReady(_airTrafficControl: ActorRef, _groundControl: ActorRef): Receive = {
+  def waitingForTheGameReady(registeredAirTrafficControl: Option[ActorRef], registeredGroundControl: Option[ActorRef]): Receive = {
     case AirTrafficControlReady =>
       val airTrafficControl = sender
       context watch airTrafficControl
 
-      if (_groundControl != null) {
-          import context.dispatcher
-        planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+      registeredGroundControl match {
+        case None =>
+          context become waitingForTheGameReady(Some(airTrafficControl), None)
 
-        context become started(airTrafficControl, _groundControl)
-      } else {
-        context become waitingForTheGameReady(airTrafficControl, null)
+        case Some(groundControl) =>
+          import context.dispatcher
+          planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+
+          context become started(airTrafficControl, groundControl)
       }
 
     case GroundControlReady =>
       val groundControl = sender
       context watch groundControl
 
-      if (_airTrafficControl != null) {
-        import context.dispatcher
-        planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+      registeredAirTrafficControl match {
+        case None =>
+          context become waitingForTheGameReady(null, Some(groundControl))
 
-        context become started(_airTrafficControl, groundControl)
-      } else {
-        context become waitingForTheGameReady(null, groundControl)
+        case Some(airTrafficControl) =>
+          import context.dispatcher
+          planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+
+          context become started(airTrafficControl, groundControl)
       }
   }
 
@@ -94,7 +99,7 @@ class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventSt
     case NewPlane if planesToGenerate > 0 =>
       val planeEventStream = new EventStream()
 
-      val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"AF-${ Random.nextLong() % 100000 }")
+      val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"AF-${Random.nextLong() % 100000}")
       val listener = context.actorOf(Props(classOf[PlaneListener], plane, gameEventStream))
 
       planeEventStream.subscribe(listener, classOf[Any])

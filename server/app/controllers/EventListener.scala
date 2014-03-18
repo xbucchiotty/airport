@@ -31,10 +31,10 @@ class EventListener(eventStream: EventStream) extends Actor {
     case newScore: Score =>
       buffer = buffer enqueue score(newScore)
 
-    case PlayerUp(address) =>
+    case PlayerUp(_, address) =>
       buffer = buffer enqueue playerUp(address)
 
-    case PlayerDown(address) =>
+    case PlayerDown(_, address) =>
       buffer = buffer enqueue playerDown(address)
 
     case DequeueEvents =>

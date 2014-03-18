@@ -1,0 +1,14 @@
+@(userInfo:controllers.UserInfo, airport: fr.xebia.xke.akka.airport.Airport)
+
+@main("XKE Akka slot")(0)(Some(airport)){
+
+<div class="container">
+
+    <div class="hero">
+        Hello <strong>@userInfo.mail</strong>. You will manage airport @airport.code in @airport.city. Please, check that your client config <em>akka.cluster.roles</em> contains <strong>"@airport.code"</strong> before start playing!
+    </div>
+
+    <a class="btn btn-primary" href="/0">Play</a>
+</div>
+
+}

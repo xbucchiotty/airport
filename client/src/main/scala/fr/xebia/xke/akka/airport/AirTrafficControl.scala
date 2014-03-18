@@ -8,9 +8,13 @@ class AirTrafficControl(groundControl: ActorRef) extends Actor with ActorLogging
 
   def receive = uninitialized
 
+  log.info("ATC created")
+
   def uninitialized: Receive = {
     case InitAirTrafficControl(runways, ackMaxTimeout) =>
       sender ! AirTrafficControlReady
+
+      log.info("ATC ready")
 
       context become (ready(runways, ackMaxTimeout) orElse uninitialized)
   }
