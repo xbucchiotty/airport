@@ -1,6 +1,6 @@
 package controllers
 
-import akka.actor.{Address, Actor}
+import akka.actor.{Props, Address, Actor}
 import fr.xebia.xke.akka.airport._
 import scala.collection.immutable.Queue
 import fr.xebia.xke.akka.airport.Score
@@ -11,6 +11,11 @@ import akka.event.EventStream
 class EventListener(eventStream: EventStream) extends Actor {
 
   private var buffer = Queue.empty[String]
+
+  override def preStart() {
+    eventStream.subscribe(self, classOf[GameEvent])
+    eventStream.subscribe(self, classOf[PlaneStatus])
+  }
 
   override def postStop() {
     eventStream.unsubscribe(self)
@@ -91,5 +96,8 @@ class EventListener(eventStream: EventStream) extends Actor {
       "address" : "$address"
     }""".stripMargin
   }
+}
 
+object EventListener {
+  def props(eventStream: EventStream): Props = Props(classOf[EventListener], eventStream)
 }

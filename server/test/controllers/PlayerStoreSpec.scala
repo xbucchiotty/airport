@@ -5,7 +5,7 @@ import akka.actor.{Address, ActorSystem}
 import akka.pattern.ask
 import controllers.PlayerStore._
 import fr.xebia.xke.akka.airport.{PlayerUp, Airport}
-import org.scalatest.concurrent.{ScalaFutures, Futures}
+import org.scalatest.concurrent.ScalaFutures
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
@@ -15,7 +15,7 @@ import controllers.PlayerStore.BindActorSystem
 import controllers.PlayerStore.BoundActorSystem
 import akka.testkit.TestProbe
 
-class PlayerStoreSpec extends FunSpec with ShouldMatchers with Futures with ScalaFutures {
+class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
   implicit val defaultPatience: PatienceConfig =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(100, Millis))

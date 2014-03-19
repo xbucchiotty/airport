@@ -52,12 +52,9 @@ class GameStore extends Actor with ActorLogging {
 
     val eventStream = new EventStream(false)
 
-    val listener = context.actorOf(Props(classOf[EventListener], eventStream))
-
-    eventStream.subscribe(listener, classOf[GameEvent])
-    eventStream.subscribe(listener, classOf[PlaneStatus])
-
     val session = s"game-session-${userInfo.airportCode}-$gameCounter"
+    val listener = context.actorOf(EventListener.props(eventStream), session + "-listener")
+
     val game = context.actorOf(Props(classOf[Game], settings, planeType, eventStream), session)
     log.info(s"Create a new game for <${userInfo.userId}>, session = <$session>")
     gameCounter += 1
