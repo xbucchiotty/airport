@@ -1,4 +1,4 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import akka.actor.{Props, ActorRef, ActorLogging, Actor}
 import akka.cluster.ClusterEvent.{ClusterDomainEvent, MemberRemoved, UnreachableMember, MemberUp, CurrentClusterState}

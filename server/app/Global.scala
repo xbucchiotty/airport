@@ -1,5 +1,4 @@
 import controllers.Application
-import play.api.Application
 import play.api.{Application, GlobalSettings}
 import scala.concurrent.duration._
 object Global extends GlobalSettings {

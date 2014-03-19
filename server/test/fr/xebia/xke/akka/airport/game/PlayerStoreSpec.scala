@@ -1,9 +1,9 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import akka.actor.{Address, ActorSystem}
 import akka.pattern.ask
-import controllers.PlayerStore._
+import PlayerStore._
 import fr.xebia.xke.akka.airport.{PlayerUp, Airport}
 import org.scalatest.concurrent.ScalaFutures
 import akka.util.Timeout
@@ -11,8 +11,8 @@ import language.postfixOps
 import concurrent.duration._
 import org.scalatest.time.{Seconds, Millis, Span}
 import com.typesafe.config.ConfigFactory
-import controllers.PlayerStore.BindActorSystem
-import controllers.PlayerStore.BoundActorSystem
+import PlayerStore.BindActorSystem
+import PlayerStore.BoundActorSystem
 import akka.testkit.TestProbe
 
 class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {

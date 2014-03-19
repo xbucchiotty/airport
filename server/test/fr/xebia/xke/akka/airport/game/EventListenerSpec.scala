@@ -1,4 +1,4 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import akka.actor.{Address, ActorSystem}
@@ -13,6 +13,7 @@ import fr.xebia.xke.akka.airport.PlayerDown
 import fr.xebia.xke.akka.airport.Score
 import fr.xebia.xke.akka.airport.PlayerUp
 import scala.Some
+import controllers.DequeueEvents
 
 class EventListenerSpec extends FunSpec with ShouldMatchers with Eventually {
 

@@ -1,14 +1,15 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import akka.actor._
-import fr.xebia.xke.akka.airport.{PlayerUp, Airport}
-import controllers.PlayerStore._
+import fr.xebia.xke.akka.airport.Airport
 import scala.util.Random
-import controllers.PlayerStore.BindError
-import controllers.PlayerStore.Register
-import controllers.PlayerStore.BindActorSystem
+import fr.xebia.xke.akka.airport.game.PlayerStore._
+import fr.xebia.xke.akka.airport.game.PlayerStore.RegisterError
+import fr.xebia.xke.akka.airport.game.PlayerStore.Register
+import fr.xebia.xke.akka.airport.game.PlayerStore.BindActorSystem
+import fr.xebia.xke.akka.airport.PlayerUp
 import scala.Some
-import controllers.PlayerStore.BoundActorSystem
+import fr.xebia.xke.akka.airport.game.PlayerStore.BoundActorSystem
 
 class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
 
@@ -46,7 +47,7 @@ class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
       sender ! None
   }
 
-  def registerUser(user: controllers.TeamMail) {
+  def registerUser(user: TeamMail) {
     val airport = availableAirports.toList(Random.nextInt(availableAirports.size))
     availableAirports -= airport
 

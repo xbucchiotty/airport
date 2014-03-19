@@ -1,17 +1,18 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import akka.actor._
 import fr.xebia.xke.akka.airport.plane.Plane
 import fr.xebia.xke.akka.airport._
-import controllers.GameStore._
 import akka.event.EventStream
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
+import fr.xebia.xke.akka.airport.game.GameStore._
+import fr.xebia.xke.akka.airport.game.GameStore.Ask
 import fr.xebia.xke.akka.airport.InitGame
 import fr.xebia.xke.akka.airport.PlayerUp
-import controllers.GameStore.NewGame
-import controllers.GameStore.StartGame
+import fr.xebia.xke.akka.airport.game.GameStore.NewGame
+import fr.xebia.xke.akka.airport.game.GameStore.StartGame
 
 class GameStore extends Actor with ActorLogging {
 

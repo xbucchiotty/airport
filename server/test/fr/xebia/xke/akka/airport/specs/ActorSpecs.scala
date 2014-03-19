@@ -1,9 +1,6 @@
 package fr.xebia.xke.akka.airport.specs
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.testkit.TestProbe
-import concurrent.duration._
-import fr.xebia.xke.akka.airport._
+import akka.actor.ActorSystem
 import languageFeature.postfixOps
 import org.scalatest.FreeSpec
 import com.typesafe.config.ConfigFactory

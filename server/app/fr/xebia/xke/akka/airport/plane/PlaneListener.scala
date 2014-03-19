@@ -2,8 +2,8 @@ package fr.xebia.xke.akka.airport.plane
 
 import akka.actor.{ActorRef, Actor}
 import akka.event.EventStream
-import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.plane.event.{DetailChanged, StateChanged, ErrorHappened}
+import fr.xebia.xke.akka.airport.game.PlaneStatus
 
 case class PlaneListener(plane: ActorRef, gameStream: EventStream) extends Actor {
 

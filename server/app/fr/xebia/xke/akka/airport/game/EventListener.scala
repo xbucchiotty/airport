@@ -1,12 +1,15 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import akka.actor.{Props, Address, Actor}
 import fr.xebia.xke.akka.airport._
 import scala.collection.immutable.Queue
+import akka.event.EventStream
+import controllers.DequeueEvents
+import scala.Predef._
+import fr.xebia.xke.akka.airport.PlayerDown
 import fr.xebia.xke.akka.airport.Score
 import fr.xebia.xke.akka.airport.PlayerUp
 import scala.Some
-import akka.event.EventStream
 
 class EventListener(eventStream: EventStream) extends Actor {
 

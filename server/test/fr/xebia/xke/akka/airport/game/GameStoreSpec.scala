@@ -1,4 +1,4 @@
-package controllers
+package fr.xebia.xke.akka.airport.game
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import akka.actor.{Address, ActorSystem}
@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigFactory
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
-import controllers.GameStore.{GameStarted, StartGame, GameCreated, NewGame}
+import GameStore.{GameStarted, StartGame, GameCreated, NewGame}
 import fr.xebia.xke.akka.airport.{Airport, Settings}
 import fr.xebia.xke.akka.airport.plane.FullStepPlane
 import akka.testkit.TestProbe

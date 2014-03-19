@@ -5,7 +5,8 @@ import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.mvc._
 import play.api.templates.HtmlFormat
 import fr.xebia.xke.akka.airport.plane.{Plane, JustTaxiingPlane, JustLandingPlane, FullStepPlane}
-import controllers.GameStore.{Ask, StartGame}
+import fr.xebia.xke.akka.airport.game.{GameContext, GameStore}
+import GameStore.{Ask, StartGame}
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
@@ -128,7 +129,8 @@ object Application extends Controller with PlayerSessionManagement {
 
         val in = Iteratee.foreach[String] {
           case "start" => {
-            gameStore ! StartGame(user)
+            //refresh user to get access to the player address system
+            gameStore ! StartGame(currentUser(session).get)
           }
         }
 

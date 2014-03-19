@@ -3,17 +3,21 @@ package controllers
 import play.api.mvc.{AnyContent, Action, Controller}
 import play.api.data.Form
 import play.api.data.Forms._
-import scala.Some
 import akka.actor.{ActorRef, ActorSystem}
 import akka.cluster.ClusterEvent.ClusterDomainEvent
 import akka.cluster.Cluster
 import fr.xebia.xke.akka.airport.Airport
 import akka.pattern.ask
-import controllers.PlayerStore.{Registered, Register, Ask}
+import fr.xebia.xke.akka.airport.game._
 import scala.concurrent.{ExecutionContext, Await, Future}
 import scala.concurrent.duration._
 import language.postfixOps
 import akka.util.Timeout
+import fr.xebia.xke.akka.airport.game.PlayerStore.Ask
+import fr.xebia.xke.akka.airport.game.PlayerStore.Register
+import scala.Some
+import fr.xebia.xke.akka.airport.game.PlayerStore.Registered
+import fr.xebia.xke.akka.airport.game.UserInfo
 
 trait PlayerSessionManagement {
 

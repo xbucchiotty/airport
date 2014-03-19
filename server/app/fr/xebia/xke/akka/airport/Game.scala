@@ -2,13 +2,13 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor._
 import concurrent.duration._
-import controllers.PlaneStatus
 import fr.xebia.xke.akka.airport.Game.NewPlane
 import languageFeature.postfixOps
 import akka.event.EventStream
 import fr.xebia.xke.akka.airport.plane.{PlaneListener, Plane}
 import scala.util.Random
 import scala.Some
+import fr.xebia.xke.akka.airport.game.PlaneStatus
 
 class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream) extends Actor with ActorLogging {
 

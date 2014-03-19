@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport
 
 import akka.actor.{Address, ActorSelection}
-import controllers.TeamMail
+import fr.xebia.xke.akka.airport.game.TeamMail
 
 trait GameEvent
 
