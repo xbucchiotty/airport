@@ -31,8 +31,12 @@ class PlayerStore(gameStore: ActorRef, airports: ActorRef) extends Actor with Ac
     case BindActorSystem(address, roles) =>
       bindActorSystem(roles, address)
 
-    case UnbindActorSystem(address, roles) =>
+    case UnbindActorSystem(address, roles) if associationsBySystem.contains(address) =>
       unbindActorSystem(roles, address)
+
+    case UnbindActorSystem(address, roles) =>
+      log.warning(s"System <$address> try to bind for airport $roles, but no user registered yet")
+      sender ! BindError(s"System <$address> try to bind for airport $roles, but no user registered yet")
 
     case Register(user) if associationsByUserId.contains(user) =>
       log.warning(s"Try to register twice user $user")

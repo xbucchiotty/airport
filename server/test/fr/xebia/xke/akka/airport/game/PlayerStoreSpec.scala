@@ -154,6 +154,19 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
           }
       }
     }
+
+    it("should not allow unbind an unknown actor system") {
+      implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+      val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
+
+      val address = Address("tcp", "testSystem", "localhost", 9000)
+
+      whenReady(ask(playerStore, UnbindActorSystem(address, Set("JFK"))).mapTo[BindError]) {
+        bindError => bindError.message should equal("System <tcp://testSystem@localhost:9000> try to bind for airport Set(JFK), but no user registered yet")
+      }
+    }
+
+
     it("should be able to register a new user") {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
