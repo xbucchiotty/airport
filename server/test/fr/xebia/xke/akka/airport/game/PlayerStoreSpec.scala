@@ -29,7 +29,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should be able to bind an actor system address to an airport") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
 
       val actorSystemAddress = Address("tcp", "testSystem", "localhost", 9000)
 
@@ -52,7 +52,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should not allow to bind an airport to two different addresses") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
 
       val firstAddress = Address("tcp", "testSystem", "localhost", 9000)
       val secondAddress = Address("tcp", "testSystem", "localhost", 9001)
@@ -74,7 +74,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should not allow bind a system without any user registered") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val playerStore = system.actorOf(PlayerStore.props(null), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
 
       val address = Address("tcp", "testSystem", "localhost", 9000)
 
@@ -87,7 +87,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
 
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
 
       val address = Address("tcp", "testSystem", "localhost", 9000)
 
@@ -107,9 +107,35 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
           }
       }
     }
+
+    it("should unbind an existing actor system binding") {
+      implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+      val gameStore = TestProbe()
+
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+
+      val address = Address("tcp", "testSystem", "localhost", 9000)
+
+      val registration = ask(playerStore, Register(TeamMail("xbucchiotty@xebia.fr"))).mapTo[Registered]
+
+      whenReady(registration) {
+        registrationInfo =>
+
+          whenReady(ask(playerStore, BindActorSystem(address, Set(registrationInfo.userInfo.airportCode))).mapTo[BoundActorSystem]) {
+            _ =>
+
+              whenReady(ask(playerStore, UnbindActorSystem(address, Set("CDG"))).mapTo[UnboundActorSystem]) {
+
+                reply =>
+                  reply.address should equal(address)
+                  reply.airport.code should equal(registrationInfo.userInfo.airportCode)
+              }
+          }
+      }
+    }
     it("should be able to register a new user") {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val playerStore = system.actorOf(PlayerStore.props(null), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
 
       val userId = TeamMail("xbucchiotty@xebia.fr")
 
@@ -122,7 +148,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should not allow to register two user with the same email") {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val playerStore = system.actorOf(PlayerStore.props(null), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
 
       val userId = TeamMail("xbucchiotty@xebia.fr")
 
@@ -139,7 +165,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should give the airport of a bound user") {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val playerStore = system.actorOf(PlayerStore.props(null), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
 
       val userId = TeamMail("xbucchiotty@xebia.fr")
 
@@ -160,7 +186,7 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should give the address of the player when system is bound") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
 
       val userId = TeamMail("xbucchiotty@xebia.fr")
 
@@ -184,9 +210,59 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       })
     }
 
+    it("should not give the address of the player when system is not bound yet") {
+      implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+      val gameStore = TestProbe()
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+
+      val userId = TeamMail("xbucchiotty@xebia.fr")
+
+      val probe = TestProbe()
+
+      probe.send(playerStore, Register(userId))
+      probe.receiveOne(timeout.duration)
+
+      probe.send(playerStore, Ask(userId))
+      val reply = probe.receiveOne(timeout.duration).asInstanceOf[Option[UserInfo]]
+
+      reply should be(defined)
+      reply.foreach(userInfo => {
+        userInfo.playerSystemAddress should not(be(defined))
+      })
+    }
+
+    it("should not give the address of the player when system is not unbound") {
+      implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+      val gameStore = TestProbe()
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+
+      val userId = TeamMail("xbucchiotty@xebia.fr")
+
+      val probe = TestProbe()
+
+      probe.send(playerStore, Register(userId))
+      val registration = probe.receiveOne(timeout.duration).asInstanceOf[Registered]
+
+      val address = Address("tcp", "TestSystem", "localhost", 9000)
+      probe.send(playerStore, BindActorSystem(address, Set(registration.userInfo.airportCode)))
+      probe.receiveN(1)
+
+      probe.send(playerStore, UnbindActorSystem(address, Set(registration.userInfo.airportCode)))
+      probe.receiveN(1)
+
+      probe.send(playerStore, Ask(userId))
+      val reply = probe.receiveOne(timeout.duration).asInstanceOf[Option[UserInfo]]
+
+      reply should be(defined)
+      reply.foreach(userInfo => {
+
+        userInfo.playerSystemAddress should not(be(defined))
+      })
+    }
+
     it("should not give airport of an unknown user") {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val playerStore = system.actorOf(PlayerStore.props(null), "playerStore")
+      val playerStore = system.actorOf(PlayerStore.props(null, null), "playerStore")
 
       val answer = ask(playerStore, Ask(TeamMail("xbucchiotty@xebia.fr"))).mapTo[Option[Airport]]
 

@@ -14,7 +14,7 @@ import fr.xebia.xke.akka.airport.PlayerUp
 import fr.xebia.xke.akka.airport.game.GameStore.NewGame
 import fr.xebia.xke.akka.airport.game.GameStore.StartGame
 
-class GameStore extends Actor with ActorLogging {
+class GameStore(airports: ActorRef) extends Actor with ActorLogging {
 
   var contexts: Map[TeamMail, GameContext] = _
   var gameCounter: Int = _
@@ -36,7 +36,9 @@ class GameStore extends Actor with ActorLogging {
       startGame(userInfo)
 
     case event@PlayerUp(userId, address) if contexts.contains(userId) =>
-      log.info(event.toString)
+      contexts(userId).eventBus.publish(event)
+
+    case event@PlayerDown(userId, address) if contexts.contains(userId) =>
       contexts(userId).eventBus.publish(event)
 
     case Ask(userId) =>
@@ -76,11 +78,11 @@ class GameStore extends Actor with ActorLogging {
     } {
       log.info(s"Start the game for <${user.userId}>, session = <${gameContext.game.path.name}>")
 
-      val airTrafficControl = context.actorSelection(
-        ActorPath.fromString(address.toString) / "user" / "airTrafficControl")
+      val airTrafficControl = context.actorSelection(s"/user/airports/${user.airportCode}/airTrafficControl")
+      println(airTrafficControl)
 
-      val groundControl = context.actorSelection(
-        ActorPath.fromString(address.toString) / "user" / "groundControl")
+      val groundControl = context.actorSelection(s"/user/airports/${user.airportCode}/groundControl")
+      println(groundControl)
 
       gameContext.game ! InitGame(airTrafficControl, groundControl)
 
@@ -91,7 +93,7 @@ class GameStore extends Actor with ActorLogging {
 
 object GameStore {
 
-  def props(): Props = Props[GameStore]
+  def props(airports: ActorRef): Props = Props(classOf[GameStore], airports)
 
   case class NewGame(user: UserInfo, settings: Settings, planeType: Class[_ <: Plane])
 

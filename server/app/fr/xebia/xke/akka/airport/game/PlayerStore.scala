@@ -2,7 +2,6 @@ package fr.xebia.xke.akka.airport.game
 
 import akka.actor._
 import fr.xebia.xke.akka.airport.Airport
-import scala.util.Random
 import fr.xebia.xke.akka.airport.game.PlayerStore._
 import fr.xebia.xke.akka.airport.game.PlayerStore.RegisterError
 import fr.xebia.xke.akka.airport.game.PlayerStore.Register
@@ -11,9 +10,9 @@ import fr.xebia.xke.akka.airport.PlayerUp
 import scala.Some
 import fr.xebia.xke.akka.airport.game.PlayerStore.BoundActorSystem
 
-class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
+class PlayerStore(gameStore: ActorRef, airports: ActorRef) extends Actor with ActorLogging {
 
-  var availableAirports: Set[Airport] = _
+  var availableAirports: List[Airport] = _
 
   var associationsBySystem: Map[Address, Airport] = _
   var associationsByUserId: Map[TeamMail, UserInfo] = _
@@ -33,6 +32,9 @@ class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
     case BindActorSystem(address, roles) =>
       bindActorSystem(roles, address)
 
+    case UnbindActorSystem(address, roles) =>
+      unbindActorSystem(roles, address)
+
     case Register(user) if associationsByUserId.contains(user) =>
       log.warning(s"Try to register twice user $user")
       sender ! RegisterError("Email already registered")
@@ -48,8 +50,8 @@ class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
   }
 
   def registerUser(user: TeamMail) {
-    val airport = availableAirports.toList(Random.nextInt(availableAirports.size))
-    availableAirports -= airport
+    val (airport :: tail) = availableAirports
+    availableAirports = tail
 
     val info = UserInfo(user, airport)
     associationsByUserId += (user -> info)
@@ -57,6 +59,27 @@ class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
     sender ! Registered(info)
 
     log.info(s"User <$user> is registered to airport ${airport.code}")
+  }
+
+  def unbindActorSystem(roles: Set[String], address: Address) {
+
+    val airport = associationsBySystem(address)
+    associationsBySystem -= address
+
+    val association = associationsByUserId.find(_._2.airport == airport)
+
+    association match {
+      case Some((userId, userInfo)) =>
+        log.info(s"System <$address> is unbound from airport <${airport.code}> for user <$userId>")
+
+        associationsByUserId = associationsByUserId.updated(userId, userInfo.copy(playerSystemAddress = None))
+        sender ! UnboundActorSystem(address, airport)
+
+      case None =>
+        log.warning(s"Receive unbound of system <$address> from airport <${airport.code}> but no user is registered to it")
+        sender ! BindError(s"Impossible to unbind airport ${airport.code} without any user registered before")
+    }
+
   }
 
   def bindActorSystem(roles: Set[String], address: Address) {
@@ -93,6 +116,7 @@ class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
               associationsBySystem += (address -> airport)
 
               sender ! BoundActorSystem(address, airport)
+              airports ! BoundActorSystem(address, airport)
 
               gameStore ! PlayerUp(userId, address)
           }
@@ -104,11 +128,15 @@ class PlayerStore(gameStore: ActorRef) extends Actor with ActorLogging {
 
 object PlayerStore {
 
-  def props(gameStore: ActorRef): Props = Props(classOf[PlayerStore], gameStore)
+  def props(gameStore: ActorRef, airports: ActorRef): Props = Props(classOf[PlayerStore], gameStore, airports)
 
   case class BindActorSystem(address: Address, roles: Set[String])
 
   case class BoundActorSystem(address: Address, airport: Airport)
+
+  case class UnbindActorSystem(address: Address, roles: Set[String])
+
+  case class UnboundActorSystem(address: Address, airport: Airport)
 
   case class BindError(message: String)
 

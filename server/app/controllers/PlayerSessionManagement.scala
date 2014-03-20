@@ -29,9 +29,11 @@ trait PlayerSessionManagement {
 
   val airportActorSystem: ActorSystem = ActorSystem.create("airportSystem")
 
-  val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(), "gameStore")
+  val airports: ActorRef = airportActorSystem.actorOf(AirportLocator.props(), "airports")
 
-  val playerStore: ActorRef = airportActorSystem.actorOf(PlayerStore.props(gameStore), "playerStore")
+  val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(airports), "gameStore")
+
+  val playerStore: ActorRef = airportActorSystem.actorOf(PlayerStore.props(gameStore, airports), "playerStore")
 
   val playerWatcher: ActorRef = {
     val playerWatcher = airportActorSystem.actorOf(PlayerWatcher.props(playerStore), "playerWatcher")

@@ -29,14 +29,23 @@ object Airport {
     }).toSet
   }
 
-  lazy val top100: Set[Airport] = airports
+  lazy val top100: List[Airport] = airports
     .map(airport => (airport, airport.departures.size + airport.arrivals.size))
     .toList
-    .sortBy(_._2)
-    .map(_._1)
+    .sortBy(byRouteSize)
+    .map(toAirport)
     .reverse
     .take(100)
-    .toSet
+    .toList
+
+
+  def toAirport: ((Airport, Int)) => Airport = {
+    case (airport, routeSize) => airport
+  }
+
+  def byRouteSize: ((Airport, Int)) => Int = {
+    case (airport, routeSize) => routeSize
+  }
 
   def fromCode(code: String): Option[Airport] = airports.find(_.code == code)
 }
