@@ -16,6 +16,7 @@ class PlayerWatcher(playerStore: ActorRef) extends Actor with ActorLogging {
 
     case MemberRemoved(member, previousStatus) if member.roles.contains("player") =>
       log.warning(s"player $member moved out")
+      playerStore ! PlayerStore.UnbindActorSystem(member.address, member.roles)
 
     case _: ClusterDomainEvent => // ignore
   }

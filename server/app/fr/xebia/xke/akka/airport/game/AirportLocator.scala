@@ -1,7 +1,7 @@
 package fr.xebia.xke.akka.airport.game
 
 import akka.actor._
-import fr.xebia.xke.akka.airport.game.PlayerStore.BoundActorSystem
+import fr.xebia.xke.akka.airport.game.PlayerStore.{UnboundActorSystem, BoundActorSystem}
 
 class AirportLocator extends Actor {
 
@@ -14,6 +14,11 @@ class AirportLocator extends Actor {
   def receive: Receive = {
     case BoundActorSystem(address, airport) =>
       table += (airport.code -> context.actorOf(AirportProxy.props(address), name = airport.code))
+
+    case UnboundActorSystem(address, airport) =>
+      val proxy = table(airport.code)
+      context.stop(proxy)
+      table -= airport.code
   }
 }
 

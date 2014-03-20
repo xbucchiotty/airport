@@ -1,12 +1,11 @@
 package fr.xebia.xke.akka.airport.game
 
 import akka.actor._
-import fr.xebia.xke.akka.airport.Airport
+import fr.xebia.xke.akka.airport.{PlayerDown, Airport, PlayerUp}
 import fr.xebia.xke.akka.airport.game.PlayerStore._
 import fr.xebia.xke.akka.airport.game.PlayerStore.RegisterError
 import fr.xebia.xke.akka.airport.game.PlayerStore.Register
 import fr.xebia.xke.akka.airport.game.PlayerStore.BindActorSystem
-import fr.xebia.xke.akka.airport.PlayerUp
 import scala.Some
 import fr.xebia.xke.akka.airport.game.PlayerStore.BoundActorSystem
 
@@ -74,6 +73,8 @@ class PlayerStore(gameStore: ActorRef, airports: ActorRef) extends Actor with Ac
 
         associationsByUserId = associationsByUserId.updated(userId, userInfo.copy(playerSystemAddress = None))
         sender ! UnboundActorSystem(address, airport)
+        airports ! UnboundActorSystem(address, airport)
+        gameStore ! PlayerDown(userId, address)
 
       case None =>
         log.warning(s"Receive unbound of system <$address> from airport <${airport.code}> but no user is registered to it")
@@ -117,7 +118,6 @@ class PlayerStore(gameStore: ActorRef, airports: ActorRef) extends Actor with Ac
 
               sender ! BoundActorSystem(address, airport)
               airports ! BoundActorSystem(address, airport)
-
               gameStore ! PlayerUp(userId, address)
           }
         }

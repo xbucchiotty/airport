@@ -4,7 +4,7 @@ import org.scalatest.{ShouldMatchers, FunSpec}
 import akka.actor.{Address, ActorSystem}
 import akka.pattern.ask
 import PlayerStore._
-import fr.xebia.xke.akka.airport.{PlayerUp, Airport}
+import fr.xebia.xke.akka.airport.{PlayerDown, PlayerUp, Airport}
 import org.scalatest.concurrent.ScalaFutures
 import akka.util.Timeout
 import language.postfixOps
@@ -29,7 +29,8 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should be able to bind an actor system address to an airport") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+      val airports = TestProbe()
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, airports.ref), "playerStore")
 
       val actorSystemAddress = Address("tcp", "testSystem", "localhost", 9000)
 
@@ -43,16 +44,18 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
             boundMessage =>
               boundMessage.address should equal(actorSystemAddress)
               boundMessage.airport.code should equal(registrationInfo.userInfo.airportCode)
+
+              airports expectMsg boundMessage
+              gameStore expectMsg PlayerUp(TeamMail("xbucchiotty@xebia.fr"), actorSystemAddress)
           }
       }
-
-      gameStore expectMsg PlayerUp(TeamMail("xbucchiotty@xebia.fr"), actorSystemAddress)
     }
 
     it("should not allow to bind an airport to two different addresses") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+      val airports = TestProbe()
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, airports.ref), "playerStore")
 
       val firstAddress = Address("tcp", "testSystem", "localhost", 9000)
       val secondAddress = Address("tcp", "testSystem", "localhost", 9001)
@@ -64,9 +67,16 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
           whenReady(ask(playerStore, BindActorSystem(firstAddress, roles)).mapTo[BoundActorSystem]) {
             _ =>
+
+              airports.receiveN(1)
+              gameStore.receiveN(1)
+
               whenReady(ask(playerStore, BindActorSystem(secondAddress, roles)).mapTo[BindError]) {
                 error =>
                   error.message should equal(s"Airport ${registrationInfo.userInfo.airportCode} is already bound to a system")
+
+                  airports.expectNoMsg(100 milliseconds)
+                  gameStore.expectNoMsg(100 milliseconds)
               }
           }
       }
@@ -86,8 +96,8 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should be idempotent for actor system binding") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+      val airports = TestProbe()
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, airports.ref), "playerStore")
 
       val address = Address("tcp", "testSystem", "localhost", 9000)
 
@@ -99,10 +109,15 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
           whenReady(ask(playerStore, BindActorSystem(address, Set(registrationInfo.userInfo.airportCode))).mapTo[BoundActorSystem]) {
             firstReply =>
 
+              airports.receiveN(1)
+              gameStore.receiveN(1)
+
               whenReady(ask(playerStore, BindActorSystem(address, Set("CDG"))).mapTo[BoundActorSystem]) {
 
                 secondReply =>
                   secondReply should equal(firstReply)
+                  airports expectNoMsg (100 milliseconds)
+                  gameStore expectNoMsg (100 milliseconds)
               }
           }
       }
@@ -111,8 +126,8 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should unbind an existing actor system binding") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = TestProbe()
-
-      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, TestProbe().ref), "playerStore")
+      val airports = TestProbe()
+      val playerStore = system.actorOf(PlayerStore.props(gameStore.ref, airports.ref), "playerStore")
 
       val address = Address("tcp", "testSystem", "localhost", 9000)
 
@@ -124,11 +139,17 @@ class PlayerStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
           whenReady(ask(playerStore, BindActorSystem(address, Set(registrationInfo.userInfo.airportCode))).mapTo[BoundActorSystem]) {
             _ =>
 
+              airports.receiveN(1)
+              gameStore.receiveN(1)
+
               whenReady(ask(playerStore, UnbindActorSystem(address, Set("CDG"))).mapTo[UnboundActorSystem]) {
 
                 reply =>
                   reply.address should equal(address)
                   reply.airport.code should equal(registrationInfo.userInfo.airportCode)
+
+                  airports expectMsg reply
+                  gameStore expectMsg PlayerDown(TeamMail("xbucchiotty@xebia.fr"), reply.address)
               }
           }
       }

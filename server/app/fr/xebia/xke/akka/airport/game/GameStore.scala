@@ -79,10 +79,8 @@ class GameStore(airports: ActorRef) extends Actor with ActorLogging {
       log.info(s"Start the game for <${user.userId}>, session = <${gameContext.game.path.name}>")
 
       val airTrafficControl = context.actorSelection(s"/user/airports/${user.airportCode}/airTrafficControl")
-      println(airTrafficControl)
 
       val groundControl = context.actorSelection(s"/user/airports/${user.airportCode}/groundControl")
-      println(groundControl)
 
       gameContext.game ! InitGame(airTrafficControl, groundControl)
 
