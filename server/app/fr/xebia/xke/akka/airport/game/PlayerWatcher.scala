@@ -1,25 +1,36 @@
 package fr.xebia.xke.akka.airport.game
 
 import akka.actor.{Props, ActorRef, ActorLogging, Actor}
-import akka.cluster.ClusterEvent.{ClusterDomainEvent, MemberRemoved, UnreachableMember, MemberUp, CurrentClusterState}
+import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberUp, CurrentClusterState}
+import akka.cluster.{Member, MemberStatus}
 
 class PlayerWatcher(playerStore: ActorRef) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case state: CurrentClusterState =>
+      state.members
+        .filter(_.status == MemberStatus.Up)
+        .filter(memberIsPlayer)
+        .foreach(member => {
+        log.info(s"player $member moves in")
+        playerStore ! PlayerStore.BindActorSystem(member.address, member.roles)
+      })
 
-    case MemberUp(member) if member.roles.contains("player") =>
+    case MemberUp(member) if memberIsPlayer(member) =>
+      log.warning(s"player $member moves in")
       playerStore ! PlayerStore.BindActorSystem(member.address, member.roles)
 
-    case UnreachableMember(member) if member.roles.contains("player") =>
+    case UnreachableMember(member) if memberIsPlayer(member) =>
       log.warning(s"player $member moved out")
 
-    case MemberRemoved(member, previousStatus) if member.roles.contains("player") =>
+    case MemberRemoved(member, previousStatus) if memberIsPlayer(member) =>
       log.warning(s"player $member moved out")
       playerStore ! PlayerStore.UnbindActorSystem(member.address, member.roles)
 
-    case _: ClusterDomainEvent => // ignore
   }
+
+  val memberIsPlayer = (member: Member) => member.roles.contains("player")
+
 }
 
 object PlayerWatcher {
