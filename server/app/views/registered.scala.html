@@ -1,11 +1,11 @@
-@(userInfo:fr.xebia.xke.akka.airport.game.UserInfo, airport: fr.xebia.xke.akka.airport.Airport)
+@(userInfo:fr.xebia.xke.akka.airport.game.UserInfo)
 
-@main("XKE Akka slot")(0)(Some(airport)){
+@main("XKE Akka slot")(0)(Some(userInfo.airport)){
 
 <div class="container">
 
     <div class="hero">
-        Hello <strong>@userInfo.userId</strong>. You will manage airport @airport.code in @airport.city. Please, check that your client config <em>akka.cluster.roles</em> contains <strong>"@airport.code"</strong> before start playing!
+        Hello <strong>@userInfo.userId</strong>. You will manage airport @userInfo.airportCode in @userInfo.airport.city. Please, check that your client config <em>akka.cluster.roles</em> contains <strong>"@userInfo.airportCode"</strong> before start playing!
     </div>
 
     <a class="btn btn-primary" href="/0">Play</a>

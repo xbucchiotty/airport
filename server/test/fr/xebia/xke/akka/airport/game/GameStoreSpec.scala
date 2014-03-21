@@ -31,26 +31,26 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should create a game for a user") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val gameStore = system.actorOf(GameStore.props(null), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userInfo = UserInfo(TeamMail("xbucchiotty@xebia.fr"), Airport("Paris", "CDG", "42", "2"))
 
       val probe = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
 
-      probe expectMsg GameCreated
+      probe expectMsgAllClassOf classOf[GameCreated]
     }
 
     it("should be able to start a created game") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val userId = TeamMail("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"), Some(Address("tcp", "TestSystem")))
-      val gameStore = system.actorOf(GameStore.props(null), "gameStore")
+      val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
+      val gameStore = system.actorOf(GameStore.props(), "gameStore")
 
       val probe = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
-      probe expectMsg GameCreated
+      probe expectMsgAllClassOf classOf[GameCreated]
 
       probe.send(gameStore, StartGame(userInfo))
       probe expectMsg GameStarted
@@ -58,7 +58,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should returns the context of an existing userId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val gameStore = system.actorOf(GameStore.props(null), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
 
@@ -66,7 +66,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
 
-      probe expectMsg GameCreated
+      probe expectMsgAllClassOf classOf[GameCreated]
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
         reply =>
@@ -76,7 +76,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should not returns the context of an unknown userId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val gameStore = system.actorOf(GameStore.props(null), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
@@ -86,14 +86,14 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should publish into the stream PlayerUp event if user is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val gameStore = system.actorOf(GameStore.props(null), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
 
       val probe = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
-      probe expectMsg GameCreated
+      probe expectMsgAllClassOf classOf[GameCreated]
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
         case Some(reply) =>
@@ -109,14 +109,14 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should publish into the stream PlayerDown event if user is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val gameStore = system.actorOf(GameStore.props(null), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
 
       val probe = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
-      probe expectMsg GameCreated
+      probe expectMsgAllClassOf classOf[GameCreated]
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
         case Some(reply) =>

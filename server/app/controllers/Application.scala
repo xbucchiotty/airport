@@ -5,13 +5,14 @@ import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.mvc._
 import play.api.templates.HtmlFormat
 import fr.xebia.xke.akka.airport.plane.{Plane, JustTaxiingPlane, JustLandingPlane, FullStepPlane}
-import fr.xebia.xke.akka.airport.game.{GameContext, GameStore}
-import GameStore.{Ask, StartGame}
+import fr.xebia.xke.akka.airport.game.{AirportLocator, GameContext, GameStore}
+import fr.xebia.xke.akka.airport.game.GameStore.{GameCreated, Ask, StartGame}
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
 import akka.pattern.ask
 import scala.concurrent.Await
+import akka.actor.Address
 
 object Application extends Controller with PlayerSessionManagement {
 
@@ -134,6 +135,7 @@ object Application extends Controller with PlayerSessionManagement {
           }
         }
 
+        import scala.concurrent.ExecutionContext.Implicits.global
         val out: Enumerator[String] = Enumerator2.infiniteUnfold(context.get.listener) {
           listener => {
             ask(context.get.listener, DequeueEvents)(Timeout(1 second))
@@ -149,8 +151,23 @@ object Application extends Controller with PlayerSessionManagement {
   }
 
   private def newGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+
     for (user <- currentUser(session)) {
-      Await.result(ask(gameStore, GameStore.NewGame(user, settings, planeType)).mapTo[GameStore.GameCreated.type], atMost = 1.second)
+      val gameCreation = ask(gameStore, GameStore.NewGame(user, settings, planeType)).mapTo[GameCreated]
+
+      gameCreation.onSuccess {
+        case GameCreated(gameContext) =>
+          val addressLookup = ask(airports, AirportLocator.AirportAddressLookup(user.airportCode)).mapTo[Option[Address]]
+          addressLookup.onSuccess {
+            case Some(address) =>
+              gameContext.eventBus.publish(PlayerUp(user.userId, address))
+          }
+      }
+
+      Await.result(gameCreation, atMost = 1.second)
+
+
     }
     Ok(template)
   }

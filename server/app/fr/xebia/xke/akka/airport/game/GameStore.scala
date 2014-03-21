@@ -14,7 +14,7 @@ import fr.xebia.xke.akka.airport.PlayerUp
 import fr.xebia.xke.akka.airport.game.GameStore.NewGame
 import fr.xebia.xke.akka.airport.game.GameStore.StartGame
 
-class GameStore(airports: ActorRef) extends Actor with ActorLogging {
+class GameStore extends Actor with ActorLogging {
 
   var contexts: Map[TeamMail, GameContext] = _
   var gameCounter: Int = _
@@ -62,18 +62,14 @@ class GameStore(airports: ActorRef) extends Actor with ActorLogging {
     log.info(s"Create a new game for <${userInfo.userId}>, session = <$session>")
     gameCounter += 1
 
-    for (address <- userInfo.playerSystemAddress) {
-      eventStream publish PlayerUp(userInfo.userId, address)
-    }
+    val gameContext = GameContext(listener, game, eventStream)
+    contexts += (userInfo.userId -> gameContext)
 
-    contexts += (userInfo.userId -> GameContext(listener, game, eventStream))
-
-    sender ! GameCreated
+    sender ! GameCreated(gameContext)
   }
 
   def startGame(user: UserInfo) {
     for {
-      address <- user.playerSystemAddress
       gameContext <- contexts.get(user.userId)
     } {
       log.info(s"Start the game for <${user.userId}>, session = <${gameContext.game.path.name}>")
@@ -91,11 +87,11 @@ class GameStore(airports: ActorRef) extends Actor with ActorLogging {
 
 object GameStore {
 
-  def props(airports: ActorRef): Props = Props(classOf[GameStore], airports)
+  def props(): Props = Props[GameStore]
 
   case class NewGame(user: UserInfo, settings: Settings, planeType: Class[_ <: Plane])
 
-  case object GameCreated
+  case class GameCreated(gameContext: GameContext)
 
   case class StartGame(user: UserInfo)
 

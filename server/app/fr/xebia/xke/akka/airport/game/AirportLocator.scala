@@ -1,30 +1,93 @@
 package fr.xebia.xke.akka.airport.game
 
 import akka.actor._
-import fr.xebia.xke.akka.airport.game.PlayerStore.{UnboundActorSystem, BoundActorSystem}
+import akka.cluster.ClusterEvent._
+import akka.cluster.{Cluster, Member, MemberStatus}
+import akka.pattern.ask
+import language.postfixOps
+import concurrent.duration._
+import akka.util.Timeout
+import fr.xebia.xke.akka.airport.PlayerDown
+import akka.cluster.ClusterEvent.MemberUp
+import fr.xebia.xke.akka.airport.PlayerUp
+import scala.Some
+import akka.cluster.ClusterEvent.CurrentClusterState
+import akka.cluster.ClusterEvent.UnreachableMember
+import fr.xebia.xke.akka.airport.game.AirportLocator.AirportAddressLookup
 
-class AirportLocator extends Actor {
+class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor with ActorLogging {
 
-  var table: Map[String, ActorRef] = _
+  var table: Map[String, (Address, ActorRef)] = _
 
   override def preStart() {
+    Cluster(context.system).subscribe(self, classOf[ClusterDomainEvent])
     table = Map.empty
   }
 
   def receive: Receive = {
-    case BoundActorSystem(address, airport) =>
-      table += (airport.code -> context.actorOf(AirportProxy.props(address), name = airport.code))
+    case state: CurrentClusterState =>
+      state.members
+        .filter(_.status == MemberStatus.Up)
+        .filter(memberIsPlayer)
+        .foreach(register)
 
-    case UnboundActorSystem(address, airport) =>
-      val proxy = table(airport.code)
-      context.stop(proxy)
-      table -= airport.code
+    case MemberUp(member) if memberIsPlayer(member) =>
+      register(member)
+
+    case UnreachableMember(member) if memberIsPlayer(member) =>
+      unregister(member)
+
+    case AirportAddressLookup(airportCode) =>
+      sender ! table.get(airportCode).map(_._1)
   }
+
+  def memberIsPlayer(member: Member) = member.roles.contains("player")
+
+  def register(member: Member) {
+    import context.dispatcher
+    implicit val timeout = Timeout(1.second)
+
+    log.info(s"player $member comes in")
+
+    member.roles - "player" foreach (airportCode => {
+      table += (airportCode ->(member.address, context.actorOf(AirportProxy.props(member.address), airportCode)))
+
+      val userInfoRequest = ask(userStore, UserStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
+
+      userInfoRequest.onSuccess {
+        case Some(userInfo) => gameStore ! PlayerUp(userInfo.userId, member.address)
+      }
+    })
+  }
+
+  def unregister(member: Member) {
+    import context.dispatcher
+    implicit val timeout = Timeout(1.second)
+
+    log.warning(s"player $member moved out")
+
+    member.roles - "player" foreach (airportCode => {
+      val proxy = table(airportCode)._2
+      context.stop(proxy)
+      table -= airportCode
+
+      val userInfoRequest = ask(userStore, UserStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
+
+      userInfoRequest.onSuccess {
+        case Some(userInfo) => gameStore ! PlayerDown(userInfo.userId, member.address)
+      }
+    })
+
+  }
+
 }
 
 object AirportLocator {
 
-  def props(): Props = Props[AirportLocator]
+  def props(userStore: ActorRef, gameStore: ActorRef): Props = Props(classOf[AirportLocator], userStore, gameStore)
+
+  case class AirportAddressLookup(airportCode: String)
+
 }
 
 class AirportProxy(remoteAddress: Address) extends Actor with ActorLogging {
