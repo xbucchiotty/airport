@@ -16,14 +16,14 @@ import fr.xebia.xke.akka.airport.game.GameStore.StartGame
 
 class GameStore extends Actor with ActorLogging {
 
-  var contexts: Map[TeamMail, GameContext] = _
+  var gameContexts: Map[TeamMail, GameContext] = _
   var gameCounter: Int = _
 
   implicit val timeout = Timeout(1 second)
 
 
   override def preStart() {
-    contexts = Map.empty
+    gameContexts = Map.empty
     gameCounter = 0
   }
 
@@ -32,53 +32,47 @@ class GameStore extends Actor with ActorLogging {
     case NewGame(userInfo, settings, planeType) =>
       newGame(userInfo, settings, planeType)
 
-    case StartGame(userInfo) if contexts.contains(userInfo.userId) =>
+    case StartGame(userInfo) if gameContexts.contains(userInfo.userId) =>
       startGame(userInfo)
 
-    case event@PlayerUp(userId, address) if contexts.contains(userId) =>
-      contexts(userId).eventBus.publish(event)
+    case event@PlayerUp(userId, address) if gameContexts.contains(userId) =>
+      gameContexts(userId).publish(event)
 
-    case event@PlayerDown(userId, address) if contexts.contains(userId) =>
-      contexts(userId).eventBus.publish(event)
+    case event@PlayerDown(userId, address) if gameContexts.contains(userId) =>
+      gameContexts(userId).publish(event)
 
     case Ask(userId) =>
-      sender ! contexts.get(userId)
+      sender ! gameContexts.get(userId)
   }
 
   def newGame(userInfo: UserInfo, settings: Settings, planeType: Class[_ <: Plane]) {
-    for (gameContext <- contexts.get(userInfo.userId)) {
-      context.stop(gameContext.game)
-      context.stop(gameContext.listener)
+    for (gameContext <- gameContexts.get(userInfo.userId)) {
 
-      contexts -= userInfo.userId
+      gameContext.stop(context.system)
+
+      gameContexts -= userInfo.userId
     }
 
-    val eventStream = new EventStream(false)
+    val sessionId = s"game-session-${userInfo.airportCode}-$gameCounter"
 
-    val session = s"game-session-${userInfo.airportCode}-$gameCounter"
-    val listener = context.actorOf(EventListener.props(eventStream), session + "-listener")
-
-    val game = context.actorOf(Props(classOf[Game], settings, planeType, eventStream), session)
-    log.info(s"Create a new game for <${userInfo.userId}>, session = <$session>")
+    val gameContext = GameContext.create(sessionId, settings, planeType)(context)
     gameCounter += 1
 
-    val gameContext = GameContext(listener, game, eventStream)
-    contexts += (userInfo.userId -> gameContext)
+    gameContexts += (userInfo.userId -> gameContext)
+
+    log.info(s"Create a new game for <${userInfo.userId}>")
 
     sender ! GameCreated(gameContext)
   }
 
   def startGame(user: UserInfo) {
-    for {
-      gameContext <- contexts.get(user.userId)
-    } {
+    for (gameContext <- gameContexts.get(user.userId)) {
       log.info(s"Start the game for <${user.userId}>, session = <${gameContext.game.path.name}>")
 
       val airTrafficControl = context.actorSelection(s"/user/airports/${user.airportCode}/airTrafficControl")
-
       val groundControl = context.actorSelection(s"/user/airports/${user.airportCode}/groundControl")
 
-      gameContext.game ! InitGame(airTrafficControl, groundControl)
+      gameContext.init(airTrafficControl, groundControl)
 
       sender ! GameStarted
     }
