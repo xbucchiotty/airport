@@ -1,18 +1,25 @@
 package controllers
 
-import fr.xebia.xke.akka.airport._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.mvc._
 import play.api.templates.HtmlFormat
-import fr.xebia.xke.akka.airport.plane.{Plane, JustTaxiingPlane, JustLandingPlane, FullStepPlane}
-import fr.xebia.xke.akka.airport.game.{AirportLocator, GameContext, GameStore}
-import fr.xebia.xke.akka.airport.game.GameStore.{GameCreated, Ask, StartGame}
+import fr.xebia.xke.akka.infrastructure._
+import fr.xebia.xke.akka.game._
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
 import akka.pattern.ask
 import scala.concurrent.Await
 import akka.actor.Address
+import fr.xebia.xke.akka.plane.Plane
+import fr.xebia.xke.akka.game.GameStore.Ask
+import fr.xebia.xke.akka.game.GameStore.GameCreated
+import fr.xebia.xke.akka.game.PlayerUp
+import scala.Some
+import fr.xebia.xke.akka.plane.JustLandingPlane
+import fr.xebia.xke.akka.game.GameStore.StartGame
+import fr.xebia.xke.akka.plane.JustTaxiingPlane
+import fr.xebia.xke.akka.plane.FullStepPlane
 
 object Application extends Controller with PlayerSessionManagement {
 

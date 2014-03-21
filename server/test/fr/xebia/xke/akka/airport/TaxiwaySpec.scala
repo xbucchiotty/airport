@@ -4,9 +4,10 @@ import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, EndOfTaxi, Taxiing}
-import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
+import fr.xebia.xke.akka.ActorSpecs
+import fr.xebia.xke.akka.game.Settings
 
 class TaxiwaySpec extends ActorSpecs with ShouldMatchers {
 

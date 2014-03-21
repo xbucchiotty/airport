@@ -2,10 +2,10 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.Props
 import akka.testkit.TestProbe
-import fr.xebia.xke.akka.airport.specs.ActorSpecs
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasParked}
 import languageFeature.postfixOps
 import concurrent.duration._
+import fr.xebia.xke.akka.ActorSpecs
 
 class GateSpec extends ActorSpecs {
 

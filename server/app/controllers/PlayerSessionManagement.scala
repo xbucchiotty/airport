@@ -5,14 +5,17 @@ import play.api.data.Form
 import play.api.data.Forms._
 import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.ask
-import fr.xebia.xke.akka.airport.game._
 import scala.concurrent.{ExecutionContext, Await, Future}
 import scala.concurrent.duration._
 import language.postfixOps
 import akka.util.Timeout
+import fr.xebia.xke.akka.infrastructure._
+import fr.xebia.xke.akka.infrastructure.UserStore.Ask
+import fr.xebia.xke.akka.infrastructure.UserStore.Register
+import fr.xebia.xke.akka.infrastructure.UserStore.Registered
 import scala.Some
-import fr.xebia.xke.akka.airport.game.UserInfo
-import fr.xebia.xke.akka.airport.game.UserStore.{Registered, Register, Ask}
+import fr.xebia.xke.akka.infrastructure.UserInfo
+import fr.xebia.xke.akka.game.GameStore
 
 trait PlayerSessionManagement {
 
@@ -43,7 +46,7 @@ trait PlayerSessionManagement {
           securedAction(user)(request)
 
         case None =>
-          Ok(views.html.register(HostName.from(request))(None))
+          Ok(views.html.register(None))
       }
   }
 

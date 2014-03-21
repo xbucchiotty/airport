@@ -5,6 +5,7 @@ import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, EndOfTaxi, Taxiing, Collision}
 import languageFeature.postfixOps
 import scala.collection.immutable.Queue
+import fr.xebia.xke.akka.game.Settings
 
 class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
