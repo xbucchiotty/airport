@@ -16,7 +16,7 @@ import fr.xebia.xke.akka.infrastructure.AirportLocator.AirportAddressLookup
 
 class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor with ActorLogging {
 
-  var table: Map[String, (Address, ActorRef)] = _
+  var table: Map[AirportCode, (Address, ActorRef)] = _
 
   override def preStart() {
     Cluster(context.system).subscribe(self, classOf[ClusterDomainEvent])
@@ -48,8 +48,8 @@ class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor wit
 
     log.info(s"player $member comes in")
 
-    member.roles - "player" foreach (airportCode => {
-      table += (airportCode ->(member.address, context.actorOf(AirportProxy.props(member.address), airportCode)))
+    member.roles - "player" map AirportCode foreach (airportCode => {
+      table += (airportCode ->(member.address, context.actorOf(AirportProxy.props(member.address), airportCode.toString)))
 
       val userInfoRequest = ask(userStore, UserStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
 
@@ -65,7 +65,7 @@ class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor wit
 
     log.warning(s"player $member moved out")
 
-    member.roles - "player" foreach (airportCode => {
+    member.roles - "player" map AirportCode foreach (airportCode => {
       val proxy = table(airportCode)._2
       context.stop(proxy)
       table -= airportCode
@@ -85,7 +85,7 @@ object AirportLocator {
 
   def props(userStore: ActorRef, gameStore: ActorRef): Props = Props(classOf[AirportLocator], userStore, gameStore)
 
-  case class AirportAddressLookup(airportCode: String)
+  case class AirportAddressLookup(airportCode: AirportCode)
 
 }
 

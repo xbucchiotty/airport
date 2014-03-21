@@ -117,7 +117,7 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
     val userStore = system.actorOf(UserStore.props(), "userStore")
 
-    whenReady(ask(userStore, AskForAirport("CDG")).mapTo[Option[UserInfo]]) {
+    whenReady(ask(userStore, AskForAirport(AirportCode("CDG"))).mapTo[Option[UserInfo]]) {
       userInfo =>
         userInfo should not(be(defined))
     }

@@ -51,7 +51,7 @@ object UserStore {
 
   case class Ask(team: TeamMail)
 
-  case class AskForAirport(airportCode: String)
+  case class AskForAirport(airportCode: AirportCode)
 
   case class RegisterError(message: String)
 

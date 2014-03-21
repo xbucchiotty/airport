@@ -11,14 +11,12 @@ import akka.testkit.TestProbe
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Second, Span}
 import akka.pattern.ask
-import fr.xebia.xke.akka.infrastructure.Airport
+import fr.xebia.xke.akka.infrastructure.{AirportCode, Airport, TeamMail, UserInfo}
 import fr.xebia.xke.akka.game.GameStore.GameCreated
-import fr.xebia.xke.akka.infrastructure.TeamMail
 import scala.Some
 import fr.xebia.xke.akka.game.GameStore.NewGame
 import fr.xebia.xke.akka.game.GameStore.StartGame
 import fr.xebia.xke.akka.plane.FullStepPlane
-import fr.xebia.xke.akka.infrastructure.UserInfo
 
 class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
@@ -33,7 +31,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should create a game for a user") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userInfo = UserInfo(TeamMail("xbucchiotty@xebia.fr"), Airport("Paris", "CDG", "42", "2"))
+      val userInfo = UserInfo(TeamMail("xbucchiotty@xebia.fr"), Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -45,7 +43,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should be able to start a created game") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val userId = TeamMail("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
+      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
 
       val probe = TestProbe()
@@ -61,7 +59,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
+      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -89,7 +87,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
+      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -112,7 +110,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val userId = TeamMail("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", "CDG", "42", "2"))
+      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 

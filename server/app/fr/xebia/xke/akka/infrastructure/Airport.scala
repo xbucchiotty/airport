@@ -14,7 +14,7 @@ object Airport {
       .map(line => line.split(','))
       .map(data => {
 
-      val airportCode = data(4)
+      val airportCode = AirportCode(data(4))
 
       val departures = routesFrom.get(airportCode).getOrElse(Nil)
       val arrivals = routesTo.get(airportCode).getOrElse(Nil)
@@ -48,10 +48,10 @@ object Airport {
     case (airport, routeSize) => routeSize
   }
 
-  def fromCode(code: String): Option[Airport] = airports.find(_.code == code)
+  def fromCode(code: AirportCode): Option[Airport] = airports.find(_.code == code)
 }
 
-case class Airport(city: String, code: String, latitude: String, longitude: String, departures: Set[Route] = Set.empty, arrivals: Set[Route] = Set.empty) {
+case class Airport(city: String, code: AirportCode, latitude: String, longitude: String, departures: Set[Route] = Set.empty, arrivals: Set[Route] = Set.empty) {
 
   override def toString = s"Airport($city $code, ${departures.size} departures, ${arrivals.size} arrivals)"
 }
