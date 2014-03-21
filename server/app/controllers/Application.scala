@@ -165,7 +165,7 @@ object Application extends Controller with PlayerSessionManagement {
           }
       }
 
-      Await.result(gameCreation, atMost = 1.second)
+      Await.result(gameCreation, atMost = 10.seconds)
 
 
     }

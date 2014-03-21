@@ -33,7 +33,7 @@ trait PlayerSessionManagement {
   def currentUser(session: play.api.mvc.Session): Option[UserInfo] =
     Await.result(session.get("email").map(userId => {
       ask(userStore, Ask(TeamMail(userId))).mapTo[Option[UserInfo]]
-    }).getOrElse(Future.successful(None)), atMost = 1.second)
+    }).getOrElse(Future.successful(None)), atMost = 10.seconds)
 
   def LoggedInAction(securedAction: (UserInfo => play.api.mvc.Request[_] => play.api.mvc.SimpleResult)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
     implicit request =>
