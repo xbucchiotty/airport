@@ -250,7 +250,7 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
   }
 
   def testActorSystem(): ActorSystem = {
-    ActorSystem("TestSystem", ConfigFactory.load("application-test.xml"))
+    ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
   }
 
   def initializedGroundControl(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int)(implicit system: ActorSystem): ActorRef = {

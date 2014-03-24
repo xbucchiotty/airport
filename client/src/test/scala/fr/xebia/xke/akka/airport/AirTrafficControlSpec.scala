@@ -143,6 +143,6 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
   }
 
   def testActorSystem(): ActorSystem = {
-    ActorSystem("TestSystem", ConfigFactory.load("application-test.xml"))
+    ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
   }
 }
