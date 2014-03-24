@@ -20,6 +20,7 @@ import fr.xebia.xke.akka.plane.JustLandingPlane
 import fr.xebia.xke.akka.game.GameStore.StartGame
 import fr.xebia.xke.akka.plane.JustTaxiingPlane
 import fr.xebia.xke.akka.plane.FullStepPlane
+import play.api.libs.json.Json
 
 object Application extends Controller with PlayerSessionManagement {
 
@@ -121,6 +122,24 @@ object Application extends Controller with PlayerSessionManagement {
           outOfKerozenTimeout = 30000)
 
         newGame(settings, views.html.level_5(settings, userInfo.airport), classOf[FullStepPlane])
+  }
+
+  def level6 = Action {
+    implicit request =>
+      val user: Option[UserInfo] = currentUser(session)
+      Ok(views.html.level_6(user.map(_.airport)))
+  }
+
+  def scores = Action {
+    val airportScores = Airport.top100.zipWithIndex.map {
+      case (airport, index) => AirportScore(
+        airport.code,
+        airport.latitude.toDouble,
+        airport.longitude.toDouble,
+        (index + 20) / 1000d)
+    }.toSeq
+
+    Ok(Json.toJson(AirportScores(airportScores)))
   }
 
   def events = WebSocket.async[String] {
