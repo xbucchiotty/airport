@@ -21,7 +21,7 @@ trait PlayerSessionManagement {
 
   this: Controller =>
 
-  implicit val timeout = Timeout(1 second)
+  implicit val timeout = Timeout(10 second)
 
   import ExecutionContext.Implicits.global
 
