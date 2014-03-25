@@ -50,7 +50,7 @@ class GameStore extends Actor with ActorLogging {
 
     val sessionId = s"game-session-${userInfo.airportCode}-$gameCounter"
 
-    val gameContext = GameContext.create(sessionId, settings, planeType)(context)
+    val gameContext = GameContext.create(sessionId, settings, planeType, userInfo.airport)(context)
     gameCounter += 1
 
     gameContexts += (userInfo.userId -> gameContext)

@@ -4,6 +4,7 @@ import akka.actor._
 import akka.event.EventStream
 import fr.xebia.xke.akka.infrastructure.EventListener
 import fr.xebia.xke.akka.plane.Plane
+import fr.xebia.xke.akka.airport.Airport
 
 case class GameContext private(listener: ActorRef, game: ActorRef, eventBus: EventStream) {
 
@@ -23,12 +24,12 @@ case class GameContext private(listener: ActorRef, game: ActorRef, eventBus: Eve
 
 object GameContext {
 
-  def create(sessionId: String, settings: Settings, planeType: Class[_ <: Plane])(context: ActorContext): GameContext = {
+  def create(sessionId: String, settings: Settings, planeType: Class[_ <: Plane], airport: Airport)(context: ActorContext): GameContext = {
     val eventStream = new EventStream(false)
 
     val listener = context.actorOf(EventListener.props(eventStream), sessionId + "-listener")
 
-    val game = context.actorOf(Props(classOf[Game], settings, planeType, eventStream), sessionId)
+    val game = context.actorOf(SinglePlayerGame.props(settings, planeType, eventStream, airport), sessionId)
 
     GameContext(listener, game, eventStream)
   }

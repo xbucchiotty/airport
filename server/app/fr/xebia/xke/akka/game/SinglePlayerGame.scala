@@ -13,10 +13,10 @@ import scala.Some
 import akka.actor.OneForOneStrategy
 import akka.actor.Terminated
 import fr.xebia.xke.akka.airport.InitAirTrafficControl
-import fr.xebia.xke.akka.game.Game.NewPlane
+import fr.xebia.xke.akka.game.SinglePlayerGame.NewPlane
 import fr.xebia.xke.akka.plane.event.PlaneStatus
 
-class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream) extends Actor with ActorLogging {
+class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream, airport: Airport) extends Actor with ActorLogging {
 
   import settings._
 
@@ -103,15 +103,17 @@ class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventSt
       context stop self
 
     case NewPlane if planesToGenerate > 0 =>
+
+      val anArrivalFlight = airport.arrivals(Random.nextInt(airport.arrivals.size))
+
       val planeEventStream = new EventStream()
 
-      val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"AF-${Random.nextLong() % 100000}")
+      val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"${anArrivalFlight.airline}-${Random.nextLong() % 100000}")
       val listener = context.actorOf(Props(classOf[PlaneListener], plane, gameEventStream))
 
       planeEventStream.subscribe(listener, classOf[Any])
 
       planesToGenerate -= 1
-
   }
 
   private def publishScore() {
@@ -141,7 +143,10 @@ class Game(settings: Settings, planeType: Class[Plane], gameEventStream: EventSt
 
 }
 
-object Game {
+object SinglePlayerGame {
+
+  def props(settings: Settings, planeType: Class[_ <: Plane], gameEventStream: EventStream, airport: Airport): Props =
+    Props(classOf[SinglePlayerGame], settings, planeType, gameEventStream, airport)
 
   case object NewPlane
 
