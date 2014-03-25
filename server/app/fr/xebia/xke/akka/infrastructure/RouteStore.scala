@@ -2,16 +2,13 @@ package fr.xebia.xke.akka.infrastructure
 
 import akka.actor.{Props, Actor}
 import scala.util.Random
-import fr.xebia.xke.akka.airport.{AirportCode, Route, Airport}
-import fr.xebia.xke.akka.infrastructure.RouteStore.{AskNewRouteTo, AskNewRouteFrom}
+import fr.xebia.xke.akka.airport.{Route, Airport}
+import scala.Predef._
+import fr.xebia.xke.akka.airport.AirportCode
+import fr.xebia.xke.akka.infrastructure.RouteStore.AskNewRouteFrom
+import fr.xebia.xke.akka.infrastructure.RouteStore.AskNewRouteTo
 
-class RouteStore extends Actor {
-
-  var airports: Map[AirportCode, Airport] = _
-
-  override def preStart() {
-    airports = Airport.airports.groupBy(_.code).mapValues(_.head)
-  }
+class RouteStore(airports: Map[AirportCode, Airport]) extends Actor {
 
   def receive: Receive = {
 
@@ -49,7 +46,7 @@ class RouteStore extends Actor {
 
 object RouteStore {
 
-  def props = Props[RouteStore]
+  def props(airports: Map[AirportCode, Airport]) = Props(classOf[RouteStore], airports)
 
   case class AskNewRouteFrom(from: AirportCode)
 

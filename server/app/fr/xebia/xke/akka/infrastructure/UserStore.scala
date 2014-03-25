@@ -5,13 +5,12 @@ import fr.xebia.xke.akka.infrastructure.UserStore._
 import scala.Some
 import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
-class UserStore extends Actor with ActorLogging {
+class UserStore(airports: List[Airport]) extends Actor with ActorLogging {
 
   var associationsByUserId: Map[TeamMail, UserInfo] = _
-  var availableAirports: List[Airport] = _
+  var availableAirports: List[Airport] = airports
 
   override def preStart() {
-    availableAirports = Airport.top100
     associationsByUserId = Map.empty
   }
 
@@ -48,7 +47,7 @@ class UserStore extends Actor with ActorLogging {
 
 object UserStore {
 
-  def props(): Props = Props[UserStore]
+  def props(airports: List[Airport]): Props = Props(classOf[UserStore], airports)
 
   case class Ask(team: TeamMail)
 

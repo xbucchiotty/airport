@@ -16,6 +16,7 @@ import fr.xebia.xke.akka.infrastructure.UserStore.Registered
 import scala.Some
 import fr.xebia.xke.akka.infrastructure.UserInfo
 import fr.xebia.xke.akka.game.GameStore
+import fr.xebia.xke.akka.airport.Airport
 
 trait PlayerSessionManagement {
 
@@ -25,13 +26,15 @@ trait PlayerSessionManagement {
 
   import ExecutionContext.Implicits.global
 
+  val airports = Airport.top100
+
   val airportActorSystem: ActorSystem = ActorSystem.create("airportSystem")
 
-  val userStore: ActorRef = airportActorSystem.actorOf(UserStore.props(), "userStore")
+  val userStore: ActorRef = airportActorSystem.actorOf(UserStore.props(airports), "userStore")
 
   val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(), "gameStore")
 
-  val airports: ActorRef = airportActorSystem.actorOf(AirportLocator.props(userStore, gameStore), "airports")
+  val airportsClusterLocation: ActorRef = airportActorSystem.actorOf(AirportLocator.props(userStore, gameStore), "airports")
 
   def currentUser(session: play.api.mvc.Session): Option[UserInfo] =
     Await.result(session.get("email").map(userId => {

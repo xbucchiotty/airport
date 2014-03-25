@@ -132,7 +132,7 @@ object Application extends Controller with PlayerSessionManagement {
   }
 
   def scores = Action {
-    val airportScores = Airport.top100.zipWithIndex.map {
+    val airportScores = airports.zipWithIndex.map {
       case (airport, index) => AirportScore(
         airport.code,
         airport.latitude.toDouble,
@@ -179,7 +179,7 @@ object Application extends Controller with PlayerSessionManagement {
 
       gameCreation.onSuccess {
         case GameCreated(gameContext) =>
-          val addressLookup = ask(airports, AirportLocator.AirportAddressLookup(user.airportCode)).mapTo[Option[Address]]
+          val addressLookup = ask(airportsClusterLocation, AirportLocator.AirportAddressLookup(user.airportCode)).mapTo[Option[Address]]
           addressLookup.onSuccess {
             case Some(address) =>
               gameContext.eventBus.publish(PlayerUp(user.userId, address))
