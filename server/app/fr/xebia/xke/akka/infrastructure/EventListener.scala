@@ -12,6 +12,7 @@ import fr.xebia.xke.akka.plane.event.PlaneStatus
 class EventListener(eventStream: EventStream) extends Actor {
 
   private var buffer = Queue.empty[String]
+  private var listening = true
 
   override def preStart() {
     eventStream.subscribe(self, classOf[GameEvent])
@@ -28,10 +29,12 @@ class EventListener(eventStream: EventStream) extends Actor {
 
     case GameOver =>
       buffer = buffer enqueue gameOver
+      listening=false
       eventStream.unsubscribe(self)
 
     case GameEnd =>
       buffer = buffer enqueue gameEnd
+      listening=false
       eventStream.unsubscribe(self)
 
     case newScore: Score =>
@@ -48,8 +51,10 @@ class EventListener(eventStream: EventStream) extends Actor {
         val (msg, newBuffer) = buffer.dequeue
         sender ! Some(msg)
         buffer = newBuffer
-      } else {
-        sender ! Option.empty[String]
+      }else {
+        if(!listening){
+          sender ! Option.empty[String]
+        }
       }
   }
 

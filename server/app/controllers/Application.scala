@@ -9,7 +9,7 @@ import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
 import akka.pattern.ask
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 import akka.actor.Address
 import fr.xebia.xke.akka.plane.Plane
 import fr.xebia.xke.akka.game.GameStore.Ask
@@ -149,28 +149,22 @@ object Application extends Controller with PlayerSessionManagement {
       // Log events to the console
 
       import scala.concurrent.ExecutionContext.Implicits.global
+      import akka.pattern.AskTimeoutException
+
       val contextReply = ask(gameStore, Ask(user.userId)).mapTo[Option[GameContext]]
 
       for (context <- contextReply)
       yield {
 
         val in = Iteratee.foreach[String] {
-          case "start" => {
+          case "start" =>
             //refresh user to get access to the player address system
             gameStore ! StartGame(currentUser(session).get)
-          }
         }
-
-        import scala.concurrent.ExecutionContext.Implicits.global
-        val out: Enumerator[String] = Enumerator2.infiniteUnfold(context.get.listener) {
-          listener => {
-            ask(context.get.listener, DequeueEvents)(Timeout(1 second))
-              .mapTo[Option[String]]
-              .map(replyOption => replyOption.map(reply => (listener, reply))
-            )
-          }
-        }
-
+        def dequeue:Future[Option[String]]= ask(context.get.listener, DequeueEvents)(Timeout(500 millisecond)).mapTo[Option[String]]recoverWith{case t:AskTimeoutException =>  dequeue}
+        val out: Enumerator[String]=Enumerator.generateM[String]({
+         dequeue
+        })
         (in, out)
       }
 
