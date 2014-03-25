@@ -10,6 +10,7 @@ import language.postfixOps
 import scala.concurrent.duration._
 import akka.pattern.ask
 import UserStore._
+import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 

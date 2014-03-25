@@ -11,12 +11,13 @@ import akka.testkit.TestProbe
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Second, Span}
 import akka.pattern.ask
-import fr.xebia.xke.akka.infrastructure.{AirportCode, Airport, TeamMail, UserInfo}
+import fr.xebia.xke.akka.infrastructure.{TeamMail, UserInfo}
 import fr.xebia.xke.akka.game.GameStore.GameCreated
 import scala.Some
 import fr.xebia.xke.akka.game.GameStore.NewGame
 import fr.xebia.xke.akka.game.GameStore.StartGame
 import fr.xebia.xke.akka.plane.FullStepPlane
+import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 

@@ -1,4 +1,4 @@
-package fr.xebia.xke.akka.infrastructure
+package fr.xebia.xke.akka.airport
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 

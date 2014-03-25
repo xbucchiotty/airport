@@ -3,6 +3,7 @@ package fr.xebia.xke.akka.infrastructure
 import akka.actor.{ActorLogging, Props, Actor}
 import fr.xebia.xke.akka.infrastructure.UserStore._
 import scala.Some
+import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 class UserStore extends Actor with ActorLogging {
 

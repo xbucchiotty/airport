@@ -1,6 +1,7 @@
 package fr.xebia.xke.akka.infrastructure
 
 import play.api.libs.json.{JsNumber, JsArray}
+import fr.xebia.xke.akka.airport.AirportCode
 
 case class AirportScore(airportCode: AirportCode, latitude: Double, longitude: Double, score: Double)
 

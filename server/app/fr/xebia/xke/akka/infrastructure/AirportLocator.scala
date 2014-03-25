@@ -13,6 +13,7 @@ import akka.cluster.ClusterEvent.CurrentClusterState
 import akka.cluster.ClusterEvent.UnreachableMember
 import fr.xebia.xke.akka.game.{PlayerDown, PlayerUp}
 import fr.xebia.xke.akka.infrastructure.AirportLocator.AirportAddressLookup
+import fr.xebia.xke.akka.airport.AirportCode
 
 class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor with ActorLogging {
 

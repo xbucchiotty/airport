@@ -1,6 +1,7 @@
 package fr.xebia.xke.akka.infrastructure
 
 import org.scalatest.{ShouldMatchers, FunSpec}
+import fr.xebia.xke.akka.airport.AirportCode
 
 class AirportScoresSpec extends FunSpec with ShouldMatchers {
 

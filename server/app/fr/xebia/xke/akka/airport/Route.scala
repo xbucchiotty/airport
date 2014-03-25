@@ -1,4 +1,4 @@
-package fr.xebia.xke.akka.infrastructure
+package fr.xebia.xke.akka.airport
 
 case class Route(from: AirportCode, to: AirportCode, stops: Int, airline: String) {
   override def toString = s"$airline: $from -> $to"

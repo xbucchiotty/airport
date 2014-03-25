@@ -1,5 +1,4 @@
-package fr.xebia.xke.akka.infrastructure
-
+package fr.xebia.xke.akka.airport
 
 object Airport {
 
@@ -24,8 +23,8 @@ object Airport {
         code = airportCode,
         latitude = data(6),
         longitude = data(7),
-        departures = departures.toSet,
-        arrivals = arrivals.toSet)
+        departures = departures.toList,
+        arrivals = arrivals.toList)
 
     }).toSet
   }
@@ -51,7 +50,7 @@ object Airport {
   def fromCode(code: AirportCode): Option[Airport] = airports.find(_.code == code)
 }
 
-case class Airport(city: String, code: AirportCode, latitude: String, longitude: String, departures: Set[Route] = Set.empty, arrivals: Set[Route] = Set.empty) {
+case class Airport(city: String, code: AirportCode, latitude: String, longitude: String, departures: List[Route] = Nil, arrivals: List[Route] = Nil) {
 
   override def toString = s"Airport($city $code, ${departures.size} departures, ${arrivals.size} arrivals)"
 }

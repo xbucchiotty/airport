@@ -21,6 +21,7 @@ import fr.xebia.xke.akka.game.GameStore.StartGame
 import fr.xebia.xke.akka.plane.JustTaxiingPlane
 import fr.xebia.xke.akka.plane.FullStepPlane
 import play.api.libs.json.Json
+import fr.xebia.xke.akka.airport.Airport
 
 object Application extends Controller with PlayerSessionManagement {
 
