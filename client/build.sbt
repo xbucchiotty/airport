@@ -22,4 +22,17 @@ fork in run := true
 
 connectInput in run := true
 
+seedNode := "akka.tcp://airportSystem@127.0.0.1:2554"
+
+airport   := ""
+
+check := {
+  println("seedNode: " + seedNode.value )
+  println("airport : " + airport.value )
+}
+
+javaOptions in run := Seq("-Dakka.cluster.seed-nodes.0=" + seedNode.value,
+                          "-Dakka.cluster.roles.0=player",
+                          "-Dakka.cluster.roles.1=" + airport.value)
+
 mainClass in (Compile,run) := Some("Launcher")

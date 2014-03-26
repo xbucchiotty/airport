@@ -10,4 +10,10 @@ object AirportBuild extends Build {
 
   lazy val client = Project(id = "client", base = file("client")).dependsOn(messages)
 
+  lazy val seedNode = settingKey[String]("URL endpoint to the master of the game")
+
+  lazy val airport = settingKey[String]("Your airport inside the cluster")
+
+  lazy val check = taskKey[Unit]("Check your config")
+
 }
