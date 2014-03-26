@@ -13,7 +13,11 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % "2.2.3" % "test",
   "com.typesafe.akka" %% "akka-cluster" % "2.2.3"
 )
- 
+
+incOptions := incOptions.value.withNameHashing(true)
+
+Revolver.settings
+
 fork in run := true
 
 connectInput in run := true
