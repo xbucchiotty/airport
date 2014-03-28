@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.plane
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.{Props, ActorRef, Actor}
 import akka.event.EventStream
 import fr.xebia.xke.akka.plane.event.{DetailChanged, StateChanged, ErrorHappened, PlaneStatus}
 
@@ -37,4 +37,10 @@ case class PlaneListener(plane: ActorRef, gameStream: EventStream) extends Actor
   override def preStart() {
     gameStream publish PlaneStatus.empty(plane)
   }
+}
+
+object PlaneListener {
+
+  def props(plane: ActorRef, gameStream: EventStream) =
+    Props(classOf[PlaneListener], plane, gameStream)
 }

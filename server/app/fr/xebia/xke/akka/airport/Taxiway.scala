@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorLogging, Actor, ActorRef}
+import akka.actor.{Props, ActorLogging, Actor, ActorRef}
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, EndOfTaxi, Taxiing, Collision}
 import languageFeature.postfixOps
@@ -83,4 +83,9 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
     context.system.scheduler.scheduleOnce(settings.taxiingDuration milliseconds, self, Tick)
   }
+}
+
+object Taxiway {
+
+  def props(settings: Settings) = Props(classOf[Taxiway], settings)
 }

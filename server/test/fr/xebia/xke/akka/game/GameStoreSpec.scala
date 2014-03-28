@@ -16,7 +16,7 @@ import fr.xebia.xke.akka.game.GameStore.GameCreated
 import scala.Some
 import fr.xebia.xke.akka.game.GameStore.NewGame
 import fr.xebia.xke.akka.game.GameStore.StartGame
-import fr.xebia.xke.akka.plane.FullStepPlane
+import fr.xebia.xke.akka.plane.JustParkingAsLastStep
 import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
@@ -36,7 +36,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       val probe = TestProbe()
 
-      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
+      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingAsLastStep]))
 
       probe expectMsgAllClassOf classOf[GameCreated]
     }
@@ -49,7 +49,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       val probe = TestProbe()
 
-      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
+      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingAsLastStep]))
       probe expectMsgAllClassOf classOf[GameCreated]
 
       probe.send(gameStore, StartGame(userInfo))
@@ -64,7 +64,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       val probe = TestProbe()
 
-      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
+      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingAsLastStep]))
 
       probe expectMsgAllClassOf classOf[GameCreated]
 
@@ -92,7 +92,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       val probe = TestProbe()
 
-      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
+      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingAsLastStep]))
       probe expectMsgAllClassOf classOf[GameCreated]
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
@@ -115,7 +115,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       val probe = TestProbe()
 
-      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[FullStepPlane]))
+      probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingAsLastStep]))
       probe expectMsgAllClassOf classOf[GameCreated]
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {

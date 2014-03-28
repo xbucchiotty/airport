@@ -23,7 +23,7 @@ class TaxiwaySpec extends ActorSpecs with ShouldMatchers {
           "When queueing is finished" - {
 
             "Then plane is notified of the end of parking event" in {
-              val taxiway = system.actorOf(Props(classOf[Taxiway], settings), "taxiway")
+              val taxiway = system.actorOf(Taxiway.props(settings), "taxiway")
 
               val plane = TestProbe()
 
@@ -46,7 +46,7 @@ class TaxiwaySpec extends ActorSpecs with ShouldMatchers {
           "When a second plane try to enter the taxiway" - {
 
             "The taxiway should terminates" in {
-              val taxiway = system.actorOf(Props(classOf[Taxiway], settings.copy(taxiwayCapacity = 1)), "taxiway")
+              val taxiway = system.actorOf(Taxiway.props(settings.copy(taxiwayCapacity = 1)), "taxiway")
 
               val firstPlane = TestProbe()
               val secondPlane = TestProbe()
@@ -74,7 +74,7 @@ class TaxiwaySpec extends ActorSpecs with ShouldMatchers {
             "When a second plane try to enter the taxiway" - {
 
               "The taxiway should terminates" in {
-                val taxiway = system.actorOf(Props(classOf[Taxiway], settings.copy(taxiwayCapacity = 1)), "taxiway")
+                val taxiway = system.actorOf(Taxiway.props(settings.copy(taxiwayCapacity = 1)), "taxiway")
 
                 val firstPlane = TestProbe()
                 val secondPlane = TestProbe()

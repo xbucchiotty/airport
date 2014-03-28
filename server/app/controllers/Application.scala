@@ -19,9 +19,8 @@ import scala.Some
 import fr.xebia.xke.akka.plane.JustLandingPlane
 import fr.xebia.xke.akka.game.GameStore.StartGame
 import fr.xebia.xke.akka.plane.JustTaxiingPlane
-import fr.xebia.xke.akka.plane.FullStepPlane
+import fr.xebia.xke.akka.plane.JustParkingAsLastStep
 import play.api.libs.json.Json
-import fr.xebia.xke.akka.airport.Airport
 
 object Application extends Controller with PlayerSessionManagement {
 
@@ -102,7 +101,7 @@ object Application extends Controller with PlayerSessionManagement {
           ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
-        newGame(settings, views.html.level_4(settings, userInfo.airport), classOf[FullStepPlane])
+        newGame(settings, views.html.level_4(settings, userInfo.airport), classOf[JustParkingAsLastStep])
   }
 
   def level5 = LoggedInAction {
@@ -122,7 +121,7 @@ object Application extends Controller with PlayerSessionManagement {
           radioReliability = 0.8,
           outOfKerozenTimeout = 30000)
 
-        newGame(settings, views.html.level_5(settings, userInfo.airport), classOf[FullStepPlane])
+        newGame(settings, views.html.level_5(settings, userInfo.airport), classOf[JustParkingAsLastStep])
   }
 
   def level6 = Action {

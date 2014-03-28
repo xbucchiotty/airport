@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.airport
 
-import akka.actor.{ActorRef, ActorLogging, Actor}
+import akka.actor.{Props, ActorRef, ActorLogging, Actor}
 import fr.xebia.xke.akka.airport.PlaneEvent.{Collision, HasLanded, HasLeft}
 
 class Runway extends Actor with ActorLogging {
@@ -42,4 +42,9 @@ class Runway extends Actor with ActorLogging {
 
   def receive: Receive = free
 
+}
+
+object Runway {
+
+  def props() = Props[Runway]
 }

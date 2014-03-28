@@ -15,7 +15,7 @@ class RunwaySpec extends ActorSpecs {
       "Given a free runway" - {
 
         "Then a plane can land on the runway" in {
-          val runway = system.actorOf(Props[Runway], "runway")
+          val runway = system.actorOf(Runway.props(), "runway")
           val probe = TestProbe()
           probe watch runway
 
@@ -37,7 +37,7 @@ class RunwaySpec extends ActorSpecs {
         "When a plane try to land on the runway" - {
 
           "Then the runway should terminates" in {
-            val runway = system.actorOf(Props[Runway], "runway")
+            val runway = system.actorOf(Runway.props(), "runway")
             val probe = TestProbe()
             probe watch runway
 
@@ -61,7 +61,7 @@ class RunwaySpec extends ActorSpecs {
         "When a plane try to leave without having landed before" - {
 
           "Then the runway should terminates" in {
-            val runway = system.actorOf(Props[Runway], "runway")
+            val runway = system.actorOf(Runway.props(), "runway")
             val probe = TestProbe()
             probe watch runway
 
@@ -82,7 +82,7 @@ class RunwaySpec extends ActorSpecs {
         "When the first plane leaves the runway" - {
 
           "Then the second plane can land" in {
-            val runway = system.actorOf(Props[Runway], "runway")
+            val runway = system.actorOf(Runway.props(), "runway")
             val probe = TestProbe()
             probe watch runway
 

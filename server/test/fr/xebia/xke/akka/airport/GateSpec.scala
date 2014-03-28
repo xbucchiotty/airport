@@ -17,7 +17,7 @@ class GateSpec extends ActorSpecs {
         "Given a plane" - {
 
           "Then a plane car parks at the gate" in {
-            val gate = system.actorOf(Props[Gate], "gate")
+            val gate = system.actorOf(Gate.props(), "gate")
             val probe = TestProbe()
             probe watch gate
 
@@ -44,7 +44,7 @@ class GateSpec extends ActorSpecs {
                 val firstPlane = TestProbe()
                 val secondPlane = TestProbe()
 
-                val gate = system.actorOf(Props[Gate], "gate")
+                val gate = system.actorOf(Gate.props(), "gate")
                 val probe = TestProbe()
                 probe watch gate
 
@@ -72,7 +72,7 @@ class GateSpec extends ActorSpecs {
               val firstPlane = TestProbe()
               val secondPlane = TestProbe()
 
-              val gate = system.actorOf(Props[Gate], "gate")
+              val gate = system.actorOf(Gate.props(), "gate")
               val probe = TestProbe()
               probe watch gate
 

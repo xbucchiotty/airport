@@ -26,7 +26,7 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
 
-            system.actorOf(Props(classOf[JustLandingPlane], airControl.ref, game.ref, settings, new EventStream()), "plane")
+            system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             airControl expectMsg Incoming
           }
@@ -44,7 +44,7 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
           "Then it should terminates" in {
             val game = TestProbe()
             val airControl = TestProbe()
-            val plane = system.actorOf(Props(classOf[JustLandingPlane], airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             val probe = TestProbe()
             probe watch plane
@@ -67,7 +67,7 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
             val runway = TestProbe()
-            system.actorOf(Props(classOf[JustLandingPlane], airControl.ref, game.ref, settings, new EventStream()), "plane")
+            system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
             airControl expectMsg Incoming
 
             //When
@@ -95,7 +95,7 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val runway = TestProbe()
-            system.actorOf(Props(classOf[JustLandingPlane], airControl.ref, game.ref, settings, new EventStream()), "plane")
+            system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             airControl expectMsg Incoming
             airControl reply Land(runway.ref)

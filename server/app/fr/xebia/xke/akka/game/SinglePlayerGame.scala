@@ -22,15 +22,15 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
 
   val runways: Seq[ActorRef] =
     for (i <- 1 to nrOfRunways)
-    yield context.actorOf(Props[Runway], s"runway-$i")
+    yield context.actorOf(Runway.props(), s"runway-$i")
 
   val taxiways: Seq[ActorRef] =
     for (i <- 1 to nrOfTaxiways)
-    yield context.actorOf(Props(classOf[Taxiway], settings), s"taxiway-$i")
+    yield context.actorOf(Taxiway.props(settings), s"taxiway-$i")
 
   val gates: Seq[ActorRef] =
     for (i <- 1 to nrOfGates)
-    yield context.actorOf(Props[Gate], s"gate-$i")
+    yield context.actorOf(Gate.props(), s"gate-$i")
 
   var planeGeneration: Cancellable = null
 
@@ -109,7 +109,7 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
       val planeEventStream = new EventStream()
 
       val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"${anArrivalFlight.airline}-${Random.nextLong() % 100000}")
-      val listener = context.actorOf(Props(classOf[PlaneListener], plane, gameEventStream))
+      val listener = context.actorOf(PlaneListener.props(plane, gameEventStream))
 
       planeEventStream.subscribe(listener, classOf[Any])
 
