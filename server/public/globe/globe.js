@@ -114,10 +114,13 @@ DAT.Globe = function(container, opts) {
 
         });
 
+    //Set the texture of the globe
     mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.y = Math.PI;
     scene.add(mesh);
 
+
+    //Set the athmosphere and horizon
     shader = Shaders['atmosphere'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
@@ -134,13 +137,15 @@ DAT.Globe = function(container, opts) {
 
     mesh = new THREE.Mesh(geometry, material);
     mesh.scale.set( 1.1, 1.1, 1.1 );
-    scene.add(mesh);
+    //scene.add(mesh);
 
+    //Point shape
     geometry = new THREE.CubeGeometry(0.75, 0.75, 1);
     geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,-0.5));
 
     point = new THREE.Mesh(geometry);
 
+    //Create the renderer
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(w, h);
 
@@ -149,11 +154,8 @@ DAT.Globe = function(container, opts) {
     container.appendChild(renderer.domElement);
 
     container.addEventListener('mousedown', onMouseDown, false);
-
     container.addEventListener('mousewheel', onMouseWheel, false);
-
     document.addEventListener('keydown', onDocumentKeyDown, false);
-
     window.addEventListener('resize', onWindowResize, false);
 
     container.addEventListener('mouseover', function() {
@@ -188,7 +190,6 @@ DAT.Globe = function(container, opts) {
         for (i = 0; i < data.length; i += step) {
           lat = data[i];
           lng = data[i + 1];
-//        size = data[i + 2];
           color = colorFnWrapper(data,i);
           size = 0;
           addPoint(lat, lng, size, color, this._baseGeometry);
@@ -202,13 +203,47 @@ DAT.Globe = function(container, opts) {
       opts.name = opts.name || 'morphTarget'+this._morphTargetId;
     }
     var subgeo = new THREE.Geometry();
+
     for (i = 0; i < data.length; i += step) {
       lat = data[i];
       lng = data[i + 1];
       color = colorFnWrapper(data,i);
       size = data[i + 2];
+      airport = data[i+3];
       size = size*200;
       addPoint(lat, lng, size, color, subgeo);
+
+      var labelCanvas = document.createElement('canvas' );
+      var labelContext = labelCanvas.getContext('2d');
+      labelContext.font= "120px sans-serif";
+      labelContext.fillStyle = "rgba(255,0,0,0.95)";
+      labelContext.fillText(airport, 20, 100);
+      geometry = new THREE.PlaneGeometry(15, 5);
+      geometry.applyMatrix(new THREE.Matrix4().makeTranslation(10,5,Math.random() * -1 + -0.5));
+
+
+      var labelTexture = new THREE.Texture(labelCanvas)
+      labelTexture.needsUpdate = true;
+      material = new THREE.MeshBasicMaterial( {map: labelTexture, side:THREE.DoubleSide } );
+      material.transparent = true;
+
+      // canvas contents will be used for a texture
+
+      label = new THREE.Mesh(geometry, material);
+
+      var phi = (90 - lat ) * Math.PI / 180 ;
+      var theta = (180 - lng ) * Math.PI / 180;
+
+      label.position.x = 200 * Math.sin(phi) * Math.cos(theta);
+      label.position.y = 200 * Math.cos(phi);
+      label.position.z = 200 * Math.sin(phi) * Math.sin(theta);
+
+      label.lookAt(mesh.position);
+
+      label.scale.z = 10; // avoid non-invertible matrix
+      label.updateMatrix();
+
+      scene.add(label);
     }
     if (opts.animated) {
       this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
@@ -261,9 +296,7 @@ DAT.Globe = function(container, opts) {
     point.updateMatrix();
 
     for (var i = 0; i < point.geometry.faces.length; i++) {
-
       point.geometry.faces[i].color = color;
-
     }
 
     THREE.GeometryUtils.merge(subgeo, point);

@@ -132,7 +132,7 @@ object Application extends Controller with PlayerSessionManagement {
   }
 
   def scores = Action {
-    val airportScores = airports.zipWithIndex.map {
+    val airportScores = airports.take(10).zipWithIndex.map {
       case (airport, index) => AirportScore(
         airport.code,
         airport.latitude.toDouble,

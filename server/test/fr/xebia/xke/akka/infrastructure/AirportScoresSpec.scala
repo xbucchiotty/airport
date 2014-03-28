@@ -12,7 +12,7 @@ class AirportScoresSpec extends FunSpec with ShouldMatchers {
 
       val json = AirportScores.jsonWriter.writes(scores)
 
-      json.toString() should equal( """[42.1,2.32,28.0]""")
+      json.toString() should equal( """[42.1,2.32,28.0,"LHR"]""")
     }
   }
 }

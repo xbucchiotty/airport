@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.infrastructure
 
-import play.api.libs.json.{JsNumber, JsArray}
+import play.api.libs.json.{JsNumber, JsArray,JsString}
 import fr.xebia.xke.akka.airport.AirportCode
 
 case class AirportScore(airportCode: AirportCode, latitude: Double, longitude: Double, score: Double)
@@ -8,7 +8,7 @@ case class AirportScore(airportCode: AirportCode, latitude: Double, longitude: D
 object AirportScore {
 
   def toJson(o: AirportScore): JsArray =
-    JsArray(Seq(JsNumber(o.latitude), JsNumber(o.longitude), JsNumber(o.score))
+    JsArray(Seq(JsNumber(o.latitude), JsNumber(o.longitude), JsNumber(o.score),JsString(o.airportCode.toString))
 
     )
 }

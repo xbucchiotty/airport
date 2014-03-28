@@ -143,10 +143,10 @@
                     var data = JSON.parse(xhr.responseText);
                     window.data = data;
 
-                    globe.addData(data, {format: 'magnitude', name: 'LHR', animated: true});
+                    globe.addData(data, {format: 'legend', animated: true});
 
                     globe.createPoints();
-                    new TWEEN.Tween(globe).to({time: 0},500).start();
+                    new TWEEN.Tween(globe).to({time: 0},3000).start();
                     globe.animate();
                     document.body.style.backgroundImage = 'none'; // remove loading
                 }
