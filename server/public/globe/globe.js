@@ -137,7 +137,7 @@ DAT.Globe = function(container, opts) {
 
     mesh = new THREE.Mesh(geometry, material);
     mesh.scale.set( 1.1, 1.1, 1.1 );
-    //scene.add(mesh);
+    scene.add(mesh);
 
     //Point shape
     geometry = new THREE.CubeGeometry(0.75, 0.75, 1);
@@ -219,7 +219,7 @@ DAT.Globe = function(container, opts) {
       labelContext.fillStyle = "rgba(255,0,0,0.95)";
       labelContext.fillText(airport, 20, 100);
       geometry = new THREE.PlaneGeometry(15, 5);
-      geometry.applyMatrix(new THREE.Matrix4().makeTranslation(10,5,Math.random() * -1 + -0.5));
+      geometry.applyMatrix(new THREE.Matrix4().makeTranslation(5,5,Math.random() * -2 + -0.5));
 
 
       var labelTexture = new THREE.Texture(labelCanvas)
@@ -238,9 +238,9 @@ DAT.Globe = function(container, opts) {
       label.position.y = 200 * Math.cos(phi);
       label.position.z = 200 * Math.sin(phi) * Math.sin(theta);
 
-      label.lookAt(mesh.position);
+      label.lookAt(new THREE.Vector3(label.position.x * 2, label.position.y * 2, label.position.z * 2));
 
-      label.scale.z = 10; // avoid non-invertible matrix
+      label.scale.z = 0.01;
       label.updateMatrix();
 
       scene.add(label);
