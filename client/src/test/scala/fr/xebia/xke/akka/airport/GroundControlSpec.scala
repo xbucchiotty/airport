@@ -107,6 +107,43 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       newPlane expectNoMsg (100 milliseconds)
     }
 
+    it("should recover taxiway slots when a plane leaves") {
+      pending
+
+      Given("a ground control with 1 taxiway with a capacity of 2 planes")
+      implicit val system = testActorSystem()
+      val taxiway = TestProbe()
+      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq.empty[ActorRef], 2, 100)
+
+      Given("2 planes")
+      val plane1 = TestProbe()
+      val plane2 = TestProbe()
+
+      When("each plane contacts ground control")
+      plane1.send(groundControl, Incoming)
+      plane2.send(groundControl, Incoming)
+
+      Then("ground control should tell each plane to taxi on the taxiway")
+      plane1.expectMsg(100 milliseconds, Taxi(taxiway.ref))
+      plane2.expectMsg(100 milliseconds, Taxi(taxiway.ref))
+      plane1 reply Ack
+      plane2 reply Ack
+
+      When("one taxiing planes have parked")
+      plane1.send(groundControl, HasParked)
+
+      When("2 new planes contact ground control")
+      val plane3 = TestProbe()
+      val plane4 = TestProbe()
+      plane3.send(groundControl, Incoming)
+      plane4.send(groundControl, Incoming)
+
+      Then("ground control should tell the first pending plane to taxi")
+      plane3.expectMsg(100 milliseconds, Taxi(taxiway.ref))
+      Then("ground control should make the second pending plane wait")
+      plane4 expectNoMsg (100 milliseconds)
+    }
+
     it("should allocate free taxiways to each plane") {
       pending
 
