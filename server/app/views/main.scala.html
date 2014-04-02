@@ -16,17 +16,17 @@
             <div class="brand">Level <span class="badge">@level</span></div>
             <div class="brand">@airport.map(airport => airport.code + ": " + airport.city).getOrElse("Devoxx International Airport")</div>
             <ul class="nav">
-                <li><a href="@routes.Application.index()">Start a new game</a></li>
+                <li><a href="@routes.Application.index()" target="_blank">Start a new game</a></li>
             </ul>
             <div class="brand" id="playerAddress"></div>
         </div>
     </div>
 </div>
+<script src="/assets/javascripts/jquery-1.9.0.min.js" type="text/javascript"></script>
+<script src="/assets/javascripts/bootstrap.js" type="text/javascript"></script>
+<script src="/assets/javascripts/intro.js" type="text/javascript"></script>
 <div>
     @content
 </div>
-    <script src="/assets/javascripts/jquery-1.9.0.min.js" type="text/javascript"></script>
-    <script src="/assets/javascripts/bootstrap.js" type="text/javascript"></script>
-    <script src="/assets/javascripts/intro.js" type="text/javascript"></script>
 </body>
 </html>

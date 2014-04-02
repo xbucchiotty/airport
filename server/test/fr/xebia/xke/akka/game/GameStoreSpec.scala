@@ -18,6 +18,7 @@ import fr.xebia.xke.akka.game.GameStore.NewGame
 import fr.xebia.xke.akka.game.GameStore.StartGame
 import fr.xebia.xke.akka.plane.JustParkingPlane
 import fr.xebia.xke.akka.airport.{AirportCode, Airport}
+import java.util.UUID
 
 class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
@@ -29,10 +30,10 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
   describe("A game store") {
 
-    it("should create a game for a user") {
+    it("should create a game for a session") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userInfo = UserInfo(SessionId("xbucchiotty@xebia.fr"), Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = UserInfo(SessionId(new UUID(0, 0)), Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -43,8 +44,8 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should be able to start a created game") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val userId = SessionId("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val sessionId = SessionId(new UUID(0, 0))
+      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
 
       val probe = TestProbe()
@@ -56,11 +57,11 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       probe expectMsg GameStarted
     }
 
-    it("should returns the context of an existing userId") {
+    it("should returns the context of an existing sessionId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = SessionId("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val sessionId = SessionId(new UUID(0, 0))
+      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -68,62 +69,62 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       probe expectMsgAllClassOf classOf[GameCreated]
 
-      whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
+      whenReady(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]]) {
         reply =>
           reply should be(defined)
       }
     }
 
-    it("should not returns the context of an unknown userId") {
+    it("should not returns the context of an unknown sessionId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = SessionId("xbucchiotty@xebia.fr")
+      val sessionId = SessionId(new UUID(0, 0))
 
-      whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
+      whenReady(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]]) {
         reply => reply should not(be(defined))
       }
     }
 
-    it("should publish into the stream PlayerUp event if user is known") {
+    it("should publish into the stream PlayerUp event if session is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = SessionId("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val sessionId = SessionId(new UUID(0, 0))
+      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingPlane]))
       probe expectMsgAllClassOf classOf[GameCreated]
 
-      whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
+      whenReady(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]]) {
         case Some(reply) =>
           val listener = TestProbe()
           reply.eventBus.subscribe(listener.ref, classOf[GameEvent])
 
-          val event = PlayerUp(userId, Address("tcp", "TestSystem"))
+          val event = PlayerUp(sessionId, Address("tcp", "TestSystem"))
           probe.send(gameStore, event)
 
           listener.expectMsg(event)
       }
     }
 
-    it("should publish into the stream PlayerDown event if user is known") {
+    it("should publish into the stream PlayerDown event if session is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = SessionId("xbucchiotty@xebia.fr")
-      val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val sessionId = SessionId(new UUID(0, 0))
+      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingPlane]))
       probe expectMsgAllClassOf classOf[GameCreated]
 
-      whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
+      whenReady(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]]) {
         case Some(reply) =>
           val listener = TestProbe()
           reply.eventBus.subscribe(listener.ref, classOf[GameEvent])
 
-          val event = PlayerDown(userId, Address("tcp", "TestSystem"))
+          val event = PlayerDown(sessionId, Address("tcp", "TestSystem"))
           probe.send(gameStore, event)
 
           listener.expectMsg(event)

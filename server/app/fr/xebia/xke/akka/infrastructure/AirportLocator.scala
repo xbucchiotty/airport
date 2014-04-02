@@ -15,7 +15,7 @@ import fr.xebia.xke.akka.game.{PlayerDown, PlayerUp}
 import fr.xebia.xke.akka.infrastructure.AirportLocator.AirportAddressLookup
 import fr.xebia.xke.akka.airport.AirportCode
 
-class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor with ActorLogging {
+class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor with ActorLogging {
 
   var table: Map[AirportCode, (Address, ActorRef)] = _
 
@@ -52,10 +52,10 @@ class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor wit
     member.roles - "player" map AirportCode foreach (airportCode => {
       table += (airportCode ->(member.address, context.actorOf(AirportProxy.props(member.address), airportCode.toString)))
 
-      val userInfoRequest = ask(userStore, UserStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
+      val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
 
       userInfoRequest.onSuccess {
-        case Some(userInfo) => gameStore ! PlayerUp(userInfo.userId, member.address)
+        case Some(userInfo) => gameStore ! PlayerUp(userInfo.sessionId, member.address)
       }
     })
   }
@@ -71,10 +71,10 @@ class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor wit
       context.stop(proxy)
       table -= airportCode
 
-      val userInfoRequest = ask(userStore, UserStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
+      val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[UserInfo]]
 
       userInfoRequest.onSuccess {
-        case Some(userInfo) => gameStore ! PlayerDown(userInfo.userId, member.address)
+        case Some(userInfo) => gameStore ! PlayerDown(userInfo.sessionId, member.address)
       }
     })
 
@@ -84,7 +84,7 @@ class AirportLocator(userStore: ActorRef, gameStore: ActorRef) extends Actor wit
 
 object AirportLocator {
 
-  def props(userStore: ActorRef, gameStore: ActorRef): Props = Props(classOf[AirportLocator], userStore, gameStore)
+  def props(sessionStore: ActorRef, gameStore: ActorRef): Props = Props(classOf[AirportLocator], sessionStore, gameStore)
 
   case class AirportAddressLookup(airportCode: AirportCode)
 

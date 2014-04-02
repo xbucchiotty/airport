@@ -1,5 +1,23 @@
 package fr.xebia.xke.akka.infrastructure
 
-case class SessionId(value: String) extends AnyVal {
-  override def toString = value
+import java.util.UUID
+import play.api.mvc.PathBindable
+import scala.util.{Failure, Success, Try}
+
+case class SessionId(value: UUID) extends AnyVal {
+  override def toString = value.toString
+}
+
+object SessionId {
+
+  def apply(): SessionId = new SessionId(UUID.randomUUID())
+
+  implicit val pathBindale = new PathBindable[SessionId] {
+    override def unbind(key: String, sessionId: SessionId): String = sessionId.toString
+
+    override def bind(key: String, pathParam: String): Either[String, SessionId] = Try(UUID.fromString(pathParam)) match {
+      case Success(sessionId) => Right(SessionId(sessionId))
+      case Failure(_) => Left(s"$pathParam is not a correct UUID")
+    }
+  }
 }

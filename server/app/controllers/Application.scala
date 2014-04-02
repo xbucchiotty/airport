@@ -22,10 +22,7 @@ import fr.xebia.xke.akka.infrastructure.UserInfo
 
 object Application extends Controller with PlayerSessionManagement {
 
-  def index: Action[AnyContent] =
-    LoggedInAction(_ => _ => Redirect(routes.Application.level0))
-
-  def level0 = LoggedInAction {
+  def level0(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
         val settings = Settings(
@@ -35,13 +32,13 @@ object Application extends Controller with PlayerSessionManagement {
           objective = 20,
           ackMaxDuration = 1000)
 
-        newSinglePlayerGame(settings, views.html.level_0(settings, userInfo.airport), classOf[JustLandingPlane])
-
+        newSinglePlayerGame(sessionId)(settings, views.html.level_0(settings, userInfo), classOf[JustLandingPlane])
   }
 
-  def level1 = LoggedInAction {
+  def level1(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
+
         val settings = Settings(
           nrOfRunways = 2,
           landingMaxDuration = 1500,
@@ -49,12 +46,13 @@ object Application extends Controller with PlayerSessionManagement {
           objective = 20,
           ackMaxDuration = 1000)
 
-        newSinglePlayerGame(settings, views.html.level_1(settings, userInfo.airport), classOf[JustLandingPlane])
+        newSinglePlayerGame(sessionId)(settings, views.html.level_1(settings, userInfo), classOf[JustLandingPlane])
   }
 
-  def level2 = LoggedInAction {
+  def level2(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
+
         val settings = Settings(
           nrOfRunways = 4,
           landingMaxDuration = 2500,
@@ -63,12 +61,13 @@ object Application extends Controller with PlayerSessionManagement {
           ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
-        newSinglePlayerGame(settings, views.html.level_2(settings, userInfo.airport), classOf[JustLandingPlane])
+        newSinglePlayerGame(sessionId)(settings, views.html.level_2(settings, userInfo), classOf[JustLandingPlane])
   }
 
-  def level3 = LoggedInAction {
+  def level3(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
+
         val settings = Settings(
           nrOfRunways = 4,
           landingMaxDuration = 2500,
@@ -80,12 +79,13 @@ object Application extends Controller with PlayerSessionManagement {
           ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
-        newSinglePlayerGame(settings, views.html.level_3(settings, userInfo.airport), classOf[JustTaxiingPlane])
+        newSinglePlayerGame(sessionId)(settings, views.html.level_3(settings, userInfo), classOf[JustTaxiingPlane])
   }
 
-  def level4 = LoggedInAction {
+  def level4(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
+
         val settings = Settings(
           nrOfRunways = 4,
           landingMaxDuration = 2500,
@@ -99,12 +99,13 @@ object Application extends Controller with PlayerSessionManagement {
           ackMaxDuration = 1000,
           outOfKerozenTimeout = 30000)
 
-        newSinglePlayerGame(settings, views.html.level_4(settings, userInfo.airport), classOf[JustParkingPlane])
+        newSinglePlayerGame(sessionId)(settings, views.html.level_4(settings, userInfo), classOf[JustParkingPlane])
   }
 
-  def level5 = LoggedInAction {
+  def level5(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
+
         val settings = Settings(
           nrOfRunways = 4,
           landingMaxDuration = 2500,
@@ -118,12 +119,13 @@ object Application extends Controller with PlayerSessionManagement {
           ackMaxDuration = 1000,
           radioReliability = 0.8,
           outOfKerozenTimeout = 30000)
-        newSinglePlayerGame(settings, views.html.level_5(settings, userInfo.airport), classOf[JustParkingPlane])
+        newSinglePlayerGame(sessionId)(settings, views.html.level_5(settings, userInfo), classOf[JustParkingPlane])
   }
 
-  def level6 = LoggedInAction {
+  def level6(sessionId: SessionId) = LoggedInAction(sessionId) {
     userInfo =>
       implicit request =>
+
         val settings = Settings(
           nrOfRunways = 4,
           landingMaxDuration = 2500,
@@ -137,14 +139,16 @@ object Application extends Controller with PlayerSessionManagement {
           ackMaxDuration = 1000,
           radioReliability = 0.8,
           outOfKerozenTimeout = 30000)
-        newMultiplayerGame(settings, views.html.level_6(settings, userInfo.airport), classOf[MultiAirportPlane])
+        newMultiplayerGame(sessionId)(settings, views.html.level_6(settings, userInfo), classOf[MultiAirportPlane])
   }
 
+  def multiplayerWithoutUser = multiplayer(None)
 
-  def multiplayer = Action {
-    implicit request =>
-      val user: Option[UserInfo] = currentUser(session)
-      Ok(views.html.multiplayer(user.map(_.airport)))
+  def multiplayerWithUser(sessionId: SessionId) = multiplayer(Some(sessionId))
+
+  def multiplayer(sessionId: Option[SessionId]) = Action {
+    val userInfo: Option[UserInfo] = sessionId.flatMap(session => currentUserInfo(session))
+    Ok(views.html.multiplayer(userInfo.map(_.airport)))
   }
 
   def scores = Action {
@@ -159,46 +163,47 @@ object Application extends Controller with PlayerSessionManagement {
     Ok(Json.toJson(AirportScores(airportScores)))
   }
 
-  def events = WebSocket.async[String] {
-    implicit request =>
+  def events(sessionId: SessionId) = WebSocket.async[String] {
+    _ =>
 
-      val user = currentUser(session).get
+      val userInfo = currentUserInfo(sessionId).get
       // Log events to the console
 
       import scala.concurrent.ExecutionContext.Implicits.global
       import akka.pattern.AskTimeoutException
 
-      val contextReply = ask(gameStore, Ask(user.userId)).mapTo[Option[GameContext]]
+      val contextReply = ask(gameStore, Ask(userInfo.sessionId)).mapTo[Option[GameContext]]
 
       for (context <- contextReply)
       yield {
 
         val in = Iteratee.foreach[String] {
           case "start" =>
-            //refresh user to get access to the player address system
-            gameStore ! StartGame(currentUser(session).get)
+            //refresh session to get access to the player address system
+            gameStore ! StartGame(currentUserInfo(sessionId).get)
         }
-        def dequeue:Future[Option[String]]= ask(context.get.listener, DequeueEvents)(Timeout(500 millisecond)).mapTo[Option[String]]recoverWith{case t:AskTimeoutException =>  dequeue}
-        val out: Enumerator[String]=Enumerator.generateM[String]({
-         dequeue
+        def dequeue: Future[Option[String]] = ask(context.get.listener, DequeueEvents)(Timeout(500 millisecond)).mapTo[Option[String]] recoverWith {
+          case t: AskTimeoutException => dequeue
+        }
+        val out: Enumerator[String] = Enumerator.generateM[String]({
+          dequeue
         })
         (in, out)
       }
-
   }
 
-  private def newSinglePlayerGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
+  private def newSinglePlayerGame(sessionId: SessionId)(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    for (user <- currentUser(session)) {
-      val gameCreation = ask(gameStore, GameStore.NewGame(user, settings, planeType)).mapTo[GameCreated]
+    for (userInfo <- currentUserInfo(sessionId)) {
+      val gameCreation = ask(gameStore, GameStore.NewGame(userInfo, settings, planeType)).mapTo[GameCreated]
 
       gameCreation.onSuccess {
         case GameCreated(gameContext) =>
-          val addressLookup = ask(airportsClusterLocation, AirportLocator.AirportAddressLookup(user.airportCode)).mapTo[Option[Address]]
+          val addressLookup = ask(airportsClusterLocation, AirportLocator.AirportAddressLookup(userInfo.airportCode)).mapTo[Option[Address]]
           addressLookup.onSuccess {
             case Some(address) =>
-              gameContext.eventBus.publish(PlayerUp(user.userId, address))
+              gameContext.eventBus.publish(PlayerUp(userInfo.sessionId, address))
           }
       }
 
@@ -209,18 +214,18 @@ object Application extends Controller with PlayerSessionManagement {
     Ok(template)
   }
 
-  private def newMultiplayerGame(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane])(implicit request: play.api.mvc.Request[_]) = {
+  private def newMultiplayerGame(sessionId: SessionId)(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    for (user <- currentUser(session)) {
-      val gameCreation = ask(gameStore, GameStore.NewGame(user, settings, planeType)).mapTo[GameCreated]
+    for (userInfo <- currentUserInfo(sessionId)) {
+      val gameCreation = ask(gameStore, GameStore.NewGame(userInfo, settings, planeType)).mapTo[GameCreated]
 
       gameCreation.onSuccess {
         case GameCreated(gameContext) =>
-          val addressLookup = ask(airportsClusterLocation, AirportLocator.AirportAddressLookup(user.airportCode)).mapTo[Option[Address]]
+          val addressLookup = ask(airportsClusterLocation, AirportLocator.AirportAddressLookup(userInfo.airportCode)).mapTo[Option[Address]]
           addressLookup.onSuccess {
             case Some(address) =>
-              gameContext.eventBus.publish(PlayerUp(user.userId, address))
+              gameContext.eventBus.publish(PlayerUp(userInfo.sessionId, address))
           }
       }
 

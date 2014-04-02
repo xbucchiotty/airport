@@ -4,16 +4,18 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /registered                 controllers.Application.registered
-GET     /events                     controllers.Application.events
-GET     /0                          controllers.Application.level0
-GET     /1                          controllers.Application.level1
-GET     /2                          controllers.Application.level2
-GET     /3                          controllers.Application.level3
-GET     /4                          controllers.Application.level4
-GET     /5                          controllers.Application.level5
-GET     /6                          controllers.Application.level6
-GET     /multiplayer                controllers.Application.multiplayer
+GET     /register                   controllers.Application.displayRegisterPage
+GET     /:sessionId/registered      controllers.Application.registered(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/events          controllers.Application.events(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/0               controllers.Application.level0(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/1               controllers.Application.level1(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/2               controllers.Application.level2(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/3               controllers.Application.level3(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/4               controllers.Application.level4(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/5               controllers.Application.level5(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/6               controllers.Application.level6(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /:sessionId/multiplayer     controllers.Application.multiplayerWithUser(sessionId: fr.xebia.xke.akka.infrastructure.SessionId)
+GET     /multiplayer                controllers.Application.multiplayerWithoutUser
 
 GET     /scores                     controllers.Application.scores
 

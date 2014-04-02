@@ -1,6 +1,6 @@
-@(settings: fr.xebia.xke.akka.game.Settings, airport: fr.xebia.xke.akka.airport.Airport)
+@(settings: fr.xebia.xke.akka.game.Settings, userInfo: fr.xebia.xke.akka.infrastructure.UserInfo)(implicit request: RequestHeader)
 
-@game(1,airport){
+@game(1,userInfo){
 
 <table id='strips'>
     <thead>
@@ -43,7 +43,7 @@
 
     </div>
     <div class="modal-footer">
-        <a href="/2" class="btn btn-primary">Next</a>
+        <a href="2" class="btn btn-primary">Next</a>
     </div>
 </div>
 

@@ -1,6 +1,7 @@
-@(level:Int,airport: fr.xebia.xke.akka.airport.Airport)(content: Html)
+@(level:Int,userInfo: fr.xebia.xke.akka.infrastructure.UserInfo)(content: Html)(implicit request: RequestHeader)
 
-@main("Devoxx Akka workshop")(level)(Some(airport)){
+@main("Devoxx Akka workshop")(level)(Some(userInfo.airport)){
+    <script src="/assets/javascripts/game.js" type="text/javascript"></script>
 
     <div id="score">
         <h1 style="text-align: right;">Score <p id="counter"></p></h1>
@@ -21,10 +22,11 @@
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Close</a>
-            <a href="/@level" class="btn btn-primary">Try again</a>
+            <a href="@level" class="btn btn-primary">Try again</a>
         </div>
     </div>
 
-    <script src="/assets/javascripts/game.js" type="text/javascript"></script>
-
+<script>
+    window.game.init('@routes.Application.events(userInfo.sessionId).webSocketURL()');
+</script>
 }
