@@ -1,17 +1,20 @@
 package fr.xebia.xke.akka.plane
 
-import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
-import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasParked, Taxiing, HasLeft, HasLanded, Incoming}
-import fr.xebia.xke.akka.airport.command.{ParkAt, Taxi, Contact, Ack, Land}
+import fr.xebia.xke.akka.airport.PlaneEvent._
+import fr.xebia.xke.akka.airport.command._
 import languageFeature.postfixOps
 import org.scalatest.ShouldMatchers
 import akka.event.EventStream
 import fr.xebia.xke.akka.ActorSpecs
 import fr.xebia.xke.akka.game.Settings
+import fr.xebia.xke.akka.airport.command.Land
+import fr.xebia.xke.akka.airport.command.ParkAt
+import fr.xebia.xke.akka.airport.command.Taxi
+import fr.xebia.xke.akka.airport.command.Contact
 
-class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
+class MultiAirportPlaneSpec extends ActorSpecs with ShouldMatchers {
 
   val settings = Settings.TEST
 
@@ -26,7 +29,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
 
-            system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             airControl expectMsg Incoming
           }
@@ -47,7 +50,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
               val airControl = TestProbe()
 
               for (_ <- 1 to 10) {
-                val plane = system.actorOf(JustParkingPlane.props(airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 50), new EventStream()))
+                val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, TestProbe().ref, settings.copy(radioReliability = 0.5, ackMaxDuration = 50), new EventStream()))
 
                 airControl.send(plane, Land(TestProbe().ref))
 
@@ -75,7 +78,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
           "Then it should terminates" in {
             val game = TestProbe()
             val airControl = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             val probe = TestProbe()
             probe watch plane
@@ -98,7 +101,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
             val runway = TestProbe()
-            system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
             airControl expectMsg Incoming
 
             //When
@@ -125,7 +128,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
             val groundControl = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             airControl expectMsg Incoming
             airControl reply Land(TestProbe().ref)
@@ -158,7 +161,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val runway = TestProbe()
-            system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
             airControl expectMsg Incoming
             airControl reply Land(runway.ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -195,7 +198,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val taxiway = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
             airControl expectMsg Incoming
             airControl reply Land(TestProbe().ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -232,7 +235,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val gate = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
             airControl expectMsg Incoming
             airControl reply Land(TestProbe().ref)
             airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
@@ -267,14 +270,14 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
         "When the plane has finished unloading passengers" - {
 
-          "Then it should terminates and notify groundControl and gate" in {
+          "Then it requests takeoff" in {
             //Given
             val game = TestProbe()
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val gate = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
             val probe = TestProbe()
             probe watch plane
             airControl expectMsg Incoming
@@ -297,9 +300,106 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             groundControl expectMsg HasParked
 
             //Then
-            probe expectTerminated(plane, 2 * settings.unloadingPassengersMaxDuration.milliseconds)
-            groundControl expectMsg HasLeft
+            groundControl expectMsg RequestTakeoff
+          }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a plane ready to takeoff" - {
+
+        "When is requested to takeoff" - {
+
+          "Then it contact the destination airport" in {
+            //Given
+            val game = TestProbe()
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val taxiway = TestProbe()
+            val gate = TestProbe()
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val probe = TestProbe()
+            probe watch plane
+            airControl expectMsg Incoming
+            airControl reply Land(TestProbe().ref)
+            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
+            airControl reply Contact(groundControl.ref)
+            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            groundControl expectMsg Incoming
+            groundControl reply Taxi(taxiway.ref)
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+
+            taxiway expectMsg Taxiing
+            taxiway.send(plane, EndOfTaxi)
+            groundControl expectMsg EndOfTaxi
+            groundControl reply ParkAt(gate.ref)
+            taxiway expectMsg HasLeft
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            gate expectMsg HasParked
+            groundControl expectMsg HasParked
+            groundControl expectMsg RequestTakeoff
+
+            val destinationAirport = TestProbe()
+            groundControl.send(plane, Takeoff(destinationAirport.ref))
+
+            //Then
+            destinationAirport expectMsg Incoming
+          }
+        }
+      }
+  }
+
+  `Given an actor system` {
+    implicit system =>
+
+      "Given a plane has contacted the destination airport before takeoff" - {
+
+        "When the destination airport ask the plane to land" - {
+
+          "Then it should notify gate and groundControl" in {
+            //Given
+            val game = TestProbe()
+            val airControl = TestProbe()
+            val groundControl = TestProbe()
+            val taxiway = TestProbe()
+            val gate = TestProbe()
+            val plane = system.actorOf(MultiAirportPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val probe = TestProbe()
+            probe watch plane
+            airControl expectMsg Incoming
+            airControl reply Land(TestProbe().ref)
+            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
+            airControl reply Contact(groundControl.ref)
+            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            groundControl expectMsg Incoming
+            groundControl reply Taxi(taxiway.ref)
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+
+            taxiway expectMsg Taxiing
+            taxiway.send(plane, EndOfTaxi)
+            groundControl expectMsg EndOfTaxi
+            groundControl reply ParkAt(gate.ref)
+            taxiway expectMsg HasLeft
+            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            gate expectMsg HasParked
+            groundControl expectMsg HasParked
+            groundControl expectMsg RequestTakeoff
+
+            val destinationAirport = TestProbe()
+            groundControl.send(plane, Takeoff(destinationAirport.ref))
+            destinationAirport expectMsg Incoming
+
+            val otherRunway = TestProbe()
+            destinationAirport.send(plane, Land(otherRunway.ref))
+
+            //Then
             gate expectMsg HasLeft
+            groundControl expectMsg HasLeft
           }
         }
       }

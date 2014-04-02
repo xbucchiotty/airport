@@ -30,6 +30,8 @@ object PlaneEvent {
 
   case object Done extends PlaneEvent
 
+  case object RequestTakeoff extends PlaneEvent
+
   case object OutOfKerozen extends PlaneError {
     val message = "Out of kerozen"
   }

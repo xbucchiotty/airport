@@ -28,7 +28,7 @@ private[plane] trait TaxiingAndWaitForGate extends Plane with RadioCommunication
           gate ! HasParked
 
           import context.dispatcher
-          context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, Done)
+          context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, PassengerUnloaded)
 
         })(nextState = unloadingPassengers(groundControl, gate))
       })
@@ -53,5 +53,5 @@ private[plane] trait TaxiingAsLastStep extends Plane with RadioCommunication {
 
 }
 
-private[plane] case object Done
+private[plane] case object PassengerUnloaded
 

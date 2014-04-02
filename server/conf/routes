@@ -13,6 +13,7 @@ GET     /3                          controllers.Application.level3
 GET     /4                          controllers.Application.level4
 GET     /5                          controllers.Application.level5
 GET     /6                          controllers.Application.level6
+GET     /multiplayer                controllers.Application.multiplayer
 
 GET     /scores                     controllers.Application.scores
 
