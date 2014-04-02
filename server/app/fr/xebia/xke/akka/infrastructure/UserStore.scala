@@ -7,7 +7,7 @@ import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 class UserStore(airports: List[Airport]) extends Actor with ActorLogging {
 
-  var associationsByUserId: Map[TeamMail, UserInfo] = _
+  var associationsByUserId: Map[SessionId, UserInfo] = _
   var availableAirports: List[Airport] = airports
 
   override def preStart() {
@@ -32,7 +32,7 @@ class UserStore(airports: List[Airport]) extends Actor with ActorLogging {
       sender ! associationsByUserId.values.find(_.airportCode == airportCode)
   }
 
-  def registerUser(user: TeamMail) {
+  def registerUser(user: SessionId) {
     val (airport :: tail) = availableAirports
     availableAirports = tail
 
@@ -49,7 +49,7 @@ object UserStore {
 
   def props(airports: List[Airport]): Props = Props(classOf[UserStore], airports)
 
-  case class Ask(team: TeamMail)
+  case class Ask(team: SessionId)
 
   case class AskForAirport(airportCode: AirportCode)
 
@@ -57,6 +57,6 @@ object UserStore {
 
   case class Registered(userInfo: UserInfo)
 
-  case class Register(userId: TeamMail)
+  case class Register(userId: SessionId)
 
 }

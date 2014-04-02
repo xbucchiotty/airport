@@ -76,7 +76,7 @@ class EventListenerSpec extends FunSpec with ShouldMatchers with Eventually {
       val probe = TestProbe()
 
       val address = Address("tcp", "localhost")
-      system.eventStream.publish(PlayerUp(TeamMail("xbucchiotty@xebia.fr"), address))
+      system.eventStream.publish(PlayerUp(SessionId("xbucchiotty@xebia.fr"), address))
 
       eventually {
         probe.send(listener, DequeueEvents)
@@ -94,7 +94,7 @@ class EventListenerSpec extends FunSpec with ShouldMatchers with Eventually {
       val probe = TestProbe()
 
       val address = Address("tcp", "localhost")
-      system.eventStream.publish(PlayerDown(TeamMail("xbucchiotty@xebia.fr"), address))
+      system.eventStream.publish(PlayerDown(SessionId("xbucchiotty@xebia.fr"), address))
 
       eventually {
         probe.send(listener, DequeueEvents)

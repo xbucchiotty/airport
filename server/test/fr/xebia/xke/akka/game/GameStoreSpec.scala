@@ -11,7 +11,7 @@ import akka.testkit.TestProbe
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Second, Span}
 import akka.pattern.ask
-import fr.xebia.xke.akka.infrastructure.{TeamMail, UserInfo}
+import fr.xebia.xke.akka.infrastructure.{SessionId, UserInfo}
 import fr.xebia.xke.akka.game.GameStore.GameCreated
 import scala.Some
 import fr.xebia.xke.akka.game.GameStore.NewGame
@@ -32,7 +32,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should create a game for a user") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userInfo = UserInfo(TeamMail("xbucchiotty@xebia.fr"), Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = UserInfo(SessionId("xbucchiotty@xebia.fr"), Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -43,7 +43,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should be able to start a created game") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val userId = TeamMail("xbucchiotty@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
 
@@ -59,7 +59,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should returns the context of an existing userId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = TeamMail("xbucchiotty@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
@@ -77,7 +77,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should not returns the context of an unknown userId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = TeamMail("xbucchiotty@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
 
       whenReady(ask(gameStore, GameStore.Ask(userId)).mapTo[Option[GameContext]]) {
         reply => reply should not(be(defined))
@@ -87,7 +87,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should publish into the stream PlayerUp event if user is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = TeamMail("xbucchiotty@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
@@ -110,7 +110,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should publish into the stream PlayerDown event if user is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userId = TeamMail("xbucchiotty@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
       val userInfo = UserInfo(userId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()

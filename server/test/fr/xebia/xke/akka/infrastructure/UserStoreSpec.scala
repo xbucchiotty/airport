@@ -43,7 +43,7 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val userStore = system.actorOf(UserStore.props(airports), "userStore")
 
-      val userId = TeamMail("xbucchiotty@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
 
       whenReady(ask(userStore, Register(userId)).mapTo[Registered]) {
         boundMessage =>
@@ -56,8 +56,8 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val userStore = system.actorOf(UserStore.props(airports), "userStore")
 
-      val userId = TeamMail("xbucchiotty@xebia.fr")
-      val userId2 = TeamMail("info@xebia.fr")
+      val userId = SessionId("xbucchiotty@xebia.fr")
+      val userId2 = SessionId("info@xebia.fr")
 
       whenReady(ask(userStore, Register(userId)).mapTo[Registered]) {
         firstReply =>
@@ -77,7 +77,7 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
     val userStore = system.actorOf(UserStore.props(airports), "userStore")
 
-    val userId = TeamMail("xbucchiotty@xebia.fr")
+    val userId = SessionId("xbucchiotty@xebia.fr")
 
     whenReady(ask(userStore, Register(userId)).mapTo[Registered]) {
       firstReply =>
@@ -94,7 +94,7 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
     val userStore = system.actorOf(UserStore.props(airports), "userStore")
 
-    val userId = TeamMail("xbucchiotty@xebia.fr")
+    val userId = SessionId("xbucchiotty@xebia.fr")
 
     whenReady(ask(userStore, Register(userId)).mapTo[Registered]) {
       firstReply =>
@@ -112,7 +112,7 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
     val userStore = system.actorOf(UserStore.props(airports), "userStore")
 
-    val userId = TeamMail("xbucchiotty@xebia.fr")
+    val userId = SessionId("xbucchiotty@xebia.fr")
 
     whenReady(ask(userStore, Register(userId)).mapTo[Registered]) {
       firstReply =>
@@ -142,7 +142,7 @@ class UserStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
     val userStore = system.actorOf(UserStore.props(airports), "userStore")
 
-    val answer = ask(userStore, Ask(TeamMail("xbucchiotty@xebia.fr"))).mapTo[Option[Airport]]
+    val answer = ask(userStore, Ask(SessionId("xbucchiotty@xebia.fr"))).mapTo[Option[Airport]]
 
     whenReady(answer) {
       storedAirport =>

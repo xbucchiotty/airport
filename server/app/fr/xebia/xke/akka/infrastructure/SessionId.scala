@@ -1,5 +1,5 @@
 package fr.xebia.xke.akka.infrastructure
 
-case class TeamMail(value: String) extends AnyVal {
+case class SessionId(value: String) extends AnyVal {
   override def toString = value
 }

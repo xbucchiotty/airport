@@ -38,7 +38,7 @@ trait PlayerSessionManagement {
 
   def currentUser(session: play.api.mvc.Session): Option[UserInfo] =
     Await.result(session.get("email").map(userId => {
-      ask(userStore, Ask(TeamMail(userId))).mapTo[Option[UserInfo]]
+      ask(userStore, Ask(SessionId(userId))).mapTo[Option[UserInfo]]
     }).getOrElse(Future.successful(None)), atMost = 10.seconds)
 
   def LoggedInAction(securedAction: (UserInfo => play.api.mvc.Request[_] => play.api.mvc.SimpleResult)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
@@ -65,7 +65,7 @@ trait PlayerSessionManagement {
         case None => {
 
           val form: Form[String] = Form(single("email" -> email))
-          val userId = TeamMail(form.bindFromRequest().get)
+          val userId = SessionId(form.bindFromRequest().get)
 
           val registration = ask(userStore, Register(userId)).mapTo[Registered]
 

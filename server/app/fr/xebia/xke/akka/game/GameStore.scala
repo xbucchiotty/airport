@@ -6,12 +6,12 @@ import language.postfixOps
 import concurrent.duration._
 import fr.xebia.xke.akka.plane.Plane
 import fr.xebia.xke.akka.game.GameStore._
-import fr.xebia.xke.akka.infrastructure.TeamMail
+import fr.xebia.xke.akka.infrastructure.SessionId
 import fr.xebia.xke.akka.infrastructure.UserInfo
 
 class GameStore extends Actor with ActorLogging {
 
-  var gameContexts: Map[TeamMail, GameContext] = _
+  var gameContexts: Map[SessionId, GameContext] = _
   var gameCounter: Int = _
 
   implicit val timeout = Timeout(1 second)
@@ -86,6 +86,6 @@ object GameStore {
 
   case object GameStarted
 
-  case class Ask(userId: TeamMail)
+  case class Ask(userId: SessionId)
 
 }
