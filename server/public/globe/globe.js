@@ -68,6 +68,15 @@ DAT.Globe = function(container, opts) {
     }
   };
 
+  var lights = [
+      {x:-179.176, y: 329.288, z:-139.515},
+      {x:  77.774, y: 256.374, z:-297.024},
+      {x:-316.331, y:-176.221, z: 169.942},
+      {x:-252.776, y:-159.064, z:-266.087},
+      {x: 290.717, y:-223.365, z: 159.973},
+      {x: 248.490, y: 232.578, z: 210.142}
+  ];
+
   var camera, scene, renderer, w, h;
   var mesh, atmosphere, point;
 
@@ -104,15 +113,11 @@ DAT.Globe = function(container, opts) {
     shader = Shaders['earth'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-    uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir+'world.jpg');
+    var planetTexture = THREE.ImageUtils.loadTexture(imgDir+'world.jpg');
 
-    material = new THREE.ShaderMaterial({
-
-          uniforms: uniforms,
-          vertexShader: shader.vertexShader,
-          fragmentShader: shader.fragmentShader
-
-        });
+    var material =  new THREE.MeshPhongMaterial( {
+        map: planetTexture,
+        shininess: 0.1 } );
 
     //Set the texture of the globe
     mesh = new THREE.Mesh(geometry, material);
@@ -144,6 +149,13 @@ DAT.Globe = function(container, opts) {
     geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,-0.5));
 
     point = new THREE.Mesh(geometry);
+
+    for(i = 0; i < lights.length ; i+=1){
+        var position = lights[i];
+        var light = new THREE.DirectionalLight(0x3333ee, 0.6);
+        light.position = new THREE.Vector3(position.x,position.y,position.z);
+        scene.add( light );
+    }
 
     //Create the renderer
     renderer = new THREE.WebGLRenderer({antialias: true});
@@ -216,7 +228,7 @@ DAT.Globe = function(container, opts) {
       var labelCanvas = document.createElement('canvas' );
       var labelContext = labelCanvas.getContext('2d');
       labelContext.font= "120px sans-serif";
-      labelContext.fillStyle = "rgba(255,0,0,0.95)";
+      labelContext.fillStyle = "#FF0000";
       labelContext.fillText(airport, 20, 100);
       geometry = new THREE.PlaneGeometry(15, 5);
       geometry.applyMatrix(new THREE.Matrix4().makeTranslation(5,5,Math.random() * -2 + -0.5));
@@ -244,6 +256,10 @@ DAT.Globe = function(container, opts) {
       label.updateMatrix();
 
       scene.add(label);
+
+      var light = new THREE.PointLight(0x808000, 20, 10);
+      light.position = label.position;
+      scene.add( light );
     }
     if (opts.animated) {
       this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});

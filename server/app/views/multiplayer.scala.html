@@ -124,7 +124,7 @@
         var container = document.getElementById('container');
         var globe = new DAT.Globe(container,{'colorFn' : function(x) {
             var c = new THREE.Color();
-            c.setHSL( ( 1 - ( x * 20 ) ), 0.2 + ( x * 20), 0.3 );
+            c.setRGB(0, 0 , 0);
             return c;
         }} );
 
