@@ -1,11 +1,9 @@
 package controllers
 
-import play.api.mvc.{AnyContent, Action, Controller}
-import play.api.data.Form
-import play.api.data.Forms._
+import play.api.mvc.{Action, Controller}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.ask
-import scala.concurrent.{ExecutionContext, Await, Future}
+import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._
 import language.postfixOps
 import akka.util.Timeout
@@ -14,8 +12,7 @@ import fr.xebia.xke.akka.infrastructure.SessionStore.Ask
 import fr.xebia.xke.akka.infrastructure.SessionStore.Register
 import fr.xebia.xke.akka.infrastructure.SessionStore.Registered
 import scala.Some
-import fr.xebia.xke.akka.infrastructure.UserInfo
-import fr.xebia.xke.akka.game.GameStore
+import fr.xebia.xke.akka.infrastructure.SessionInfo
 import fr.xebia.xke.akka.airport.Airport
 
 trait PlayerSessionManagement {
@@ -32,23 +29,19 @@ trait PlayerSessionManagement {
 
   val sessionStore: ActorRef = airportActorSystem.actorOf(SessionStore.props(airports), "sessionStore")
 
-  val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(), "gameStore")
-
-  val airportsClusterLocation: ActorRef = airportActorSystem.actorOf(AirportLocator.props(sessionStore, gameStore), "airports")
-
-  def currentUserInfo(sessionId: SessionId): Option[UserInfo] =
+  def currentSessionInfo(sessionId: SessionId): Option[SessionInfo] =
     Await.result(
-      ask(sessionStore, Ask(sessionId)).mapTo[Option[UserInfo]], atMost = 10.seconds)
+      ask(sessionStore, Ask(sessionId)).mapTo[Option[SessionInfo]], atMost = 10.seconds)
 
-  def LoggedInAction(sessionId: SessionId)(securedAction: (UserInfo => play.api.mvc.Request[_] => play.api.mvc.SimpleResult)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
+  def LoggedInAction(sessionId: SessionId)(securedAction: (SessionInfo => play.api.mvc.Request[_] => play.api.mvc.SimpleResult)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
     implicit request =>
-      currentUserInfo(sessionId) match {
+      currentSessionInfo(sessionId) match {
 
         case Some(userInfo) =>
           securedAction(userInfo)(request)
 
         case None =>
-          Ok(views.html.register(None))
+          Redirect(routes.Application.index)
       }
   }
 

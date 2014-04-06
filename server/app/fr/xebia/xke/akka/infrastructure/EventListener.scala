@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.infrastructure
 
-import akka.actor.{Props, Address, Actor}
+import akka.actor._
 import scala.collection.immutable.Queue
 import akka.event.EventStream
 import controllers.DequeueEvents
@@ -8,11 +8,17 @@ import scala.Predef._
 import fr.xebia.xke.akka.game._
 import scala.Some
 import fr.xebia.xke.akka.plane.event.PlaneStatus
+import fr.xebia.xke.akka.game.PlayerDown
+import fr.xebia.xke.akka.game.Score
+import fr.xebia.xke.akka.game.PlayerUp
+import scala.Some
 
-class EventListener(eventStream: EventStream) extends Actor {
+class EventListener(eventStream: EventStream) extends Actor with ActorLogging {
 
   private var buffer = Queue.empty[String]
   private var listening = true
+
+  private var pendingRequest: Option[ActorRef] = None
 
   override def preStart() {
     eventStream.subscribe(self, classOf[GameEvent])
@@ -25,37 +31,56 @@ class EventListener(eventStream: EventStream) extends Actor {
 
   def receive = {
     case status: PlaneStatus =>
-      buffer = buffer enqueue toJson(status)
+      sendWhenPendingRequestOrQueue(toJson(status))
 
     case GameOver =>
-      buffer = buffer enqueue gameOver
-      listening=false
+      sendWhenPendingRequestOrQueue(gameOver)
+      listening = false
       eventStream.unsubscribe(self)
 
     case GameEnd =>
-      buffer = buffer enqueue gameEnd
-      listening=false
+      sendWhenPendingRequestOrQueue(gameEnd)
+      listening = false
       eventStream.unsubscribe(self)
 
     case newScore: Score =>
-      buffer = buffer enqueue score(newScore)
+      sendWhenPendingRequestOrQueue(score(newScore))
 
     case PlayerUp(_, address) =>
-      buffer = buffer enqueue playerUp(address)
+      sendWhenPendingRequestOrQueue(playerUp(address))
 
     case PlayerDown(_, address) =>
-      buffer = buffer enqueue playerDown(address)
+      sendWhenPendingRequestOrQueue(playerDown(address))
 
     case DequeueEvents =>
       if (buffer.nonEmpty) {
         val (msg, newBuffer) = buffer.dequeue
         sender ! Some(msg)
+        log.debug(s"send buffered $msg")
         buffer = newBuffer
-      }else {
-        if(!listening){
+      } else {
+        if (!listening) {
+          log.debug(s"end of stream")
           sender ! Option.empty[String]
         }
+        else {
+          log.debug(s"pending request")
+          pendingRequest = Some(sender)
+        }
       }
+  }
+
+  def sendWhenPendingRequestOrQueue(msg: String) {
+    pendingRequest match {
+      case None =>
+        log.debug(s"Queuing $msg")
+        buffer = buffer enqueue msg
+
+      case Some(caller) =>
+        log.debug(s"Send $msg")
+        caller ! Some(msg)
+        pendingRequest = None
+    }
   }
 
   def toJson(planeStatus: PlaneStatus): String = {

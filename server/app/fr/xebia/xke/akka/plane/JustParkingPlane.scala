@@ -13,7 +13,7 @@ case class JustParkingPlane(airControl: ActorRef, game: ActorRef, settings: Sett
   with TaxiingAndWaitForGate
   with ParkingAsLastStep {
 
-  def initialState = flying
+  def initialState = idle
 }
 
 object JustParkingPlane {

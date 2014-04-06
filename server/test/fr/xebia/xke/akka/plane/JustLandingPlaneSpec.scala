@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.plane
 
-import akka.actor.Props
+import akka.actor.{ActorRef, Props}
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded, Incoming}
@@ -20,13 +20,15 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
       "Given a plane" - {
 
-        "When it starts" - {
+        "When it is requested to contact the aircontrol" - {
 
           "Then it should contact the aircontrol" in {
             val game = TestProbe()
             val airControl = TestProbe()
 
-            system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+
+            TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
           }
@@ -47,6 +49,7 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val plane = system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
 
             val probe = TestProbe()
+            probe.send(plane, Contact(airControl.ref))
             probe watch plane
 
             probe expectTerminated(plane, (2 * settings.outOfKerozenTimeout).milliseconds)
@@ -67,7 +70,8 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val game = TestProbe()
             val airControl = TestProbe()
             val runway = TestProbe()
-            system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            TestProbe().send(plane, Contact(airControl.ref))
             airControl expectMsg Incoming
 
             //When
@@ -95,7 +99,8 @@ class JustLandingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val runway = TestProbe()
-            system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustLandingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            game.send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
             airControl reply Land(runway.ref)

@@ -100,7 +100,7 @@ class SessionStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     whenReady(ask(sessionStore, Register(sessionId)).mapTo[Registered]) {
       firstReply =>
 
-        whenReady(ask(sessionStore, Ask(sessionId)).mapTo[Option[UserInfo]]) {
+        whenReady(ask(sessionStore, Ask(sessionId)).mapTo[Option[SessionInfo]]) {
           userInfo =>
             userInfo should be(defined)
             userInfo.get.airport should equal(firstReply.userInfo.airport)
@@ -118,7 +118,7 @@ class SessionStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     whenReady(ask(sessionStore, Register(sessionId)).mapTo[Registered]) {
       firstReply =>
 
-        whenReady(ask(sessionStore, AskForAirport(firstReply.userInfo.airportCode)).mapTo[Option[UserInfo]]) {
+        whenReady(ask(sessionStore, AskForAirport(firstReply.userInfo.airportCode)).mapTo[Option[SessionInfo]]) {
           userInfo =>
             userInfo should be(defined)
             userInfo.foreach(info => {
@@ -133,7 +133,7 @@ class SessionStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
     val sessionStore = system.actorOf(SessionStore.props(airports), "sessionStore")
 
-    whenReady(ask(sessionStore, AskForAirport(AirportCode("LHR"))).mapTo[Option[UserInfo]]) {
+    whenReady(ask(sessionStore, AskForAirport(AirportCode("LHR"))).mapTo[Option[SessionInfo]]) {
       userInfo =>
         userInfo should not(be(defined))
     }

@@ -1,4 +1,4 @@
-@(level:Int,userInfo: fr.xebia.xke.akka.infrastructure.UserInfo)(content: Html)(implicit request: RequestHeader)
+@(level:Int,userInfo: fr.xebia.xke.akka.infrastructure.SessionInfo)(content: Html)(implicit request: RequestHeader)
 
 @main("Devoxx Akka workshop")(level)(Some(userInfo.airport)){
     <script src="/assets/javascripts/game.js" type="text/javascript"></script>

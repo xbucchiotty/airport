@@ -1,11 +1,11 @@
-package fr.xebia.xke.akka.infrastructure
+package fr.xebia.xke.akka.infrastructure.cluster
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import akka.testkit.TestProbe
 
-class SimpleProxySpec extends FunSpec with ShouldMatchers {
+class RemoteProxySpec extends FunSpec with ShouldMatchers {
 
   describe("A simple proxy") {
     it("should forward message to the actorSelection") {
@@ -13,7 +13,7 @@ class SimpleProxySpec extends FunSpec with ShouldMatchers {
 
       val target = TestProbe()
 
-      val proxy = system.actorOf(SimpleProxy.props(system.actorSelection(target.ref.path)))
+      val proxy = system.actorOf(RemoteProxy.props(system.actorSelection(target.ref.path)))
 
       val probe = TestProbe()
 

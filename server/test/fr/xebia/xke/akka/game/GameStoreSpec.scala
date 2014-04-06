@@ -11,7 +11,7 @@ import akka.testkit.TestProbe
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Second, Span}
 import akka.pattern.ask
-import fr.xebia.xke.akka.infrastructure.{SessionId, UserInfo}
+import fr.xebia.xke.akka.infrastructure.{SessionId, SessionInfo}
 import fr.xebia.xke.akka.game.GameStore.GameCreated
 import scala.Some
 import fr.xebia.xke.akka.game.GameStore.NewGame
@@ -33,7 +33,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should create a game for a session") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
-      val userInfo = UserInfo(SessionId(new UUID(0, 0)), Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = SessionInfo(SessionId(new UUID(0, 0)), Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -45,15 +45,17 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should be able to start a created game") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val sessionId = SessionId(new UUID(0, 0))
-      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = SessionInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
 
       val probe = TestProbe()
+      val airTrafficControl = TestProbe()
+      val groundControl = TestProbe()
 
       probe.send(gameStore, NewGame(userInfo, Settings.TEST, classOf[JustParkingPlane]))
       probe expectMsgAllClassOf classOf[GameCreated]
 
-      probe.send(gameStore, StartGame(userInfo))
+      probe.send(gameStore, StartGame(userInfo, airTrafficControl.ref, groundControl.ref))
       probe expectMsg GameStarted
     }
 
@@ -61,7 +63,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val sessionId = SessionId(new UUID(0, 0))
-      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = SessionInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -89,7 +91,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val sessionId = SessionId(new UUID(0, 0))
-      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = SessionInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 
@@ -112,7 +114,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val gameStore = system.actorOf(GameStore.props(), "gameStore")
       val sessionId = SessionId(new UUID(0, 0))
-      val userInfo = UserInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
+      val userInfo = SessionInfo(sessionId, Airport("Paris", AirportCode("CDG"), "42", "2"))
 
       val probe = TestProbe()
 

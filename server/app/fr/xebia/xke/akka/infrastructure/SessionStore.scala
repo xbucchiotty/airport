@@ -7,7 +7,7 @@ import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 class SessionStore(airports: List[Airport]) extends Actor with ActorLogging {
 
-  var associationsBySessionId: Map[SessionId, UserInfo] = _
+  var associationsBySessionId: Map[SessionId, SessionInfo] = _
   var availableAirports: List[Airport] = airports
 
   override def preStart() {
@@ -22,11 +22,8 @@ class SessionStore(airports: List[Airport]) extends Actor with ActorLogging {
     case Register(sessionId) =>
       registerUser(sessionId)
 
-    case Ask(sessionId) if associationsBySessionId.isDefinedAt(sessionId) =>
-      sender ! Some(associationsBySessionId(sessionId))
-
-    case Ask(userId) =>
-      sender ! None
+    case Ask(sessionId) =>
+      sender ! associationsBySessionId.get(sessionId)
 
     case AskForAirport(airportCode) =>
       sender ! associationsBySessionId.values.find(_.airportCode == airportCode)
@@ -36,7 +33,7 @@ class SessionStore(airports: List[Airport]) extends Actor with ActorLogging {
     val (airport :: tail) = availableAirports
     availableAirports = tail
 
-    val info = UserInfo(session, airport)
+    val info = SessionInfo(session, airport)
     associationsBySessionId += (session -> info)
 
     sender ! Registered(info)
@@ -55,7 +52,7 @@ object SessionStore {
 
   case class RegisterError(message: String)
 
-  case class Registered(userInfo: UserInfo)
+  case class Registered(userInfo: SessionInfo)
 
   case class Register(sessionId: SessionId)
 

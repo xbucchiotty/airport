@@ -11,7 +11,7 @@ case class Settings(
                      taxiwayCapacity: Int = 1,
                      nrOfGates: Int = 1,
                      unloadingPassengersMaxDuration: Int = 5000,
-                     outOfKerozenTimeout: Int = 10000,
+                     outOfKerozenTimeout: Int = 60000,
                      ackMaxDuration: Int = 500,
                      radioReliability: Double = 1,
                      objective: Int = 20,

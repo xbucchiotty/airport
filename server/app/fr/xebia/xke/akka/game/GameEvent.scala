@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.game
 
-import akka.actor.{Address, ActorSelection}
+import akka.actor.{ActorRef, Address}
 import fr.xebia.xke.akka.infrastructure.SessionId
 
 trait GameEvent
@@ -15,4 +15,4 @@ case class PlayerUp(sessionId: SessionId, address: Address) extends GameEvent
 
 case class PlayerDown(sessionId: SessionId, address: Address) extends GameEvent
 
-case class InitGame(airTrafficControlLookup: ActorSelection, groundControlLookup: ActorSelection) extends GameEvent
+case class InitGame(airTrafficControl: ActorRef, groundControl: ActorRef) extends GameEvent

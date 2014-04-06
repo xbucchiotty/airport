@@ -16,8 +16,12 @@ trait StateMachine {
   def transitionTo(transition: Transition)(nextState: State) {
     transition()
 
-    eventStream.publish(StateChanged(nextState.name))
-    context become nextState.behavior
+    setState(nextState)
+  }
+
+  def setState(state: State) {
+    eventStream.publish(StateChanged(state.name))
+    context become state.behavior
   }
 
   def done() {

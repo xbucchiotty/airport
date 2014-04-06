@@ -10,7 +10,7 @@ case class JustLandingPlane(airControl: ActorRef, game: ActorRef, settings: Sett
   with Incoming
   with LandingAsLastStep {
 
-  def initialState = flying
+  def initialState = idle
 }
 
 object JustLandingPlane {

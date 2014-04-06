@@ -11,4 +11,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-cluster" % "2.2.3"
 )
 
+javaOptions in run += "-Xmx256M -server"
+
 play.Project.playScalaSettings

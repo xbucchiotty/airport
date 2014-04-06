@@ -11,7 +11,7 @@ case class JustTaxiingPlane(airControl: ActorRef, game: ActorRef, settings: Sett
   with OnRunwayWaitingForTaxiway
   with TaxiingAsLastStep {
 
-  def initialState = flying
+  def initialState = idle
 }
 
 object JustTaxiingPlane {

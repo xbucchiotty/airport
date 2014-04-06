@@ -7,7 +7,7 @@ import concurrent.duration._
 import fr.xebia.xke.akka.plane.Plane
 import fr.xebia.xke.akka.game.GameStore._
 import fr.xebia.xke.akka.infrastructure.SessionId
-import fr.xebia.xke.akka.infrastructure.UserInfo
+import fr.xebia.xke.akka.infrastructure.SessionInfo
 
 class GameStore extends Actor with ActorLogging {
 
@@ -27,8 +27,9 @@ class GameStore extends Actor with ActorLogging {
     case NewGame(userInfo, settings, planeType) =>
       newGame(userInfo, settings, planeType)
 
-    case StartGame(userInfo) if gameContexts.contains(userInfo.sessionId) =>
-      startGame(userInfo)
+    case StartGame(userInfo, airTrafficControl, groundControl) =>
+      log.info(s"StartGame ready: ${gameContexts.contains(userInfo.sessionId)}")
+      startGame(userInfo, airTrafficControl, groundControl)
 
     case event@PlayerUp(sessionId, address) if gameContexts.contains(sessionId) =>
       gameContexts(sessionId).publish(event)
@@ -38,9 +39,12 @@ class GameStore extends Actor with ActorLogging {
 
     case Ask(sessionId) =>
       sender ! gameContexts.get(sessionId)
+
+    case default =>
+      log.info(default.toString)
   }
 
-  def newGame(userInfo: UserInfo, settings: Settings, planeType: Class[_ <: Plane]) {
+  def newGame(userInfo: SessionInfo, settings: Settings, planeType: Class[_ <: Plane]) {
     for (gameContext <- gameContexts.get(userInfo.sessionId)) {
 
       gameContext.stop(context.system)
@@ -60,12 +64,10 @@ class GameStore extends Actor with ActorLogging {
     sender ! GameCreated(gameContext)
   }
 
-  def startGame(userInfo: UserInfo) {
+  def startGame(userInfo: SessionInfo, airTrafficControl: ActorRef, groundControl: ActorRef) {
+    log.info("startGame")
     for (gameContext <- gameContexts.get(userInfo.sessionId)) {
       log.info(s"Start the game for <${userInfo.sessionId}>, session = <${gameContext.game.path.name}>")
-
-      val airTrafficControl = context.actorSelection(s"/user/airports/${userInfo.airportCode}/airTrafficControl")
-      val groundControl = context.actorSelection(s"/user/airports/${userInfo.airportCode}/groundControl")
 
       gameContext.init(airTrafficControl, groundControl)
 
@@ -78,11 +80,11 @@ object GameStore {
 
   def props(): Props = Props[GameStore]
 
-  case class NewGame(userInfo: UserInfo, settings: Settings, planeType: Class[_ <: Plane])
+  case class NewGame(userInfo: SessionInfo, settings: Settings, planeType: Class[_ <: Plane])
 
   case class GameCreated(gameContext: GameContext)
 
-  case class StartGame(userInfo: UserInfo)
+  case class StartGame(userInfo: SessionInfo, airTrafficControl: ActorRef, groundControl: ActorRef)
 
   case object GameStarted
 

@@ -17,7 +17,7 @@ case class GameContext private(listener: ActorRef, game: ActorRef, eventBus: Eve
     actorSystem.stop(game)
   }
 
-  def init(airTrafficControl: ActorSelection, groundControl: ActorSelection)(implicit sender: akka.actor.ActorRef) = {
+  def init(airTrafficControl: ActorRef, groundControl: ActorRef)(implicit sender: akka.actor.ActorRef) = {
     game ! InitGame(airTrafficControl, groundControl)
   }
 }

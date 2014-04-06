@@ -13,7 +13,7 @@ case class MultiAirportPlane(airControl: ActorRef, game: ActorRef, settings: Set
   with TaxiingAndWaitForGate
   with ParkingAndRequestTakeoff {
 
-  def initialState = flying
+  def initialState = idle
 }
 
 object MultiAirportPlane {

@@ -9,12 +9,12 @@ import fr.xebia.xke.akka.plane.Plane
 import fr.xebia.xke.akka.airport._
 import fr.xebia.xke.akka.airport.InitGroundControl
 import fr.xebia.xke.akka.plane.PlaneListener
-import scala.Some
 import akka.actor.OneForOneStrategy
 import akka.actor.Terminated
 import fr.xebia.xke.akka.airport.InitAirTrafficControl
 import fr.xebia.xke.akka.game.SinglePlayerGame.NewPlane
 import fr.xebia.xke.akka.plane.event.PlaneStatus
+import fr.xebia.xke.akka.airport.command.Contact
 
 class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream, airport: Airport) extends Actor with ActorLogging {
 
@@ -51,43 +51,33 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
   def receive = idle
 
   def idle: Receive = {
-    case InitGame(airTrafficControlLookup, groundControlLookup) =>
+    case InitGame(airTrafficControl, groundControl) =>
 
-      airTrafficControlLookup ! InitAirTrafficControl(runways, settings.ackMaxDuration)
-      groundControlLookup ! InitGroundControl(taxiways, gates, taxiwayCapacity, settings.ackMaxDuration)
+      airTrafficControl ! InitAirTrafficControl(groundControl, runways, settings.ackMaxDuration)
+      groundControl ! InitGroundControl(taxiways, gates, taxiwayCapacity, settings.ackMaxDuration)
 
-      context become waitingForTheGameReady(None, None)
+      context become waitingForTheGameReady(airTrafficControl, false, groundControl, false)
   }
 
-  def waitingForTheGameReady(registeredAirTrafficControl: Option[ActorRef], registeredGroundControl: Option[ActorRef]): Receive = {
+  def waitingForTheGameReady(airTrafficControl: ActorRef, airTrafficControlReady: Boolean, groundControl: ActorRef, groundControlReady: Boolean): Receive = {
     case AirTrafficControlReady =>
-      val airTrafficControl = sender
-      context watch airTrafficControl
+      if (!groundControlReady) {
+        context become waitingForTheGameReady(airTrafficControl, true, groundControl, false)
+      } else {
+        import context.dispatcher
+        planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
-      registeredGroundControl match {
-        case None =>
-          context become waitingForTheGameReady(Some(airTrafficControl), None)
-
-        case Some(groundControl) =>
-          import context.dispatcher
-          planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
-
-          context become started(airTrafficControl, groundControl)
+        context become started(airTrafficControl, groundControl)
       }
 
     case GroundControlReady =>
-      val groundControl = sender
-      context watch groundControl
+      if (!airTrafficControlReady) {
+        context become waitingForTheGameReady(airTrafficControl, false, groundControl, true)
+      } else {
+        import context.dispatcher
+        planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
-      registeredAirTrafficControl match {
-        case None =>
-          context become waitingForTheGameReady(null, Some(groundControl))
-
-        case Some(airTrafficControl) =>
-          import context.dispatcher
-          planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
-
-          context become started(airTrafficControl, groundControl)
+        context become started(airTrafficControl, groundControl)
       }
   }
 
@@ -112,6 +102,8 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
       val listener = context.actorOf(PlaneListener.props(plane, gameEventStream))
 
       planeEventStream.subscribe(listener, classOf[Any])
+
+      plane.tell(Contact(airTrafficControl), airTrafficControl)
 
       planesToGenerate -= 1
   }

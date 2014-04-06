@@ -3,7 +3,7 @@ package fr.xebia.xke.akka.plane.state
 import akka.actor.{Cancellable, ActorRef}
 import fr.xebia.xke.akka.airport.PlaneEvent
 import fr.xebia.xke.akka.airport.PlaneEvent.{Incoming, HasLanded, OutOfKerozen}
-import fr.xebia.xke.akka.airport.command.Land
+import fr.xebia.xke.akka.airport.command.{Contact, Land}
 import languageFeature.postfixOps
 import concurrent.duration._
 import fr.xebia.xke.akka.plane.Plane
@@ -11,42 +11,45 @@ import fr.xebia.xke.akka.Transition
 
 private[plane] trait Incoming extends Plane with RadioCommunication {
 
-  def airControl: ActorRef
-
   private var outOfKerozenCrash: Cancellable = null
 
-  val landing = State("incoming", behavior = LoggingReceive {
+  def landing(airTrafficControl: ActorRef) = State("incoming", behavior = LoggingReceive {
     case msg@this.Landed(runway) =>
       transitionTo(transition = () => {
-        airControl ! HasLanded
+        airTrafficControl ! HasLanded
         runway ! HasLanded
-      })(nextState = waitingToTaxi(airControl, runway))
+      })(nextState = waitingToTaxi(airTrafficControl, runway))
 
   })
 
   val flying = State("incoming", behavior = LoggingReceive {
     case Land(runway) =>
-      val atc = sender
+      val airTrafficControl = sender
 
-      replyWithRadio(to = atc)(() => {
+      replyWithRadio(to = airTrafficControl)(() => {
         transitionTo(transition = () => {
           outOfKerozenCrash.cancel()
 
           import context.dispatcher
           context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
-        })(nextState = landing)
+        })(nextState = landing(airTrafficControl))
       })
 
     case OutOfKerozen =>
       terminateInError(s"Plane ${self.path.name} is out of kerozen, it crashes")
   })
 
-  val initAction: Transition = () => {
-    airControl ! Incoming
+  val idle = State("incoming", behavior = LoggingReceive {
+    case Contact(airTrafficControl) => {
 
-    import context.dispatcher
-    outOfKerozenCrash = context.system.scheduler.scheduleOnce(settings.outOfKerozenTimeout milliseconds, self, OutOfKerozen)
-  }
+      transitionTo(transition = () => {
+        airTrafficControl ! Incoming
+
+        import context.dispatcher
+        outOfKerozenCrash = context.system.scheduler.scheduleOnce(settings.outOfKerozenTimeout milliseconds, self, OutOfKerozen)
+      })(nextState = flying)
+    }
+  })
 
   def waitingToTaxi(airControl: ActorRef, runway: ActorRef): State
 

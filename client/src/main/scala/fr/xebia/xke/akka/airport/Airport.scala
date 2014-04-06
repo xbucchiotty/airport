@@ -10,7 +10,7 @@ class Airport extends Actor {
   override def preStart() {
     groundControl = context.actorOf(Props[GroundControl], "groundControl")
 
-    airTrafficControl = context.actorOf(Props(classOf[AirTrafficControl], groundControl), "airTrafficControl")
+    airTrafficControl = context.actorOf(Props[AirTrafficControl], "airTrafficControl")
 
   }
 

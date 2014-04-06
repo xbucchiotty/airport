@@ -4,17 +4,21 @@ import akka.actor.{ActorLogging, ActorRef, Actor}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, Incoming, HasLanded}
 import fr.xebia.xke.akka.airport.command.{Contact, Land}
 
-class AirTrafficControl(groundControl: ActorRef) extends Actor with ActorLogging {
+class AirTrafficControl extends Actor with ActorLogging {
 
   def receive = uninitialized
+
+  var groundControl: ActorRef = null
 
   log.info("ATC created")
 
   def uninitialized: Receive = {
-    case InitAirTrafficControl(runways, ackMaxTimeout) =>
+    case InitAirTrafficControl(groundControlRef, runways, ackMaxTimeout) =>
       sender ! AirTrafficControlReady
 
       log.info("ATC ready")
+
+      groundControl = groundControlRef
 
       context become (ready(runways, ackMaxTimeout) orElse uninitialized)
   }
