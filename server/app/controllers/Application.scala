@@ -9,7 +9,7 @@ import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
 import akka.pattern.ask
-import scala.concurrent.{Future, Await}
+import scala.concurrent.Await
 import akka.actor.{ActorRef, Address}
 import fr.xebia.xke.akka.plane._
 import play.api.libs.json.Json
@@ -170,7 +170,6 @@ object Application extends Controller with PlayerSessionManagement {
       // Log events to the console
 
       import scala.concurrent.ExecutionContext.Implicits.global
-      import akka.pattern.AskTimeoutException
 
       val contextReply = ask(gameStore, Ask(userInfo.sessionId)).mapTo[Option[GameContext]]
 
@@ -178,9 +177,10 @@ object Application extends Controller with PlayerSessionManagement {
         context <- contextReply
       }
       yield {
+        var started = false
 
         val in = Iteratee.foreach[String] {
-          case "start" =>
+          case "start" if !started =>
             val proxyReply = ask(airportsClusterLocation, AirportLocator.AskAirportAddressLookup(userInfo.airportCode)).mapTo[Option[AirportProxy]]
 
             for (proxy <- proxyReply) {
@@ -188,6 +188,8 @@ object Application extends Controller with PlayerSessionManagement {
               val info = currentSessionInfo(sessionId).get
               gameStore ! StartGame(info, proxy.get.airTrafficControl, proxy.get.groundControl)
             }
+
+            started = true
         }
 
         val out = Enumerator.fromCallback1 {

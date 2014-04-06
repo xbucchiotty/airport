@@ -52,14 +52,26 @@ class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor 
       .foreach(airportCode => {
       log.info(s"player <$member> comes in for <$airportCode>")
 
+      val (airTrafficControlProxy, groundControlProxy) =
+        if (table.isDefinedAt(airportCode)) {
 
+          log.info(s"Redirecting proxy for <$airportCode> to <$member.address>")
 
-      val airTrafficControl = context.actorOf(RemoteProxy.props(airTrafficControlPath), "airTrafficControl")
-      val groundControl = context.actorOf(RemoteProxy.props(groundControlPath), "groundControl")
+          val proxy = table(airportCode)
 
-      log.info(s"Start proxy from ${self.path} to $member.address")
+          proxy.airTrafficControl ! RemoteProxy.Register(airTrafficControlPath)
+          proxy.groundControl ! RemoteProxy.Register(groundControlPath)
 
-      table += (airportCode -> AirportProxy(member.address, airTrafficControl, groundControl))
+          (proxy.airTrafficControl, proxy.groundControl)
+        } else {
+
+          log.info(s"Start proxy from <${self.path}> to <$member.address>")
+
+          (context.actorOf(RemoteProxy.props(airTrafficControlPath), s"$airportCode-airTrafficControl"),
+            context.actorOf(RemoteProxy.props(groundControlPath), s"$airportCode-groundControl"))
+        }
+
+      table += (airportCode -> AirportProxy(member.address, airTrafficControlProxy, groundControlProxy))
 
       val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[SessionInfo]]
 
@@ -84,16 +96,20 @@ class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor 
 
     member.roles - "player" map AirportCode foreach (airportCode => {
       val proxy = table(airportCode)
-      proxy.stop(context)
-      table -= airportCode
 
-      import context.dispatcher
-      implicit val timeout = Timeout(10 seconds)
-      val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[SessionInfo]]
+      if (proxy.address == member.address) {
+        proxy.airTrafficControl ! RemoteProxy.Unregister
+        proxy.groundControl ! RemoteProxy.Unregister
 
-      userInfoRequest.onSuccess {
-        case Some(userInfo) => gameStore ! PlayerDown(userInfo.sessionId, member.address)
+        import context.dispatcher
+        implicit val timeout = Timeout(10 seconds)
+        val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[SessionInfo]]
+
+        userInfoRequest.onSuccess {
+          case Some(userInfo) => gameStore ! PlayerDown(userInfo.sessionId, member.address)
+        }
       }
+
     })
   }
 

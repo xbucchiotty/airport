@@ -28,7 +28,6 @@ class GameStore extends Actor with ActorLogging {
       newGame(userInfo, settings, planeType)
 
     case StartGame(userInfo, airTrafficControl, groundControl) =>
-      log.info(s"StartGame ready: ${gameContexts.contains(userInfo.sessionId)}")
       startGame(userInfo, airTrafficControl, groundControl)
 
     case event@PlayerUp(sessionId, address) if gameContexts.contains(sessionId) =>
