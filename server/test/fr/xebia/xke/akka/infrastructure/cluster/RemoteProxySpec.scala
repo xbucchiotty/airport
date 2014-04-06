@@ -7,8 +7,8 @@ import akka.testkit.TestProbe
 
 class RemoteProxySpec extends FunSpec with ShouldMatchers {
 
-  describe("A simple proxy") {
-    it("should forward message to the actorSelection") {
+  describe("A remote proxy") {
+    it("should forward message and reply to the actorSelection") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
 
       val target = TestProbe()
@@ -20,7 +20,9 @@ class RemoteProxySpec extends FunSpec with ShouldMatchers {
       probe.send(proxy, "Hello")
 
       target.expectMsg("Hello")
-      target.lastSender should equal(probe.ref)
+      target.send(target.lastSender, ", World")
+
+      probe expectMsg ", World"
     }
   }
 }
