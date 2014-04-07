@@ -46,11 +46,11 @@ class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor 
     import context.dispatcher
     implicit val timeout = Timeout(1.second)
 
-    (member.roles - "player")
+    member.roles
       .map(AirportCode)
       .filter(_.code.nonEmpty)
       .foreach(airportCode => {
-      log.info(s"player <$member> comes in for <$airportCode>")
+      log.info(s"<$member> comes in for <$airportCode>")
 
       val (airTrafficControlProxy, groundControlProxy) =
         if (table.isDefinedAt(airportCode)) {
@@ -92,9 +92,9 @@ class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor 
   def unregister(member: Member) {
     implicit val timeout = Timeout(1.second)
 
-    log.warning(s"player $member moved out")
+    log.warning(s"$member moved out")
 
-    member.roles - "player" map AirportCode foreach (airportCode => {
+    member.roles map AirportCode foreach (airportCode => {
       val proxy = table(airportCode)
 
       if (proxy.address == member.address) {
@@ -113,7 +113,7 @@ class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor 
     })
   }
 
-  def memberIsPlayer(member: Member) = member.roles.contains("player")
+  def memberIsPlayer(member: Member) = member.roles.nonEmpty
 }
 
 object AirportLocator {
