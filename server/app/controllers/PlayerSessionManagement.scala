@@ -33,7 +33,7 @@ trait PlayerSessionManagement {
     Await.result(
       ask(sessionStore, Ask(sessionId)).mapTo[Option[SessionInfo]], atMost = 10.seconds)
 
-  def LoggedInAction(sessionId: SessionId)(securedAction: (SessionInfo => play.api.mvc.Request[_] => play.api.mvc.SimpleResult)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
+  def LoggedInAction(sessionId: SessionId)(securedAction: (SessionInfo => play.api.mvc.Request[_] => play.api.mvc.Result)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
     implicit request =>
       currentSessionInfo(sessionId) match {
 

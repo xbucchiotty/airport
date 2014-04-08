@@ -163,7 +163,7 @@ object Application extends Controller with PlayerSessionManagement {
     Ok(Json.toJson(AirportScores(airportScores)))
   }
 
-  def events(sessionId: SessionId) = WebSocket.async[String] {
+  def events(sessionId: SessionId) = WebSocket.tryAccept[String] {
     _ =>
 
       val userInfo = currentSessionInfo(sessionId).get
@@ -196,7 +196,7 @@ object Application extends Controller with PlayerSessionManagement {
           _ => ask(context.get.listener, DequeueEvents)(Timeout(10 minutes)).mapTo[Option[String]]
         }
 
-        (in, out)
+        Right(in, out)
       }
   }
 
