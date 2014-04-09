@@ -15,7 +15,7 @@ class RemoteProxySpec extends FunSpec with ShouldMatchers {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
 
       val target = TestProbe()
-      val proxy = system.actorOf(RemoteProxy.props(system.actorSelection(target.ref.path)))
+      val proxy = system.actorOf(RemoteProxy.props(target.ref))
       val probe = TestProbe()
 
       probe.send(proxy, "Hello")
@@ -29,13 +29,13 @@ class RemoteProxySpec extends FunSpec with ShouldMatchers {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
 
       val target = TestProbe()
-      val proxy = system.actorOf(RemoteProxy.props(system.actorSelection(target.ref.path)))
+      val proxy = system.actorOf(RemoteProxy.props(target.ref))
       val probe = TestProbe()
 
       probe.send(proxy, Unregister)
       probe.send(proxy, "Hello")
 
-      target expectNoMsg(100 milliseconds)
+      target expectNoMsg (100 milliseconds)
     }
 
     it("should forward message to the last registered actorSelection") {
@@ -43,10 +43,10 @@ class RemoteProxySpec extends FunSpec with ShouldMatchers {
 
       val target1 = TestProbe()
       val target2 = TestProbe()
-      val proxy = system.actorOf(RemoteProxy.props(system.actorSelection(target1.ref.path)))
+      val proxy = system.actorOf(RemoteProxy.props(target1.ref))
       val probe = TestProbe()
 
-      probe.send(proxy, Register(system.actorSelection(target2.ref.path)))
+      probe.send(proxy, Register(target2.ref))
       probe.send(proxy, "Hello")
 
       target1 expectNoMsg (100 milliseconds)
@@ -58,14 +58,14 @@ class RemoteProxySpec extends FunSpec with ShouldMatchers {
 
       val target1 = TestProbe()
       val target2 = TestProbe()
-      val proxy = system.actorOf(RemoteProxy.props(system.actorSelection(target1.ref.path)))
+      val proxy = system.actorOf(RemoteProxy.props(target1.ref))
       val probe = TestProbe()
 
       probe.send(proxy, Unregister)
-      probe.send(proxy, Register(system.actorSelection(target2.ref.path)))
+      probe.send(proxy, Register(target2.ref))
       probe.send(proxy, "Hello")
 
-      target1 expectNoMsg(100 milliseconds)
+      target1 expectNoMsg (100 milliseconds)
       target2 expectMsg "Hello"
     }
   }

@@ -11,12 +11,11 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.0.13",
   "ch.qos.logback" % "logback-core" % "1.0.13",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.1" % "test",
-  "com.typesafe.akka" %% "akka-cluster" % "2.3.1"
+  "com.typesafe.akka" %% "akka-cluster" % "2.3.1",
+  "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.1"
 )
 
 incOptions := incOptions.value.withNameHashing(true)
-
-Revolver.settings
 
 fork in run := true
 
@@ -32,7 +31,9 @@ check := {
 }
 
 javaOptions in run := Seq("-Dakka.cluster.seed-nodes.0=" + seedNode.value,
-                          "-Dakka.cluster.roles.0=player",
-                          "-Dakka.cluster.roles.1=" + airport.value)
+                          "-Dakka.cluster.roles.0=" + airport.value,
+                          "-Dakka.persistence.snapshot-store.local.dir=target/"+airport.value+"/snapshots",
+                          "-Dakka.persistence.journal.leveldb.dir=target/"+airport.value+"/journal"
+)
 
 mainClass in (Compile,run) := Some("Launcher")

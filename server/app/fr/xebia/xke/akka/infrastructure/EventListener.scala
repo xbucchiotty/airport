@@ -6,7 +6,6 @@ import akka.event.EventStream
 import controllers.DequeueEvents
 import scala.Predef._
 import fr.xebia.xke.akka.game._
-import scala.Some
 import fr.xebia.xke.akka.plane.event.PlaneStatus
 import fr.xebia.xke.akka.game.PlayerDown
 import fr.xebia.xke.akka.game.Score
@@ -46,26 +45,26 @@ class EventListener(eventStream: EventStream) extends Actor with ActorLogging {
     case newScore: Score =>
       sendWhenPendingRequestOrQueue(score(newScore))
 
-    case PlayerUp(_, address) =>
+    case PlayerUp(address) =>
       sendWhenPendingRequestOrQueue(playerUp(address))
 
-    case PlayerDown(_, address) =>
+    case PlayerDown(address) =>
       sendWhenPendingRequestOrQueue(playerDown(address))
 
     case DequeueEvents =>
       if (buffer.nonEmpty) {
         val (msg, newBuffer) = buffer.dequeue
-        sender ! Some(msg)
+        sender() ! Some(msg)
         log.debug(s"send buffered $msg")
         buffer = newBuffer
       } else {
         if (!listening) {
           log.debug(s"end of stream")
-          sender ! Option.empty[String]
+          sender() ! Option.empty[String]
         }
         else {
           log.debug(s"pending request")
-          pendingRequest = Some(sender)
+          pendingRequest = Some(sender())
         }
       }
   }

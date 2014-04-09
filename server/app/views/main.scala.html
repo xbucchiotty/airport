@@ -13,10 +13,60 @@
 <div class="navbar">
     <div class="navbar-inner">
         <div class="container">
-            <div class="brand">Level <span class="badge">@level</span></div>
+
+
+            @airport match{
+                case Some(selectedAirport) =>  {
+                    <div class="brand dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Level <span class="badge">@level</a></span>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <form action="@routes.Application.createLevel0(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 0, a piece of cake.</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel1(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 1, more runways.</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel2(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 2, even more runways.</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel3(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 3, here comes taxiways.</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel4(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 4, say hello to boarding gates.</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel5(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 5, dawn radio.</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel6(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 6, chaos monkey level.</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+
+                case None => {}
+
+
+            }
+
+
             <div class="brand">@airport.map(airport => airport.code + ": " + airport.city).getOrElse("Devoxx International Airport")</div>
             <ul class="nav">
-                <li><a href="@routes.Application.index()" target="_blank">Start a new game</a></li>
+                <li><a href="@routes.Application.displayRegisterPage()" target="_blank">Get a new airport</a></li>
             </ul>
             <div class="brand" id="playerAddress"></div>
         </div>

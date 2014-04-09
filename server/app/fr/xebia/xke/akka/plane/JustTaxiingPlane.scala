@@ -5,7 +5,7 @@ import akka.event.EventStream
 import fr.xebia.xke.akka.game.Settings
 import fr.xebia.xke.akka.plane.state.{TaxiingAsLastStep, OnRunwayWaitingForTaxiway, Incoming}
 
-case class JustTaxiingPlane(airControl: ActorRef, game: ActorRef, settings: Settings, eventStream: EventStream)
+case class JustTaxiingPlane(settings: Settings, eventStream: EventStream)
   extends Plane
   with Incoming
   with OnRunwayWaitingForTaxiway
@@ -16,6 +16,6 @@ case class JustTaxiingPlane(airControl: ActorRef, game: ActorRef, settings: Sett
 
 object JustTaxiingPlane {
 
-  def props(airControl: ActorRef, game: ActorRef, settings: Settings, eventStream: EventStream) =
-    Props(classOf[JustTaxiingPlane], airControl, game, settings, eventStream)
+  def props(settings: Settings, eventStream: EventStream) =
+    Props(classOf[JustTaxiingPlane], settings, eventStream)
 }

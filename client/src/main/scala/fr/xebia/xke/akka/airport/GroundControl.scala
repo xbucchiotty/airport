@@ -8,19 +8,19 @@ class GroundControl extends Actor with ActorLogging {
 
   def receive = uninitialized
 
-  log.info("GroundCountrol created")
+  log.info(s"${self.path.name} created ")
 
   def uninitialized: Receive = {
-    case InitGroundControl(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int) =>
+    case InitGroundControl(taxiways: Set[ActorRef], gates: Set[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int) =>
       sender ! GroundControlReady
       context become (ready(taxiways, gates, taxiwayCapacity, ackMaxDuration) orElse uninitialized)
-      log.info("GroundCountrol ready")
+      log.info(s"${self.path.name} ready")
   }
 
-  def ready(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int): Receive = {
+  def ready(taxiways: Set[ActorRef], gates: Set[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int): Receive = {
     //A new plane is on a taxiway and requests to taxi
     case Incoming =>
-      val plane = sender
+      val plane = sender()
       //we should find him a free taxiway
       //tell him to taxy on it
       sender ! Taxi(taxiways.head)
@@ -36,7 +36,7 @@ class GroundControl extends Actor with ActorLogging {
     //A plane is at the end of a taxiway
     //It requests a gate
     case EndOfTaxi =>
-      val plane = sender
+      val plane = sender()
       //We should find him a free gate
       //tell the plane to park
       plane ! ParkAt(gates.head)
@@ -53,7 +53,7 @@ class GroundControl extends Actor with ActorLogging {
 
     //A plane has parked
     case HasParked =>
-      val plane = sender
+      val plane = sender()
 
     //The plane is no longer on the taxiway
     //The taxiway has gained one slot free
@@ -63,7 +63,7 @@ class GroundControl extends Actor with ActorLogging {
 
     //A plane has left a gate
     case HasLeft =>
-      val plane = sender
+      val plane = sender()
     //The plane has ended the game
     //The gate is now free
 

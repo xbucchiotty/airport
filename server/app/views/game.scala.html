@@ -1,32 +1,19 @@
-@(level:Int,userInfo: fr.xebia.xke.akka.infrastructure.SessionInfo)(content: Html)(implicit request: RequestHeader)
+@(level:Int, gameContext: fr.xebia.xke.akka.game.GameContext)(content: Html)(implicit request: RequestHeader)
 
-@main("Devoxx Akka workshop")(level)(Some(userInfo.airport)){
-    <script src="/assets/javascripts/game.js" type="text/javascript"></script>
+@main("Devoxx Akka workshop")(level)(Some(gameContext.airport)){
+<script src="/assets/javascripts/game.js" type="text/javascript"></script>
 
-    <div id="score">
-        <h1 style="text-align: right;">Score <p id="counter"></p></h1>
-        <div class="progress progress-success progress-striped">
-            <div class="bar" style="width: 0%;"></div>
-        </div>
+<div id="score">
+    <h1 style="text-align: right;">Score <p id="counter"></p></h1>
+    <div class="progress progress-success progress-striped">
+        <div class="bar" style="width: 0%;"></div>
     </div>
+</div>
 
-    @content
-
-    <div class="modal hide fade" id="GameOver">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h3>Xebia International Airport</h3>
-        </div>
-        <div class="modal-body">
-            <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTWy_nDEGPAkcXKSwy85J0fw90r_QxDBQzzBZSIb6JEtjUCbi_v" class="img-polaroid">
-        </div>
-        <div class="modal-footer">
-            <a href="#" class="btn" data-dismiss="modal">Close</a>
-            <a href="@level" class="btn btn-primary">Try again</a>
-        </div>
-    </div>
+@content
 
 <script>
-    window.game.init('@routes.Application.events(userInfo.sessionId).webSocketURL()');
+    window.game.init('@routes.Application.events(gameContext.airport.code,gameContext.sessionId).webSocketURL()');
+
 </script>
 }

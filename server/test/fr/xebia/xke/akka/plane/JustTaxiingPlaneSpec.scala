@@ -1,6 +1,5 @@
 package fr.xebia.xke.akka.plane
 
-import akka.actor.Props
 import akka.testkit.TestProbe
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasParked, EndOfTaxi, Taxiing, HasLeft, HasLanded, Incoming}
@@ -23,10 +22,9 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
         "When it starts" - {
 
           "Then it should contact the aircontrol" in {
-            val game = TestProbe()
             val airControl = TestProbe()
 
-            val plane = system.actorOf(JustTaxiingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustTaxiingPlane.props(settings, new EventStream()), "plane")
             TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
@@ -44,19 +42,19 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
           "Then the plane should ack and land withing timeout" in {
             //Given
-            val game = TestProbe()
             val airControl = TestProbe()
             val runway = TestProbe()
-            val plane = system.actorOf(JustTaxiingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
-            TestProbe().send(plane, Contact(airControl.ref))
+            val plane = system.actorOf(JustTaxiingPlane.props(settings, new EventStream()), "plane")
+            val operator = TestProbe()
+            operator.send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
 
             //When
-            airControl reply Land(runway.ref)
+            operator.send(plane, Land(runway.ref))
 
             //Then
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
             runway expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
           }
@@ -73,22 +71,23 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
           "Then the plane should make the contact" in {
             //Given
-            val game = TestProbe()
             val airControl = TestProbe()
             val groundControl = TestProbe()
-            val plane = system.actorOf(JustTaxiingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustTaxiingPlane.props(settings, new EventStream()), "plane")
+            val operator = TestProbe()
+
             TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
-            airControl reply Land(TestProbe().ref)
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator.send(plane, Land(TestProbe().ref))
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
 
             //When
-            airControl reply Contact(groundControl.ref)
+            operator reply Contact(groundControl.ref)
 
             //Then
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl expectMsg Incoming
             groundControl.lastSender should be(plane)
           }
@@ -105,28 +104,28 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
           "Then it should informs airControl, runway, groundControl and taxiway of its movement" in {
             //Given
-            val game = TestProbe()
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val runway = TestProbe()
-            val plane = system.actorOf(JustTaxiingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val operator = TestProbe()
+            val plane = system.actorOf(JustTaxiingPlane.props(settings, new EventStream()), "plane")
             TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
-            airControl reply Land(runway.ref)
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator.send(plane, Land(runway.ref))
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
             runway expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
-            airControl reply Contact(groundControl.ref)
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator reply Contact(groundControl.ref)
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl expectMsg Incoming
 
             //When
-            groundControl reply Taxi(taxiway.ref)
+            operator.send(plane, Taxi(taxiway.ref))
 
             //Then
-            groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             runway expectMsg HasLeft
             airControl expectMsg HasLeft
             taxiway expectMsg Taxiing
@@ -145,22 +144,22 @@ class JustTaxiingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
           "Then it should terminates" in {
             //Given
-            val game = TestProbe()
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val taxiway = TestProbe()
-            val plane = system.actorOf(JustTaxiingPlane.props(airControl.ref, game.ref, settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustTaxiingPlane.props(settings, new EventStream()), "plane")
             val probe = TestProbe()
+            val operator = TestProbe()
             TestProbe().send(plane, Contact(airControl.ref))
 
             probe watch plane
             airControl expectMsg Incoming
-            airControl reply Land(TestProbe().ref)
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator.send(plane, Land(TestProbe().ref))
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             airControl expectMsg(2 * settings.landingMaxDuration.milliseconds, HasLanded)
-            airControl reply Contact(groundControl.ref)
+            operator reply Contact(groundControl.ref)
             groundControl expectMsg Incoming
-            airControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
+            operator expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
             groundControl reply Taxi(taxiway.ref)
             groundControl expectMsg(2 * settings.ackMaxDuration.milliseconds, Ack)
 

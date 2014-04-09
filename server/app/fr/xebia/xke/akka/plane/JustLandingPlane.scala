@@ -5,7 +5,7 @@ import akka.event.EventStream
 import fr.xebia.xke.akka.game.Settings
 import fr.xebia.xke.akka.plane.state.{LandingAsLastStep, Incoming}
 
-case class JustLandingPlane(airControl: ActorRef, game: ActorRef, settings: Settings, eventStream: EventStream)
+case class JustLandingPlane(settings: Settings, eventStream: EventStream)
   extends Plane
   with Incoming
   with LandingAsLastStep {
@@ -15,6 +15,6 @@ case class JustLandingPlane(airControl: ActorRef, game: ActorRef, settings: Sett
 
 object JustLandingPlane {
 
-  def props(airControl: ActorRef, game: ActorRef, settings: Settings, eventStream: EventStream) =
-    Props(classOf[JustLandingPlane], airControl, game, settings, eventStream)
+  def props(settings: Settings, eventStream: EventStream) =
+    Props(classOf[JustLandingPlane], settings, eventStream)
 }

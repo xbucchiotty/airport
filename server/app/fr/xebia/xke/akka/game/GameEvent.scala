@@ -11,8 +11,6 @@ case object GameOver extends GameEvent
 
 case object GameEnd extends GameEvent
 
-case class PlayerUp(sessionId: SessionId, address: Address) extends GameEvent
+case class PlayerUp(address: Address) extends GameEvent
 
-case class PlayerDown(sessionId: SessionId, address: Address) extends GameEvent
-
-case class InitGame(airTrafficControl: ActorRef, groundControl: ActorRef) extends GameEvent
+case class PlayerDown(address: Address) extends GameEvent

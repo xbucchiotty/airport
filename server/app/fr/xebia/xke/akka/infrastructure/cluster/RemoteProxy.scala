@@ -3,13 +3,15 @@ package fr.xebia.xke.akka.infrastructure.cluster
 import akka.actor._
 import fr.xebia.xke.akka.infrastructure.cluster.RemoteProxy.{Register, Unregister}
 
-class RemoteProxy(firstRemoteLookup: ActorSelection) extends Actor with ActorLogging {
+class RemoteProxy(firstRemoteLookup: ActorRef) extends Actor with ActorLogging {
 
   var inboundProxies = Map.empty[ActorRef, ActorRef]
 
+  log.debug(s"Creating an outbound proxy from <${self.path}> to ${firstRemoteLookup.path}")
+
   def receive = registered(firstRemoteLookup)
 
-  def registered(target: ActorSelection): Receive = {
+  def registered(target: ActorRef): Receive = {
     case Register(newTarget) =>
       context become registered(newTarget)
 
@@ -18,29 +20,27 @@ class RemoteProxy(firstRemoteLookup: ActorSelection) extends Actor with ActorLog
 
     case any =>
 
-      if (!inboundProxies.isDefinedAt(sender)) {
-        log.debug(s"Creating an inbound proxy for ${sender.path.name}")
-        inboundProxies += (sender -> context.actorOf(SimpleProxy.props(sender, self), sender.path.name))
+      if (!inboundProxies.isDefinedAt(sender())) {
+        inboundProxies += (sender() -> context.actorOf(SimpleProxy.props(sender(), self), sender().path.name))
       }
 
-      log.debug(s"Sending $any to $target")
-      target.tell(any, inboundProxies(sender))
+      inboundProxies(sender()) ! SimpleProxy.Send(any, target)
   }
 
-  def unregistered(lastTarget: ActorSelection): Receive = {
+  def unregistered(lastTarget: ActorRef): Receive = {
     case Register(newTarget) =>
-    context become registered(newTarget)
+      context become registered(newTarget)
 
     case any =>
-      log.debug(s"Unable to deliver $any")
+      log.debug(s"Unable to deliver <$any> to <${self.path.name}>}")
   }
 }
 
 object RemoteProxy {
-  def props(remoteLookup: ActorSelection): Props = Props(classOf[RemoteProxy], remoteLookup)
+  def props(remoteLookup: ActorRef): Props = Props(classOf[RemoteProxy], remoteLookup)
 
   case object Unregister
 
-  case class Register(newTarget: ActorSelection)
+  case class Register(newTarget: ActorRef)
 
 }

@@ -4,89 +4,132 @@ import akka.actor._
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
-import fr.xebia.xke.akka.plane.Plane
-import fr.xebia.xke.akka.game.GameStore._
 import fr.xebia.xke.akka.infrastructure.SessionId
-import fr.xebia.xke.akka.infrastructure.SessionInfo
+import fr.xebia.xke.akka.airport.{Airport, AirportCode}
+import fr.xebia.xke.akka.game.GameStore._
+import fr.xebia.xke.akka.plane.Plane
+import fr.xebia.xke.akka.game.GameStore.NewGame
+import fr.xebia.xke.akka.game.GameStore.Ask
+import fr.xebia.xke.akka.game.GameStore.GameCreated
+import fr.xebia.xke.akka.game.GameStore.StartGame
+import akka.event.EventStream
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
+import akka.pattern.ask
 
-class GameStore extends Actor with ActorLogging {
+class GameStore(airportsClusterLocation: ActorRef, clusterEventStream: EventStream) extends Actor with ActorLogging {
 
-  var gameContexts: Map[SessionId, GameContext] = _
   var gameCounter: Int = _
 
-  implicit val timeout = Timeout(1 second)
+  var gameContexts: Map[GameStatus, GameContext] = _
+
+  import context.dispatcher
+
+  implicit val timeout: Timeout = Timeout(10 seconds)
 
 
   override def preStart() {
     gameContexts = Map.empty
     gameCounter = 0
+
+    clusterEventStream.subscribe(self, classOf[AirportLocator.AirportConnected])
+    clusterEventStream.subscribe(self, classOf[AirportLocator.AirportDisconnected])
   }
 
   def receive: Receive = {
 
-    case NewGame(userInfo, settings, planeType) =>
-      newGame(userInfo, settings, planeType)
+    case NewGame(airport, settings, planeType) =>
+      newGame(airport, settings, planeType)
 
-    case StartGame(userInfo, airTrafficControl, groundControl) =>
-      startGame(userInfo, airTrafficControl, groundControl)
-
-    case event@PlayerUp(sessionId, address) if gameContexts.contains(sessionId) =>
-      gameContexts(sessionId).publish(event)
-
-    case event@PlayerDown(sessionId, address) if gameContexts.contains(sessionId) =>
-      gameContexts(sessionId).publish(event)
+    case StartGame(sessionId) =>
+      startGame(sessionId)
 
     case Ask(sessionId) =>
-      sender ! gameContexts.get(sessionId)
+      sender() ! gameContexts.find(_._1.sessionId == sessionId).map(_._2)
 
-    case default =>
-      log.info(default.toString)
+    case AirportLocator.AirportConnected(airportCode, address) =>
+      airportConnected(airportCode, address)
+
+    case AirportLocator.AirportDisconnected(airportCode, address) =>
+      airportDisconnected(airportCode, address)
   }
 
-  def newGame(userInfo: SessionInfo, settings: Settings, planeType: Class[_ <: Plane]) {
-    for (gameContext <- gameContexts.get(userInfo.sessionId)) {
-
-      gameContext.stop(context.system)
-
-      gameContexts -= userInfo.sessionId
+  def airportDisconnected(airportCode: AirportCode, address: Address) {
+    for ((status, gameContext) <- gameContexts.filter(_._1.airportCode == airportCode)) {
+      gameContext.publish(PlayerDown(address))
     }
+  }
 
-    val sessionId = s"game-session-${userInfo.airportCode}-$gameCounter"
+  def airportConnected(airportCode: AirportCode, address: Address) {
+    for ((status, gameContext) <- gameContexts.filter(_._1.airportCode == airportCode)) {
+      gameContext.publish(PlayerUp(address))
 
-    val gameContext = GameContext.create(sessionId, settings, planeType, userInfo.airport)(context)
+      if (status.started) {
+        log.info(s"Game <${gameContext.sessionId}> already started")
+
+        airportsClusterLocation ! AirportLocator.UpdateClient(gameContext.airport.code, gameContext.sessionId, address)
+
+      } else {
+        log.info(s"Game <${gameContext.sessionId}> is ready to start")
+      }
+    }
+  }
+
+  def newGame(airport: Airport, settings: Settings, planeType: Class[_ <: Plane]) {
+    val gameContext = GameContext.create(settings, planeType, airport, airportsClusterLocation)(context)
     gameCounter += 1
 
-    gameContexts += (userInfo.sessionId -> gameContext)
+    gameContexts += (GameStatus(airport.code, gameContext.sessionId) -> gameContext)
 
-    log.info(s"Create a new game for <${userInfo.sessionId}>")
+    log.info(s"Create a new game for <${airport.code}> with id <${gameContext.sessionId}>")
 
-    sender ! GameCreated(gameContext)
+    val lastSender = sender()
+
+    for (airportAddress <- ask(airportsClusterLocation, AirportLocator.AskAddress(airport.code)).mapTo[Option[Address]]) {
+
+      airportAddress.foreach(address => {
+        gameContext.publish(PlayerUp(address))
+      })
+    }
+
+    lastSender ! GameCreated(gameContext)
   }
 
-  def startGame(userInfo: SessionInfo, airTrafficControl: ActorRef, groundControl: ActorRef) {
-    log.info("startGame")
-    for (gameContext <- gameContexts.get(userInfo.sessionId)) {
-      log.info(s"Start the game for <${userInfo.sessionId}>, session = <${gameContext.game.path.name}>")
+  def startGame(sessionId: SessionId) {
+    for ((status, gameContext) <- gameContexts.find(_._1.sessionId == sessionId)) {
+      log.info(s"Start the game <${gameContext.game.path.name}>")
 
-      gameContext.init(airTrafficControl, groundControl)
+      def newInstances = ask(airportsClusterLocation, AirportLocator.CreateClient(gameContext.airport.code, sessionId)).mapTo[(ActorRef, ActorRef)]
 
-      sender ! GameStarted
+      val lastSender = sender()
+
+      for ((airTrafficControl, groundControl) <- newInstances) {
+        gameContext.init(airTrafficControl, groundControl)
+
+        lastSender ! GameStarted
+
+        status.started = true
+
+      }
     }
   }
 }
 
 object GameStore {
 
-  def props(): Props = Props[GameStore]
+  def props(airportsClusterLocation: ActorRef, clusterEventStream: EventStream): Props = Props(classOf[GameStore], airportsClusterLocation, clusterEventStream)
 
-  case class NewGame(userInfo: SessionInfo, settings: Settings, planeType: Class[_ <: Plane])
+  case class NewGame(airport: Airport, settings: Settings, planeType: Class[_ <: Plane])
 
   case class GameCreated(gameContext: GameContext)
 
-  case class StartGame(userInfo: SessionInfo, airTrafficControl: ActorRef, groundControl: ActorRef)
+  case class StartGame(sessionId: SessionId)
 
   case object GameStarted
 
   case class Ask(sessionId: SessionId)
+
+  private[GameStore] case class GameStatus(airportCode: AirportCode, sessionId: SessionId) {
+    var started: Boolean = false
+  }
 
 }

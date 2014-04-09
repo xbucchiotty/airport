@@ -1,6 +1,6 @@
-@(settings: fr.xebia.xke.akka.game.Settings, userInfo: fr.xebia.xke.akka.infrastructure.SessionInfo)(implicit request: RequestHeader)
+@(gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
 
-@game(5,userInfo){
+@game(6,gameContext){
 
 <table id='strips'>
     <thead>
@@ -9,26 +9,26 @@
             <a href="#"
                title="Incoming"
                data-toggle="popover"
-               data-content="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
+               data-content="@gameContext.settings.planeGenerationInterval millis between each plane and @gameContext.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
         </th>
         <th class="header active">
             <a href="#"
                title="Runway"
                data-toggle="popover"
-               data-content="@settings.nrOfRunways runways with @settings.landingMaxDuration  millis max to land">Runway</a>
+               data-content="@gameContext.settings.nrOfRunways runways with @gameContext.settings.landingMaxDuration  millis max to land">Runway</a>
         </th>
         <th class="header active">
             <a href="#"
                title="Taxiway"
                data-toggle="popover"
-               data-content="@settings.nrOfTaxiways taxiways with a capacity of @settings.taxiwayCapacity planes and @settings.taxiingDuration millis max to taxi">Taxiway</a>
+               data-content="@gameContext.settings.nrOfTaxiways taxiways with a capacity of @gameContext.settings.taxiwayCapacity planes and @gameContext.settings.taxiingDuration millis max to taxi">Taxiway</a>
         </th>
         <th class="header active">
             <a href="#"
                title="Gate"
                data-toggle="popover"
-               data-content="@settings.nrOfGates gates and @settings.unloadingPassengersMaxDuration millis to unload passengers"
-               data-intro='Welcome to the multiplayer mode. Now each plane that unloads passengers will request to takeoff to another airport. This airport will be managed by some other player.'
+               data-content="@gameContext.settings.nrOfGates gates and @gameContext.settings.unloadingPassengersMaxDuration millis to unload passengers"
+               data-intro='Welcome to the chaos monkey level. Some monkeys will eventually shoot your instance. Use Persistence to be fault tolerant and be able to restart in the middle of a game session.'
                data-step="1">Gate</a>
         </th>
         <th class="header">Done</th>
@@ -39,6 +39,22 @@
     </tbody>
 </table>
 
+<div class="modal hide fade" id="GameOver">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Xebia International Airport</h3>
+    </div>
+    <div class="modal-body">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTWy_nDEGPAkcXKSwy85J0fw90r_QxDBQzzBZSIb6JEtjUCbi_v"
+             class="img-polaroid">
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <form action="@routes.Application.createLevel6(gameContext.airport.code)" method="POST" class="form-inline">
+            <button type="submit" class="btn btn-primary">Retry</button>
+        </form>
+    </div>
+</div>
 <div class="modal hide fade" id="GameEnded">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
