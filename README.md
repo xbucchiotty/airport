@@ -1,42 +1,33 @@
-#Sequence diagrams
-##Short Landing procedure
-![Sequence as image](http://www.websequencediagrams.com/cgi-bin/cdraw?lz=dGl0bGUgU2hvcnQgTGFuZGluZyBwcm9jZWR1cmUKCiAgICBvcAASCQALBVBsYW5lLS0-K0FpciBDb250cm9sOiBJbmNvbQAbCAAPCy0-ABoNV2FpdCBmcmVlIHJ1bndheQAdEgBaBToAgQgFKFIAHwUpCgCBAwYAcQgAFwtpbmcgd2l0aCByYW5kb20gZHVyYXRpb24AgRwNAIEbDUxhbmRlZChwbGFuZSkAgRsSLQB4B0NvbnRhY3QoZ3JvdW5kACMGZW5kAIIICgCBQwZvciBhIGdhdGUAggwORwAxBQCCBhcADw4tPgAdEFdhaXRpbmcAWAUAgiUFAFcJAAkxdGF4aQCCXQgAZxAAgWIIVGF4aUFuZFBhcmsoVAAqBixHYXQAghYHAIFnDVRheGkgdG8AgV8UAIQADEhhc0xlZnQAgzUJAIQpDACCChBIYXNFbnRlcmVkAHUIKQCDWBVUYXhpAINIJQBOEwCBCAUAggQHAHAeUGFya2VkKACBaBdVbmxvYQCGHAZhc3NlbmdlcnMAhQUUAIM1DHUAFCAAgRgYAIJ5CgCEdAg&s=modern-blue "Landing procedure")
+Pré-requis
+------------
 
-    title Short Landing procedure
+Vous avez besoin :
+* De java
+* D'un éditeur de texte (nous recommandons sublime-text)
+* D'un serveur monde (lors d'un handson les organisateurs font tourner le serveur et vous donneront l'adresse, chez vous il faut le lancer en local, voir plus bas)
 
-    opt Landing
-    Plane-->+Air Control: Incoming
-    Air Control->Air Control: Wait free runway
-    Air Control->Plane: Land(Runway)
-    Plane->Air Control: Ack
+Lancer le Hands-on
+------------
+Connectez-vous sur l'adresse du serveur et demandez-lui de vous assigner un aéroport.
+Modifiez le fichier `client/build.sbt` pour renseigner le nom de votre aéroport et, si besoin, changer le noeud source
+Vous pouvez ensuite lancer le hands-on en tapant
+* ```./handson``` sous linux/mac
+* ```handson.bat``` sous windows
 
-    Plane-->Plane: Landing with random duration
-    Plane-->Air Control: Landed(plane)
-    Air Control->-Plane: Contact(ground)
-    Plane->Air Control: Ack
-    end
+Ces scripts lancent SBT (scala build tool) en arrière plan pré-configuré avec des commandes pour jouer le hands-on.
 
-    opt Wait for a gate
-    Plane-->+Ground Control: Incoming
-    Ground Control->Ground Control: Waiting for free taxiway
-    Ground Control->-Plane: Taxi(Taxiway)
-    Plane->Ground Control: Ack
-    end
+Commandes
+------------
+* `start` lance votre aéroport, ce dernier essaye de se connecter au noeud source pour trouver le serveur monde, une fois
+connecté vous pouvez interagir avec la session de votre aéroport sur l'ihm web du serveur monde.
+* `test` joue les tests de votre aéroport pour vérifier que vous avez correctement implémenté la logique.
 
-    opt Taxi
-    Plane-->Air Control:HasLeft
-    Plane-->Ground Control: Taxiing
+Lancer son propre serveur monde
+------------
+Ouvrez un second terminal et allez dans le sous dossier `server`. Il s'agit d'une application Play2. Toutes les commandes habituelles de play sont disponible.
+Pour démarrer le serveur faites `sbt run`.
 
-    Plane-->Plane: Taxiing with random duration
-    Plane-->Ground Control: EndOfTaxi
-    Ground Control->Ground Control: Waiting for free gate
-    Plane-->Ground Control: ParkAt(Gate)
-    Plane->Ground Control: Ack
-    end
+Protocole de communication avec les avions
+------------
 
-    opt Unloading passengers
-    Plane-> Ground Control: HasParked
-    Plane-->Plane: Waiting for unloading passengers
-    Plane-->Ground Control: HasLeft
-
-    end
+Le protocole de communication complet est décrit dans le fichier SEQUENCE.md
