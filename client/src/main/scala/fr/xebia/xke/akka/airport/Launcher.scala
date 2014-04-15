@@ -8,24 +8,29 @@ import collection.JavaConversions._
 
 object Launcher {
   def main(args: Array[String]) {
-    val system = ActorSystem.create("airportSystem")
-
-
     val conf = ConfigFactory.load()
-    val airportCode = conf.getStringList("akka.cluster.roles").asInstanceOf[List[String]].head
+    val airportCode = conf.getStringList("akka.cluster.roles").headOption.getOrElse("")
+    if(airportCode.isEmpty){
+      println()
+      println()
+      println(s"You must provide an airport code in build.sbt before you can start the airport")
+      println()
+      println()
+    }else {
+      val system = ActorSystem.create("airportSystem")
+      system.actorOf(AirportManager.props, airportCode)
 
-    system.actorOf(AirportManager.props, airportCode)
+      println()
+      println()
+      println(s"Airport $airportCode started, press CTRL+D to stop")
+      println()
+      println()
 
-    println()
-    println()
-    println(s"Airport $airportCode started, press CTRL+D to stop")
-    println()
-    println()
-
-    if (shouldTerminate) {
-      println("Shutting down...")
-      system.shutdown()
-      system.awaitTermination()
+      if (shouldTerminate) {
+        println("Shutting down...")
+        system.shutdown()
+        system.awaitTermination()
+      }
     }
   }
 
