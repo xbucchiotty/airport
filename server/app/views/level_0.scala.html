@@ -1,6 +1,6 @@
 @(gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
 
-@game(0,gameContext){
+@game(0,gameContext,Some(routes.Application.createLevel0(gameContext.airport.code))){
 
 <table id='strips'>
     <thead>
