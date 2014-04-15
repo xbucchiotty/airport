@@ -9,7 +9,7 @@ Vous avez besoin :
 Lancer son propre serveur monde
 ------------
 Ouvrez un terminal et allez dans le sous dossier `server`. Il s'agit d'une application Play2. Toutes les commandes habituelles de play sont disponible.
-Pour démarrer le serveur faites `sbt run`.
+Pour démarrer le serveur faites `worldserver run` ou `worldserver.bat` run sous Windows.
 
 Lancer le Hands-on
 ------------
