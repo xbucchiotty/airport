@@ -4,12 +4,17 @@ Pré-requis
 Vous avez besoin :
 * De java
 * D'un éditeur de texte (nous recommandons sublime-text)
-* D'un serveur monde (lors d'un handson les organisateurs font tourner le serveur et vous donneront l'adresse, chez vous il faut le lancer en local, voir plus bas)
+* D'un serveur monde
+
+Lancer son propre serveur monde
+------------
+Ouvrez un terminal et allez dans le sous dossier `server`. Il s'agit d'une application Play2. Toutes les commandes habituelles de play sont disponible.
+Pour démarrer le serveur faites `sbt run`.
 
 Lancer le Hands-on
 ------------
-Connectez-vous sur l'adresse du serveur et demandez-lui de vous assigner un aéroport.
-Modifiez le fichier `client/build.sbt` pour renseigner le nom de votre aéroport et, si besoin, changer le noeud source
+Connectez-vous sur http://localhost:9000 et demandez-lui de vous assigner un aéroport.
+Modifiez le fichier `client/build.sbt` pour renseigner le nom de votre aéroport. (airport := "LHR" par exemple)
 Vous pouvez ensuite lancer le hands-on en tapant
 * ```./handson``` sous linux/mac
 * ```handson.bat``` sous windows
@@ -22,10 +27,7 @@ Commandes
 connecté vous pouvez interagir avec la session de votre aéroport sur l'ihm web du serveur monde.
 * `test` joue les tests de votre aéroport pour vérifier que vous avez correctement implémenté la logique.
 
-Lancer son propre serveur monde
-------------
-Ouvrez un second terminal et allez dans le sous dossier `server`. Il s'agit d'une application Play2. Toutes les commandes habituelles de play sont disponible.
-Pour démarrer le serveur faites `sbt run`.
+
 
 Protocole de communication avec les avions
 ------------
