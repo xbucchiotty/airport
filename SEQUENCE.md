@@ -1,6 +1,6 @@
 #Sequence diagrams
 ##Short Landing procedure
-![Sequence as image](http://www.websequencediagrams.com/cgi-bin/cdraw?lz=dGl0bGUgU2hvcnQgTGFuZGluZyBwcm9jZWR1cmUKCiAgICBvcAASCQALBVBsYW5lLS0-K0FpciBDb250cm9sOiBJbmNvbQAbCAAPCy0-ABoNV2FpdCBmcmVlIHJ1bndheQAdEgBaBToAgQgFKFIAHwUpCgCBAwYAcQgAFwtpbmcgd2l0aCByYW5kb20gZHVyYXRpb24AgRwNAIEbDUxhbmRlZChwbGFuZSkAgRsSLQB4B0NvbnRhY3QoZ3JvdW5kACMGZW5kAIIICgCBQwZvciBhIGdhdGUAggwORwAxBQCCBhcADw4tPgAdEFdhaXRpbmcAWAUAgiUFAFcJAAkxdGF4aQCCXQgAZxAAgWIIVGF4aUFuZFBhcmsoVAAqBixHYXQAghYHAIFnDVRheGkgdG8AgV8UAIQADEhhc0xlZnQAgzUJAIQpDACCChBIYXNFbnRlcmVkAHUIKQCDWBVUYXhpAINIJQBOEwCBCAUAggQHAHAeUGFya2VkKACBaBdVbmxvYQCGHAZhc3NlbmdlcnMAhQUUAIM1DHUAFCAAgRgYAIJ5CgCEdAg&s=modern-blue "Landing procedure")
+![Sequence as image](http://www.websequencediagrams.com/cgi-bin/cdraw?lz=dGl0bGUgU2hvcnQgTGFuZGluZyBwcm9jZWR1cmUKCiAgICBvcAASCQALBVBsYW5lLS0-K0FpciBDb250cm9sOiBJbmNvbQAbCAAPCy0-ABoNV2FpdCBmcmVlIHJ1bndheQAdEgBaBToAgQgFKFIAHwUpAGwLAEAOQWNrAIEeBgCBDAgAMgtpbmcgd2l0aCByYW5kb20gZHVyYXRpb24AgTcNAIE2DUhhc0xhbmRlZChwbGFuZQBxBgCBPg0tAIEWB0NvbnRhY3QoZ3JvdW5kAIECHiAgICBlbmQAgkIKAIF9Bm9yIGEgZ2F0ZQCCRg5HAE0FAIJAFwAPDi0-AB0QV2FpdGluZwBYBQCCXwV0YXhpAIJdCAAtEACBRAhUYXhpKFQAIwYAgl0NAHsQAIE4FVRheGkAgjkZSGFzTGVmdACEKQ0AgVEQVGF4aWluZwCDMhUAFQcAgyUiAIImEEVuZE9mAIESCQCCBjEAgwYRAIMGEFBhcmtBdChHYXQAhB8HAIIHLFVubG9hAIZjBmFzc2VuZ2VycwCFVgwAg1gPAIUTBVBhcmtlZACFVxQAg2gMdQA8HgCEHxIAgxkIAIUdCA&s=modern-blue "Landing procedure")
 
     title Short Landing procedure
 
@@ -11,7 +11,7 @@
     Plane->Air Control: Ack
 
     Plane-->Plane: Landing with random duration
-    Plane-->Air Control: Landed(plane)
+    Plane-->Air Control: HasLanded(plane)
     Air Control->-Plane: Contact(ground)
     Plane->Air Control: Ack
     end
