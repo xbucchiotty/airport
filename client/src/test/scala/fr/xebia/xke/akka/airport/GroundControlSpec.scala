@@ -9,27 +9,23 @@ import fr.xebia.xke.akka.airport.command.{ParkAt, Ack, Taxi}
 import language.postfixOps
 import org.scalatest._
 
-class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
+class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterEach {
 
   describe("A ground control in taxiway management") {
 
     it("can be initialized") {
-      implicit val system = testActorSystem()
-
       val groundControl = system.actorOf(Props[GroundControl], "groundControl")
       val game = TestProbe()
 
-      game.send(groundControl, InitGroundControl(Seq.empty, Seq.empty, 1, 100))
+      game.send(groundControl, InitGroundControl(Set.empty, Set.empty, 1, 100))
       game expectMsg GroundControlReady
     }
 
     it("can be restarted") {
-      implicit val system = testActorSystem()
-
-      val groundControl = initializedGroundControl(Seq.empty, Seq.empty, 1, 100)
+      val groundControl = initializedGroundControl(Set.empty, Set.empty, 1, 100)
 
       val game = TestProbe()
-      game.send(groundControl, InitGroundControl(Seq.empty, Seq.empty, 1, 100))
+      game.send(groundControl, InitGroundControl(Set.empty, Set.empty, 1, 100))
       game expectMsg GroundControlReady
     }
 
@@ -37,9 +33,8 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 1 taxiway")
-      implicit val system = testActorSystem()
       val taxiway = TestProbe()
-      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq.empty[ActorRef], 1, 100)
+      val groundControl = initializedGroundControl(Set(taxiway.ref), Set.empty[ActorRef], 1, 100)
 
       When("a new plane incomes")
       val plane = TestProbe()
@@ -54,9 +49,8 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 1 taxiway")
-      implicit val system = testActorSystem()
       val taxiway = TestProbe()
-      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq.empty[ActorRef], 1, 100)
+      val groundControl = initializedGroundControl(Set(taxiway.ref), Set.empty[ActorRef], 1, 100)
 
       Given("a plane is already on the taxiway")
       val firstPlane = TestProbe()
@@ -83,9 +77,8 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 1 taxiway with a capacity of 4 planes")
-      implicit val system = testActorSystem()
       val taxiway = TestProbe()
-      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq.empty[ActorRef], 4, 100)
+      val groundControl = initializedGroundControl(Set(taxiway.ref), Set.empty[ActorRef], 4, 100)
 
       Given("4 planes")
       val planes = List.fill(4)(TestProbe())
@@ -111,9 +104,8 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 1 taxiway with a capacity of 2 planes")
-      implicit val system = testActorSystem()
       val taxiway = TestProbe()
-      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq.empty[ActorRef], 2, 100)
+      val groundControl = initializedGroundControl(Set(taxiway.ref), Set.empty[ActorRef], 2, 100)
 
       Given("2 planes")
       val plane1 = TestProbe()
@@ -148,9 +140,8 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 4 taxiways with a capacity of 1 plane")
-      implicit val system = testActorSystem()
-      val taxiways = List.fill(4)(TestProbe()).map(_.ref).toSeq
-      val groundControl = initializedGroundControl(taxiways, Seq.empty[ActorRef], 1, 100)
+      val taxiways = List.fill(4)(TestProbe()).map(_.ref).toSet
+      val groundControl = initializedGroundControl(taxiways, Set.empty[ActorRef], 1, 100)
 
       Given("4 planes")
       val planes = List.fill(4)(TestProbe())
@@ -179,12 +170,12 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
   }
 
   describe("A ground control in gate management") {
+    pending
 
     it("should tell the plane to park when there is a free gate") {
       Given("a ground control with 1 gate")
-      implicit val system = testActorSystem()
       val gate = TestProbe()
-      val groundControl = initializedGroundControl(Seq.empty[ActorRef], Seq(gate.ref), 0, 100)
+      val groundControl = initializedGroundControl(Set.empty[ActorRef], Set(gate.ref), 0, 100)
 
       When("a new plane requests to park")
       val plane = TestProbe()
@@ -199,10 +190,9 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 2 gates")
-      implicit val system = testActorSystem()
       val gate1 = TestProbe()
       val gate2 = TestProbe()
-      val groundControl = initializedGroundControl(Seq.empty[ActorRef], Seq(gate1.ref, gate2.ref), 0, 100)
+      val groundControl = initializedGroundControl(Set.empty[ActorRef], Set(gate1.ref, gate2.ref), 0, 100)
 
       When("a new 2 request to park")
       val plane1 = TestProbe()
@@ -227,10 +217,9 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("a ground control with 1 gate")
-      implicit val system = testActorSystem()
       val gate = TestProbe()
       val taxiway = TestProbe()
-      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq(gate.ref), 1, 100)
+      val groundControl = initializedGroundControl(Set(taxiway.ref), Set(gate.ref), 1, 100)
 
       Given("a first plane has parked at the gate")
       val firstPlane = TestProbe()
@@ -261,10 +250,9 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
       pending
 
       Given("an ground control with 1 taxiway and 1 gate")
-      implicit val system = testActorSystem()
       val gate = TestProbe()
       val taxiway = TestProbe()
-      val groundControl = initializedGroundControl(Seq(taxiway.ref), Seq(gate.ref), 1, 100)
+      val groundControl = initializedGroundControl(Set(taxiway.ref), Set(gate.ref), 1, 100)
 
       When("a new plane incomes")
       val plane = TestProbe()
@@ -286,17 +274,26 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
     }
   }
 
-  def testActorSystem(): ActorSystem = {
-    ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-  }
-
-  def initializedGroundControl(taxiways: Seq[ActorRef], gates: Seq[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int)(implicit system: ActorSystem): ActorRef = {
+  def initializedGroundControl(taxiways: Set[ActorRef], gates: Set[ActorRef], taxiwayCapacity: Int, ackMaxDuration: Int)(implicit system: ActorSystem): ActorRef = {
     val groundControl = system.actorOf(Props[GroundControl], "groundControl")
     val game = TestProbe()
     game.send(groundControl, InitGroundControl(taxiways, gates, taxiwayCapacity, ackMaxDuration))
     game expectMsg GroundControlReady
 
     groundControl
+  }
+
+  implicit var system: ActorSystem = _
+
+  override protected def afterEach(): Unit = {
+    system.shutdown()
+    system.awaitTermination()
+  }
+
+  override protected def beforeEach(): Unit = {
+    system = {
+      ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+    }
   }
 
 }

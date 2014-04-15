@@ -6,6 +6,7 @@ import fr.xebia.xke.akka.airport.PlaneError
 import fr.xebia.xke.akka.plane.event.ErrorHappened
 import fr.xebia.xke.akka.plane.event.StateChanged
 import fr.xebia.xke.akka.plane.event.DetailChanged
+import language.postfixOps
 
 trait StateMachine {
 
@@ -13,10 +14,12 @@ trait StateMachine {
 
   def eventStream: EventStream
 
+
   def transitionTo(transition: Transition)(nextState: State) {
     transition()
 
     setState(nextState)
+
   }
 
   def setState(state: State) {
@@ -39,6 +42,7 @@ trait StateMachine {
   private def updateStatus(detail: String) {
     eventStream.publish(DetailChanged(detail))
   }
+
 
   case class State(name: String, behavior: LoggingReceive)
 

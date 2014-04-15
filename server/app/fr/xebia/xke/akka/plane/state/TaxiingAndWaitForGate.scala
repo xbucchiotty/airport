@@ -5,7 +5,7 @@ import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, EndOfTaxi, HasParked}
 import fr.xebia.xke.akka.airport.command.ParkAt
 import fr.xebia.xke.akka.plane.Plane
 
-private[plane] trait TaxiingAndWaitForGate extends Plane with RadioCommunication{
+private[plane] trait TaxiingAndWaitForGate extends Plane with RadioCommunication {
 
   def taxiing(groundControl: ActorRef, taxiway: ActorRef) = State("taxiway", LoggingReceive {
     case EndOfTaxi =>
@@ -18,17 +18,17 @@ private[plane] trait TaxiingAndWaitForGate extends Plane with RadioCommunication
   def waitingToPark(taxiway: ActorRef, groundControl: ActorRef) = State("taxiway", LoggingReceive {
 
     case ParkAt(gate) =>
-      val gc = sender
-      replyWithRadio(to = gc)(() => {
+      replyWithRadio(() => {
+
+        import context.dispatcher
+        context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, PassengerUnloaded)
+
+        taxiway ! HasLeft
+        gate ! HasParked
 
         transitionTo(transition = () => {
 
-          taxiway ! HasLeft
           groundControl ! HasParked
-          gate ! HasParked
-
-          import context.dispatcher
-          context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, PassengerUnloaded)
 
         })(nextState = unloadingPassengers(groundControl, gate))
       })
@@ -44,7 +44,7 @@ private[plane] trait TaxiingAsLastStep extends Plane with RadioCommunication {
 
     case EndOfTaxi =>
 
-      groundControl ! HasParked
+      groundControl ! EndOfTaxi
       taxiway ! HasLeft
 
       done()

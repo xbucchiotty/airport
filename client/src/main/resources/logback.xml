@@ -11,11 +11,10 @@
     <logger name="akka.remote" level="ERROR" />
     <logger name="akka.event" level="ERROR" />
     <logger name="akka.serialization" level="ERROR" />
-    <logger name="fr.xebia" level="INFO" />
+    <logger name="fr.xebia" level="DEBUG" />
 
-    <root level="ERROR">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <!--<appender-ref ref="FILE" />-->
     </root>
 
 </configuration>

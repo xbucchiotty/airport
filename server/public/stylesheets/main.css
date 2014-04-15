@@ -45,6 +45,19 @@ body > .navbar .brand {
     transition: all .2s linear;
 }
 
+.dropdown-menu {
+    left: -150px;
+    width: 250px;
+}
+
+.btn-link {
+    text-align: left;
+}
+
+form {
+  margin-bottom: 0px;
+}
+
 table > thead tr .header {
     min-width: 210px;
 }

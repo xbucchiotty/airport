@@ -1,28 +1,26 @@
-import akka.actor.{Props, ActorSystem}
+import akka.actor.ActorSystem
 
-import com.typesafe.config.{Config, ConfigFactory}
-import fr.xebia.xke.akka.airport.Airport
+import com.typesafe.config.ConfigFactory
+import fr.xebia.xke.akka.airport.AirportManager
 import scala.annotation.tailrec
+import java.util.List
+import collection.JavaConversions._
 
 object Launcher {
   def main(args: Array[String]) {
     val system = ActorSystem.create("airportSystem")
 
-    system.actorOf(Props[Airport], "airport")
+
+    val conf = ConfigFactory.load()
+    val airportCode = conf.getStringList("akka.cluster.roles").asInstanceOf[List[String]].head
+
+    system.actorOf(AirportManager.props, airportCode)
 
     println()
     println()
-    println("Airport started, press CTRL+D to stop")
+    println(s"Airport $airportCode started, press CTRL+D to stop")
     println()
     println()
-    println("Please check your configuration before starting playing")
-    println()
-    println()
-
-    val config: Config = ConfigFactory.load()
-
-    println(s"akka.cluster.roles: ${config.getAnyRef("akka.cluster.roles")}")
-    println(s"akka.cluster.seed-nodes: ${config.getAnyRef("akka.cluster.seed-nodes")}")
 
     if (shouldTerminate) {
       println("Shutting down...")

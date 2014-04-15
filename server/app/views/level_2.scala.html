@@ -1,6 +1,6 @@
-@(settings: fr.xebia.xke.akka.game.Settings, userInfo: fr.xebia.xke.akka.infrastructure.SessionInfo)(implicit request: RequestHeader)
+@(gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
 
-@game(2,userInfo){
+@game(2,gameContext){
 
 <table id='strips'>
     <thead>
@@ -9,16 +9,16 @@
             <a href="#"
                title="Incoming"
                data-toggle="popover"
-               data-content="@settings.planeGenerationInterval millis between each plane and @settings.outOfKerozenTimeout millis before a plane beiing out of kerozen"
-               data-intro='Even more planes. <b>@settings.planeGenerationInterval millis</b> between each plane!'
+               data-content="@gameContext.settings.planeGenerationInterval millis between each plane and @gameContext.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen"
+               data-intro='Even more planes. <b>@gameContext.settings.planeGenerationInterval millis</b> between each plane!'
                data-step='1'>Incoming</a>
         </th>
         <th class="header active">
             <a href="#"
                title="Runway"
                data-toggle="popover"
-               data-content="@settings.nrOfRunways runways with @settings.landingMaxDuration  millis max to land"
-               data-intro='and <b>@settings.nrOfRunways runways</b> but planes are dead slow with <b>@settings.landingMaxDuration millis</b> to land. Beware of collisions!'
+               data-content="@gameContext.settings.nrOfRunways runways with @gameContext.settings.landingMaxDuration  millis max to land"
+               data-intro='and <b>@gameContext.settings.nrOfRunways runways</b> but planes are dead slow with <b>@gameContext.settings.landingMaxDuration millis</b> to land. Beware of collisions!'
                data-step='2'>Runway</a>
         </th>
         <th class="header inactive">Taxiway</th>
@@ -31,6 +31,22 @@
     </tbody>
 </table>
 
+<div class="modal hide fade" id="GameOver">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Xebia International Airport</h3>
+    </div>
+    <div class="modal-body">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTWy_nDEGPAkcXKSwy85J0fw90r_QxDBQzzBZSIb6JEtjUCbi_v"
+             class="img-polaroid">
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <form action="@routes.Application.createLevel2(gameContext.airport.code)" method="POST" class="form-inline">
+            <button type="submit" class="btn btn-primary">Retry</button>
+        </form>
+    </div>
+</div>
 <div class="modal hide fade" id="GameEnded">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -43,7 +59,9 @@
 
     </div>
     <div class="modal-footer">
-        <a href="3" class="btn btn-primary">Next</a>
+        <form action="@routes.Application.createLevel3(gameContext.airport.code)" method="POST" class="form-inline">
+            <button type="submit" class="btn btn-primary">Next</button>
+        </form>
     </div>
 </div>
 

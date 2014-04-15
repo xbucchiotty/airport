@@ -15,7 +15,8 @@ case class Settings(
                      ackMaxDuration: Int = 500,
                      radioReliability: Double = 1,
                      objective: Int = 20,
-                     planeGenerationInterval: Int = 8500) {
+                     planeGenerationInterval: Int = 8500,
+                     chaosMonkey: Boolean = false) {
 
   private def aRandomDuration(maxDurationInMillis: Int): FiniteDuration = {
     val minDuration = maxDurationInMillis / 2

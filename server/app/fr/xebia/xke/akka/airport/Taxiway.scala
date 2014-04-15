@@ -14,7 +14,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
   private var free = settings.taxiwayCapacity
 
   val planeHasLeft: Receive = {
-    case HasLeft if sender == queue.head =>
+    case HasLeft if sender() == queue.head =>
       val (plane, newQueue) = queue.dequeue
       this.queue = newQueue
 
@@ -31,7 +31,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
   val acceptNewPlane: Receive = {
     case Taxiing =>
-      val plane = sender
+      val plane = sender()
       log.debug("Plane <{}> runs on taxiway <{}>", plane.path.name, self.path.name)
       this.queue = queue enqueue plane
 
@@ -46,7 +46,7 @@ class Taxiway(settings: Settings) extends Actor with ActorLogging {
 
   val rejectNewPlane: Receive = {
     case Taxiing =>
-      val plane = sender
+      val plane = sender()
 
       plane ! Collision(queue.last, self)
 

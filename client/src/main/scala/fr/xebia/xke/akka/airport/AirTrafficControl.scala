@@ -23,10 +23,10 @@ class AirTrafficControl extends Actor with ActorLogging {
       context become (ready(runways, ackMaxTimeout) orElse uninitialized)
   }
 
-  def ready(runways: Seq[ActorRef], ackMaxTimeout: Int): Receive = {
+  def ready(runways: Set[ActorRef], ackMaxTimeout: Int): Receive = {
     //Plane incomes from the sky
     case Incoming =>
-      val plane = sender
+      val plane = sender()
       //it requests to land
       //you should tell the sender (the plane)
       //to land on a free runway
@@ -42,15 +42,15 @@ class AirTrafficControl extends Actor with ActorLogging {
 
     //A plane has landed
     case HasLanded =>
-      val plane = sender
+      val plane = sender()
       //It does not know yet the ground control
       //You reply with the reference to the ground control
-      //Nothing very usefull to add there
+      //Nothing very useful to add there
       plane ! Contact(groundControl)
 
     //The plane has left the runway
     case HasLeft =>
-      val plane = sender
+      val plane = sender()
     //It's now free to accept a new plane
     //and if the actor has stashed request
     //it's time to reply to  them

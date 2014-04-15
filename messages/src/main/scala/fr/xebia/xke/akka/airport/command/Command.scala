@@ -10,7 +10,7 @@ case class Land(runway: ActorRef) extends Command {
 }
 
 case class Contact(target: ActorRef) extends Command {
-  override def toString = s"Contact ${target.path.name}"
+  override def toString = s"Contact"
 }
 
 case class Taxi(taxiway: ActorRef) extends Command {
@@ -26,3 +26,5 @@ case class Takeoff(destination: ActorRef) extends Command {
 }
 
 case object Ack
+
+case object Repeat

@@ -2,176 +2,214 @@ package controllers
 
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.mvc._
-import play.api.templates.HtmlFormat
 import fr.xebia.xke.akka.infrastructure._
 import fr.xebia.xke.akka.game._
 import akka.util.Timeout
 import language.postfixOps
 import concurrent.duration._
 import akka.pattern.ask
-import scala.concurrent.Await
-import akka.actor.{ActorRef, Address}
+import scala.concurrent.{Future, Await}
+import akka.actor.ActorRef
 import fr.xebia.xke.akka.plane._
-import play.api.libs.json.Json
-import fr.xebia.xke.akka.game.GameStore.Ask
 import fr.xebia.xke.akka.game.GameStore.GameCreated
-import fr.xebia.xke.akka.game.PlayerUp
-import scala.Some
 import fr.xebia.xke.akka.game.GameStore.StartGame
-import fr.xebia.xke.akka.infrastructure.SessionInfo
-import fr.xebia.xke.akka.infrastructure.cluster.{AirportProxy, AirportLocator}
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
+import fr.xebia.xke.akka.airport.{Airport, AirportCode}
+import akka.event.EventStream
 
 object Application extends Controller with PlayerSessionManagement {
 
-  val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(), "gameStore")
+  val clusterEventStream = new EventStream()
 
-  val airportsClusterLocation: ActorRef = airportActorSystem.actorOf(AirportLocator.props(sessionStore, gameStore), "airports")
+  val airportsClusterLocation: ActorRef = airportActorSystem.actorOf(AirportLocator.props(clusterEventStream), "airportsClusterLocation")
 
-  def level0(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
-        val settings = Settings(
-          nrOfRunways = 1,
-          landingMaxDuration = 1500,
-          planeGenerationInterval = 3000,
-          objective = 100,
-          ackMaxDuration = 1000)
+  val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(airportsClusterLocation, clusterEventStream), "gameStore")
 
-        newSinglePlayerGame(sessionId)(settings, views.html.level_0(settings, userInfo), classOf[JustLandingPlane])
+  def createLevel0(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 1,
+      landingMaxDuration = 1500,
+      planeGenerationInterval = 3000,
+      objective = 20,
+      ackMaxDuration = 1000)
+
+    newSinglePlayerGame(airportCode, settings, classOf[JustLandingPlane]) {
+      gameContext => routes.Application.level0(airportCode, gameContext.sessionId)
+    }
   }
 
-  def level1(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
+  def createLevel1(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 2,
+      landingMaxDuration = 1500,
+      planeGenerationInterval = 1250,
+      objective = 20,
+      ackMaxDuration = 1000)
 
-        val settings = Settings(
-          nrOfRunways = 2,
-          landingMaxDuration = 1500,
-          planeGenerationInterval = 1250,
-          objective = 20,
-          ackMaxDuration = 1000)
-
-        newSinglePlayerGame(sessionId)(settings, views.html.level_1(settings, userInfo), classOf[JustLandingPlane])
+    newSinglePlayerGame(airportCode, settings, classOf[JustLandingPlane]) {
+      gameContext => routes.Application.level1(airportCode, gameContext.sessionId)
+    }
   }
 
-  def level2(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
-
-        val settings = Settings(
-          nrOfRunways = 4,
-          landingMaxDuration = 2500,
-          planeGenerationInterval = 500,
-          objective = 50,
-          ackMaxDuration = 1000)
-
-        newSinglePlayerGame(sessionId)(settings, views.html.level_2(settings, userInfo), classOf[JustLandingPlane])
+  def createLevel2(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      ackMaxDuration = 1000)
+    newSinglePlayerGame(airportCode, settings, classOf[JustLandingPlane]) {
+      gameContext => routes.Application.level2(airportCode, gameContext.sessionId)
+    }
   }
 
-  def level3(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
+  def createLevel3(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      nrOfTaxiways = 1,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 5,
+      ackMaxDuration = 1000)
 
-        val settings = Settings(
-          nrOfRunways = 4,
-          landingMaxDuration = 2500,
-          planeGenerationInterval = 500,
-          objective = 50,
-          nrOfTaxiways = 1,
-          taxiingDuration = 1000,
-          taxiwayCapacity = 5,
-          ackMaxDuration = 1000)
-
-        newSinglePlayerGame(sessionId)(settings, views.html.level_3(settings, userInfo), classOf[JustTaxiingPlane])
+    newSinglePlayerGame(airportCode, settings, classOf[JustTaxiingPlane]) {
+      gameContext => routes.Application.level3(airportCode, gameContext.sessionId)
+    }
   }
 
-  def level4(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
+  def createLevel4(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      nrOfTaxiways = 2,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 10,
+      nrOfGates = 2,
+      unloadingPassengersMaxDuration = 5000,
+      ackMaxDuration = 1000)
 
-        val settings = Settings(
-          nrOfRunways = 4,
-          landingMaxDuration = 2500,
-          planeGenerationInterval = 500,
-          objective = 50,
-          nrOfTaxiways = 2,
-          taxiingDuration = 1000,
-          taxiwayCapacity = 10,
-          nrOfGates = 2,
-          unloadingPassengersMaxDuration = 5000,
-          ackMaxDuration = 1000)
-
-        newSinglePlayerGame(sessionId)(settings, views.html.level_4(settings, userInfo), classOf[JustParkingPlane])
+    newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
+      gameContext => routes.Application.level4(airportCode, gameContext.sessionId)
+    }
   }
 
-  def level5(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
-
-        val settings = Settings(
-          nrOfRunways = 4,
-          landingMaxDuration = 2500,
-          planeGenerationInterval = 500,
-          objective = 50,
-          nrOfTaxiways = 2,
-          taxiingDuration = 1000,
-          taxiwayCapacity = 10,
-          nrOfGates = 2,
-          unloadingPassengersMaxDuration = 5000,
-          ackMaxDuration = 1000,
-          radioReliability = 0.8)
-        newSinglePlayerGame(sessionId)(settings, views.html.level_5(settings, userInfo), classOf[JustParkingPlane])
+  def createLevel5(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      nrOfTaxiways = 2,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 10,
+      nrOfGates = 2,
+      unloadingPassengersMaxDuration = 5000,
+      ackMaxDuration = 1000,
+      radioReliability = 0.8)
+    newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
+      gameContext => routes.Application.level5(airportCode, gameContext.sessionId)
+    }
   }
 
-  def level6(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      implicit request =>
-
-        val settings = Settings(
-          nrOfRunways = 4,
-          landingMaxDuration = 2500,
-          planeGenerationInterval = 250,
-          objective = 100,
-          nrOfTaxiways = 3,
-          taxiingDuration = 1000,
-          taxiwayCapacity = 10,
-          nrOfGates = 4,
-          unloadingPassengersMaxDuration = 5000,
-          ackMaxDuration = 1000,
-          radioReliability = 0.8)
-        newMultiplayerGame(sessionId)(settings, views.html.level_6(settings, userInfo), classOf[MultiAirportPlane])
+  def createLevel6(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 250,
+      objective = 100,
+      nrOfTaxiways = 3,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 10,
+      nrOfGates = 4,
+      unloadingPassengersMaxDuration = 5000,
+      ackMaxDuration = 1000,
+      radioReliability = 0.8,
+      chaosMonkey = true)
+    newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
+      gameContext => routes.Application.level6(airportCode, gameContext.sessionId)
+    }
   }
 
-  def multiplayerWithoutUser = multiplayer(None)
+  def level0(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
 
-  def multiplayerWithUser(sessionId: SessionId) = multiplayer(Some(sessionId))
-
-  def multiplayer(sessionId: Option[SessionId]) = Action {
-    val userInfo: Option[SessionInfo] = sessionId.flatMap(session => currentSessionInfo(session))
-    Ok(views.html.multiplayer(userInfo.map(_.airport)))
+      gameContext match {
+        case Some(context) => Ok(views.html.level_0(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
   }
 
-  def scores = Action {
-    val airportScores = airports.take(10).zipWithIndex.map {
-      case (airport, index) => AirportScore(
-        airport.code,
-        airport.latitude.toDouble,
-        airport.longitude.toDouble,
-        (index + 20) / 1000d)
-    }.toSeq
+  def level1(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
 
-    Ok(Json.toJson(AirportScores(airportScores)))
+      gameContext match {
+        case Some(context) => Ok(views.html.level_1(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
   }
 
-  def events(sessionId: SessionId) = WebSocket.async[String] {
+  def level2(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
+
+      gameContext match {
+        case Some(context) => Ok(views.html.level_2(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
+  }
+
+  def level3(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
+
+      gameContext match {
+        case Some(context) => Ok(views.html.level_3(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
+  }
+
+  def level4(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
+
+      gameContext match {
+        case Some(context) => Ok(views.html.level_4(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
+  }
+
+  def level5(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
+
+      gameContext match {
+        case Some(context) => Ok(views.html.level_5(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
+  }
+
+  def level6(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
+
+      gameContext match {
+        case Some(context) => Ok(views.html.level_6(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
+  }
+
+  def events(airportCode: AirportCode, sessionId: SessionId) = WebSocket.tryAccept[String] {
     _ =>
-
-      val userInfo = currentSessionInfo(sessionId).get
-      // Log events to the console
 
       import scala.concurrent.ExecutionContext.Implicits.global
 
-      val contextReply = ask(gameStore, Ask(userInfo.sessionId)).mapTo[Option[GameContext]]
+      val contextReply = ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]]
 
       for {
         context <- contextReply
@@ -181,13 +219,7 @@ object Application extends Controller with PlayerSessionManagement {
 
         val in = Iteratee.foreach[String] {
           case "start" if !started =>
-            val proxyReply = ask(airportsClusterLocation, AirportLocator.AskAirportAddressLookup(userInfo.airportCode)).mapTo[Option[AirportProxy]]
-
-            for (proxy <- proxyReply) {
-
-              val info = currentSessionInfo(sessionId).get
-              gameStore ! StartGame(info, proxy.get.airTrafficControl, proxy.get.groundControl)
-            }
+            gameStore ! StartGame(sessionId)
 
             started = true
         }
@@ -196,52 +228,31 @@ object Application extends Controller with PlayerSessionManagement {
           _ => ask(context.get.listener, DequeueEvents)(Timeout(10 minutes)).mapTo[Option[String]]
         }
 
-        (in, out)
+        Right(in, out)
       }
   }
 
-  private def newSinglePlayerGame(sessionId: SessionId)(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {
+  private def newSinglePlayerGame(airportCode: AirportCode, settings: Settings, planeType: Class[_ <: Plane])(template: (GameContext => play.api.mvc.Call)) = {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    for (userInfo <- currentSessionInfo(sessionId)) {
-      val gameCreation = ask(gameStore, GameStore.NewGame(userInfo, settings, planeType)).mapTo[GameCreated]
-
-      gameCreation.onSuccess {
-        case GameCreated(gameContext) =>
-          val proxyLookup = ask(airportsClusterLocation, AirportLocator.AskAirportAddressLookup(userInfo.airportCode)).mapTo[Option[AirportProxy]]
-          proxyLookup.onSuccess {
-            case Some(proxy) =>
-              gameContext.eventBus.publish(PlayerUp(userInfo.sessionId, proxy.address))
-          }
-      }
-
-      Await.result(gameCreation, atMost = 10.seconds)
-
-
+    def checkAirportRegistration = {
+      ask(airportStore, AirportStore.IsRegistered(airportCode)).mapTo[Option[Airport]]
     }
-    Ok(template)
-  }
 
-  private def newMultiplayerGame(sessionId: SessionId)(settings: Settings, template: HtmlFormat.Appendable, planeType: Class[_ <: Plane]) = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-
-    for (userInfo <- currentSessionInfo(sessionId)) {
-      val gameCreation = ask(gameStore, GameStore.NewGame(userInfo, settings, planeType)).mapTo[GameCreated]
-
-      gameCreation.onSuccess {
-        case GameCreated(gameContext) =>
-          val addressLookup = ask(airportsClusterLocation, AirportLocator.AskAirportAddressLookup(userInfo.airportCode)).mapTo[Option[Address]]
-          addressLookup.onSuccess {
-            case Some(address) =>
-              gameContext.eventBus.publish(PlayerUp(userInfo.sessionId, address))
-          }
-      }
-
-      Await.result(gameCreation, atMost = 10.seconds)
-
-
+    def askGameCreation(airport: Airport) = {
+      ask(gameStore, GameStore.NewGame(airport, settings, planeType)).mapTo[GameCreated]
     }
-    Ok(template)
+
+    val gameCreation: Future[GameContext] = for {
+      airportRegistered <- checkAirportRegistration if airportRegistered.isDefined
+      gameCreated <- askGameCreation(airportRegistered.get)
+    } yield {
+      gameCreated.gameContext
+    }
+
+    val gameContext = Await.result(gameCreation, atMost = 10.seconds)
+
+    Redirect(template(gameContext))
   }
 
 }

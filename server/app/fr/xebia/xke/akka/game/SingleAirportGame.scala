@@ -15,28 +15,43 @@ import fr.xebia.xke.akka.airport.InitAirTrafficControl
 import fr.xebia.xke.akka.game.SinglePlayerGame.NewPlane
 import fr.xebia.xke.akka.plane.event.PlaneStatus
 import fr.xebia.xke.akka.airport.command.Contact
+import akka.pattern.ask
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
+import fr.xebia.xke.akka.infrastructure.SessionId
+import akka.util.Timeout
+import akka.cluster.Cluster
 
-class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStream: EventStream, airport: Airport) extends Actor with ActorLogging {
+case class SinglePlayerGame(
+                             sessionId: SessionId,
+                             settings: Settings,
+                             planeType: Class[_ <: Plane],
+                             gameEventStream: EventStream,
+                             airport: Airport,
+                             airportClusterLocation: ActorRef) extends Actor with ActorLogging {
 
   import settings._
 
-  val runways: Seq[ActorRef] =
-    for (i <- 1 to nrOfRunways)
+  val runways: Set[ActorRef] =
+    for (i <- (1 to nrOfRunways).toSet[Int])
     yield context.actorOf(Runway.props(), s"runway-$i")
 
-  val taxiways: Seq[ActorRef] =
-    for (i <- 1 to nrOfTaxiways)
+  val taxiways: Set[ActorRef] =
+    for (i <- (1 to nrOfTaxiways).toSet[Int])
     yield context.actorOf(Taxiway.props(settings), s"taxiway-$i")
 
-  val gates: Seq[ActorRef] =
-    for (i <- 1 to nrOfGates)
+  val gates: Set[ActorRef] =
+    for (i <- (1 to nrOfGates).toSet[Int])
     yield context.actorOf(Gate.props(), s"gate-$i")
 
   var planeGeneration: Cancellable = null
 
   var score = 0
 
-  var planesToGenerate: Int = settings.objective / 2
+  var planesToGenerate: Int = totalPlanes
+
+  def totalPlanes: Int = settings.objective / 2
+
+  var isAirportConnected = true
 
   override def preStart() {
     runways.foreach(context.watch)
@@ -51,12 +66,13 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
   def receive = idle
 
   def idle: Receive = {
-    case InitGame(airTrafficControl, groundControl) =>
+    case SinglePlayerGame.InitGame(airTrafficControl, groundControl) =>
 
       airTrafficControl ! InitAirTrafficControl(groundControl, runways, settings.ackMaxDuration)
       groundControl ! InitGroundControl(taxiways, gates, taxiwayCapacity, settings.ackMaxDuration)
 
       context become waitingForTheGameReady(airTrafficControl, false, groundControl, false)
+
   }
 
   def waitingForTheGameReady(airTrafficControl: ActorRef, airTrafficControlReady: Boolean, groundControl: ActorRef, groundControlReady: Boolean): Receive = {
@@ -88,6 +104,12 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
     case PlaneStatus(_, _, _, error) if error.nonEmpty =>
       loose()
 
+    case PlayerUp(_) =>
+      isAirportConnected = true
+
+    case PlayerDown(_) =>
+      isAirportConnected = false
+
     case Terminated(_) =>
       gameEventStream.publish(GameOver)
       context stop self
@@ -98,7 +120,7 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
 
       val planeEventStream = new EventStream()
 
-      val plane = context.actorOf(Props(planeType, airTrafficControl, self, settings, planeEventStream), s"${anArrivalFlight.airline}-${Random.nextLong() % 100000}")
+      val plane = context.actorOf(Props(planeType, settings, planeEventStream), s"${anArrivalFlight.airline}-${Random.nextLong() % 100000}")
       val listener = context.actorOf(PlaneListener.props(plane, gameEventStream))
 
       planeEventStream.subscribe(listener, classOf[Any])
@@ -106,6 +128,12 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
       plane.tell(Contact(airTrafficControl), airTrafficControl)
 
       planesToGenerate -= 1
+
+
+      if (settings.chaosMonkey && planesToGenerate == (totalPlanes / 2)) {
+        log.warning("Oh no, a chaos monkey is coming and shut you down!")
+        airportClusterLocation ! AirportLocator.KillClient(airport.code)
+      }
   }
 
   private def publishScore() {
@@ -137,11 +165,21 @@ class SinglePlayerGame(settings: Settings, planeType: Class[Plane], gameEventStr
 
 object SinglePlayerGame {
 
-  def props(settings: Settings, planeType: Class[_ <: Plane], gameEventStream: EventStream, airport: Airport): Props =
-    Props(classOf[SinglePlayerGame], settings, planeType, gameEventStream, airport)
+  def props(
+             sessionId: SessionId,
+             settings: Settings,
+             planeType: Class[_ <: Plane],
+             gameEventStream: EventStream,
+             airport: Airport,
+             airportClusterLocation: ActorRef): Props =
+    Props(new SinglePlayerGame(sessionId, settings, planeType, gameEventStream, airport, airportClusterLocation))
 
   case object NewPlane
 
   case class ErrorInGame(cause: String) extends Exception(cause)
+
+  case class InitGame(airTrafficControl: ActorRef, groundControl: ActorRef)
+
+  case class GameInitialized(airTrafficControl: ActorRef, groundControl: ActorRef) extends GameEvent
 
 }

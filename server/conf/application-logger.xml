@@ -1,6 +1,6 @@
-<configuration  scan="true" scanPeriod="5 seconds">
+<configuration scan="true" scanPeriod="5 seconds">
 
-    <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -8,18 +8,18 @@
         </encoder>
     </appender>
 
-    <logger name="akka" level="WARN" />
-    <logger name="akka.cluster" level="ERROR" />
-    <logger name="akka.remote" level="ERROR" />
-    <logger name="akka.event" level="ERROR" />
-    <logger name="akka.serialization" level="ERROR" />
+    <logger name="akka" level="WARN"/>
+    <logger name="akka.cluster" level="ERROR"/>
+    <logger name="akka.remote" level="ERROR"/>
+    <logger name="akka.event" level="ERROR"/>
+    <logger name="akka.serialization" level="ERROR"/>
 
-    <logger name="play" level="INFO" />
-    <logger name="application" level="INFO" />
-    <logger name="fr.xebia" level="INFO" />
+    <logger name="play" level="INFO"/>
+    <logger name="application" level="INFO"/>
+    <logger name="fr.xebia.xke.akka.infrastructure.cluster" level="INFO"/>
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
     </root>
 
 </configuration>

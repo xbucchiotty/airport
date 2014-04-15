@@ -8,12 +8,9 @@ import scala.concurrent.duration._
 import language.postfixOps
 import akka.util.Timeout
 import fr.xebia.xke.akka.infrastructure._
-import fr.xebia.xke.akka.infrastructure.SessionStore.Ask
-import fr.xebia.xke.akka.infrastructure.SessionStore.Register
-import fr.xebia.xke.akka.infrastructure.SessionStore.Registered
-import scala.Some
-import fr.xebia.xke.akka.infrastructure.SessionInfo
-import fr.xebia.xke.akka.airport.Airport
+import fr.xebia.xke.akka.infrastructure.AirportStore.Register
+import fr.xebia.xke.akka.infrastructure.AirportStore.Registered
+import fr.xebia.xke.akka.airport.{AirportCode, Airport}
 
 trait PlayerSessionManagement {
 
@@ -27,46 +24,38 @@ trait PlayerSessionManagement {
 
   val airportActorSystem: ActorSystem = ActorSystem.create("airportSystem")
 
-  val sessionStore: ActorRef = airportActorSystem.actorOf(SessionStore.props(airports), "sessionStore")
+  val airportStore: ActorRef = airportActorSystem.actorOf(AirportStore.props(airports), "airportStore")
 
-  def currentSessionInfo(sessionId: SessionId): Option[SessionInfo] =
+  def checkAirport(airportCode: AirportCode): Option[Airport] =
     Await.result(
-      ask(sessionStore, Ask(sessionId)).mapTo[Option[SessionInfo]], atMost = 10.seconds)
+      ask(airportStore, AirportStore.IsRegistered(airportCode)).mapTo[Option[Airport]], atMost = 10.seconds)
 
-  def LoggedInAction(sessionId: SessionId)(securedAction: (SessionInfo => play.api.mvc.Request[_] => play.api.mvc.SimpleResult)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
+
+  def LoggedInAction(airportCode: AirportCode)(securedAction: (play.api.mvc.Request[_] => play.api.mvc.Result)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
     implicit request =>
-      currentSessionInfo(sessionId) match {
-
-        case Some(userInfo) =>
-          securedAction(userInfo)(request)
-
+      checkAirport(airportCode) match {
+        case Some(airport) =>
+          securedAction(request)
         case None =>
-          Redirect(routes.Application.index)
+          Redirect(routes.Application.displayRegisterPage)
       }
   }
 
-  def displayRegisterPage = Action {
-    Ok(views.html.register(None))
-  }
-
   def register = Action {
-    val sessionId = SessionId()
-
-    val registration = ask(sessionStore, Register(sessionId)).mapTo[Registered]
+    val registration = ask(airportStore, Register).mapTo[Registered]
 
     Await.result(registration.map {
-      case _ => Redirect(routes.Application.registered(sessionId))
+      case Registered(airport) => Redirect(routes.Application.registered(airport.code))
     }, atMost = 10.seconds)
 
   }
 
-  def registered(sessionId: SessionId) = LoggedInAction(sessionId) {
-    userInfo =>
-      _ =>
-        Ok(views.html.registered(userInfo))
+  def registered(airportCode: AirportCode) = LoggedInAction(airportCode) {
+    _ =>
+      Ok(views.html.registered(airports.find(_.code == airportCode).get))
   }
 
-  def index = Action {
-    Redirect(routes.Application.displayRegisterPage)
+  def displayRegisterPage = Action {
+    Ok(views.html.register(None))
   }
 }

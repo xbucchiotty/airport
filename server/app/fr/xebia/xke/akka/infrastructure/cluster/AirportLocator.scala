@@ -7,120 +7,149 @@ import akka.pattern.ask
 import language.postfixOps
 import concurrent.duration._
 import akka.util.Timeout
+import fr.xebia.xke.akka.airport.{ChaosMonkey, AirportCode, NewGameInstance, GameInstance}
+import fr.xebia.xke.akka.infrastructure.SessionId
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator._
+import akka.event.EventStream
 import akka.cluster.ClusterEvent.MemberUp
-import scala.Some
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator.CreateClient
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator.UpdateClient
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator.AirportDisconnected
 import akka.cluster.ClusterEvent.CurrentClusterState
 import akka.cluster.ClusterEvent.UnreachableMember
-import fr.xebia.xke.akka.game.{PlayerDown, PlayerUp}
-import fr.xebia.xke.akka.airport.AirportCode
-import fr.xebia.xke.akka.infrastructure.{SessionInfo, SessionStore}
-import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator.AskAirportAddressLookup
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator.AirportConnected
 
-class AirportLocator(sessionStore: ActorRef, gameStore: ActorRef) extends Actor with ActorLogging {
+class AirportLocator(clusterEventStream: EventStream) extends Actor with ActorLogging {
 
-  var table: Map[AirportCode, AirportProxy] = _
+  var airportLocations: Map[AirportCode, Address] = _
+  var gameSessions: Map[SessionId, AirportProxy] = _
 
   override def preStart() {
     Cluster(context.system).subscribe(self, classOf[ClusterDomainEvent])
-    table = Map.empty
+    airportLocations = Map.empty
+    gameSessions = Map.empty
   }
 
   def receive: Receive = {
     case state: CurrentClusterState =>
       state.members
         .filter(_.status == MemberStatus.Up)
-        .filter(memberIsPlayer)
         .foreach(register)
 
-    case MemberUp(member) if memberIsPlayer(member) =>
+    case MemberUp(member) =>
       register(member)
 
-    case UnreachableMember(member) if memberIsPlayer(member) =>
+    case UnreachableMember(member) =>
       unregister(member)
 
-    case AskAirportAddressLookup(airportCode) =>
-      sender ! table.get(airportCode)
+    case CreateClient(airportCode, sessionId) =>
+      createClient(airportCode, sessionId)
+
+    case UpdateClient(airportCode, sessionId, address) =>
+      updateClient(airportCode, sessionId, address)
+
+    case AskAddress(airportCode) =>
+      sender() ! airportLocations.get(airportCode)
+
+    case KillClient(airportCode) =>
+      killClient(airportCode)
+  }
+
+  def killClient(airportCode: AirportCode) {
+    for (airportAddress <- airportLocations.get(airportCode)) {
+      val airportManager = context.actorSelection(ActorPath.fromString(airportAddress.toString) / "user" / airportCode.toString)
+      airportManager ! ChaosMonkey
+    }
+  }
+
+  def createClient(airportCode: AirportCode, sessionId: SessionId) {
+    import context.dispatcher
+    implicit val timeout: Timeout = Timeout(10 seconds)
+
+    for (address <- airportLocations.get(airportCode)) {
+      val airportManager = context.actorSelection(ActorPath.fromString(address.toString) / "user" / airportCode.toString)
+
+      val lastSender = sender()
+      for (gameInstance <- ask(airportManager, NewGameInstance(sessionId.toString)).mapTo[GameInstance]) {
+
+        val atcProxy = context.actorOf(RemoteProxy.props(gameInstance.airTrafficControlRef), s"$airportCode-$sessionId-airTrafficControl")
+        val gcProxy = context.actorOf(RemoteProxy.props(gameInstance.groundControlRef), s"$airportCode-$sessionId-groundControl")
+
+        gameSessions += (sessionId -> AirportProxy(address, atcProxy, gcProxy))
+
+        lastSender ! ((atcProxy, gcProxy))
+      }
+    }
+  }
+
+  def updateClient(airportCode: AirportCode, sessionId: SessionId, address: Address) {
+    import context.dispatcher
+    implicit val timeout: Timeout = Timeout(10 seconds)
+
+    val airportManager = context.actorSelection(ActorPath.fromString(address.toString) / "user" / airportCode.toString)
+
+    for (gameInstance <- ask(airportManager, NewGameInstance(sessionId.toString)).mapTo[GameInstance]) {
+
+      for (gameSession <- gameSessions.get(sessionId)) {
+        gameSession.airTrafficControl ! RemoteProxy.Register(gameInstance.airTrafficControlRef)
+        gameSession.groundControl ! RemoteProxy.Register(gameInstance.groundControlRef)
+
+      }
+    }
   }
 
   def register(member: Member) {
-    import context.dispatcher
-    implicit val timeout = Timeout(1.second)
 
-    (member.roles - "player")
-      .map(AirportCode)
-      .filter(_.code.nonEmpty)
-      .foreach(airportCode => {
-      log.info(s"player <$member> comes in for <$airportCode>")
+    for (role <- member.roles if role.nonEmpty) {
+      val airportCode = AirportCode(role)
 
-      val (airTrafficControlProxy, groundControlProxy) =
-        if (table.isDefinedAt(airportCode)) {
+      clusterEventStream.publish(AirportConnected(airportCode, member.address))
 
-          log.info(s"Redirecting proxy for <$airportCode> to <$member.address>")
+      log.info(s"<$member> comes in for <$airportCode>")
 
-          val proxy = table(airportCode)
-
-          proxy.airTrafficControl ! RemoteProxy.Register(airTrafficControlPath)
-          proxy.groundControl ! RemoteProxy.Register(groundControlPath)
-
-          (proxy.airTrafficControl, proxy.groundControl)
-        } else {
-
-          log.info(s"Start proxy from <${self.path}> to <$member.address>")
-
-          (context.actorOf(RemoteProxy.props(airTrafficControlPath), s"$airportCode-airTrafficControl"),
-            context.actorOf(RemoteProxy.props(groundControlPath), s"$airportCode-groundControl"))
-        }
-
-      table += (airportCode -> AirportProxy(member.address, airTrafficControlProxy, groundControlProxy))
-
-      val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[SessionInfo]]
-
-      userInfoRequest.onSuccess {
-        case Some(userInfo) => gameStore ! PlayerUp(userInfo.sessionId, member.address)
+      if (airportLocations.isDefinedAt(airportCode)) {
+        log.info(s"Redirecting proxy for <$airportCode> to <${member.address}>")
+      } else {
+        log.info(s"Start proxy to <${member.address}>")
       }
-    })
 
-    def groundControlPath: ActorSelection = {
-      context.actorSelection(ActorPath.fromString(member.address.toString) / "user" / "airport" / "groundControl")
-    }
-
-    def airTrafficControlPath: ActorSelection = {
-      context.actorSelection(ActorPath.fromString(member.address.toString) / "user" / "airport" / "airTrafficControl")
+      airportLocations += (airportCode -> member.address)
     }
   }
 
   def unregister(member: Member) {
-    implicit val timeout = Timeout(1.second)
+    implicit val timeout: Timeout = Timeout(10.seconds)
 
-    log.warning(s"player $member moved out")
+    log.warning(s"$member moved out")
 
-    member.roles - "player" map AirportCode foreach (airportCode => {
-      val proxy = table(airportCode)
-
-      if (proxy.address == member.address) {
-        proxy.airTrafficControl ! RemoteProxy.Unregister
-        proxy.groundControl ! RemoteProxy.Unregister
-
-        import context.dispatcher
-        implicit val timeout = Timeout(10 seconds)
-        val userInfoRequest = ask(sessionStore, SessionStore.AskForAirport(airportCode)).mapTo[Option[SessionInfo]]
-
-        userInfoRequest.onSuccess {
-          case Some(userInfo) => gameStore ! PlayerDown(userInfo.sessionId, member.address)
-        }
-      }
-
-    })
+    for {
+      role <- member.roles if role.nonEmpty
+      airportCode = AirportCode(role)
+      currentAddress <- airportLocations.get(airportCode) if currentAddress == member.address
+    } {
+      clusterEventStream.publish(AirportDisconnected(airportCode, member.address))
+      airportLocations -= airportCode
+    }
   }
 
-  def memberIsPlayer(member: Member) = member.roles.contains("player")
+  def memberIsPlayer(member: Member) = member.roles.nonEmpty
 }
 
 object AirportLocator {
 
-  def props(sessionStore: ActorRef, gameStore: ActorRef): Props = Props(classOf[AirportLocator], sessionStore, gameStore)
+  def props(clusterEventStream: EventStream): Props = Props(classOf[AirportLocator], clusterEventStream)
 
-  case class AskAirportAddressLookup(airportCode: AirportCode)
+  case class CreateClient(airportCode: AirportCode, sessionId: SessionId)
+
+  case class UpdateClient(airportCode: AirportCode, sessionId: SessionId, address: Address)
+
+  case class AirportConnected(airportCode: AirportCode, address: Address)
+
+  case class AirportDisconnected(airportCode: AirportCode, address: Address)
+
+  case class AskAddress(airportCode: AirportCode)
+
+  case class KillClient(airportCode: AirportCode)
 
 }
 

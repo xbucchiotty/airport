@@ -6,40 +6,41 @@ import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.command.{Ack, Land}
 import language.postfixOps
-import org.scalatest.{ShouldMatchers, GivenWhenThen, FunSpec}
+import org.scalatest.{BeforeAndAfterEach, OneInstancePerTest, ShouldMatchers, GivenWhenThen, FunSpec}
 import com.typesafe.config.ConfigFactory
 
-class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers {
+class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterEach {
 
   describe("An air traffic control") {
 
     it("can be initialized") {
-      implicit val system = testActorSystem()
       val runway = TestProbe()
-      val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref), "airTrafficControl")
+      val groundControl = TestProbe()
+      val airTrafficControl = system.actorOf(Props[AirTrafficControl], "airTrafficControl")
 
       val game = TestProbe()
-      game.send(airTrafficControl, InitAirTrafficControl(Seq(runway.ref), 100))
+      game.send(airTrafficControl, InitAirTrafficControl(groundControl.ref, Set(runway.ref), 100))
 
       game expectMsg AirTrafficControlReady
     }
 
     it("can be restarted") {
-      implicit val system = testActorSystem()
       val runway = TestProbe()
-      val airTrafficControl = initializedAirTrafficControl(Seq(runway.ref), 100)
+      val groundControl = TestProbe()
+      val airTrafficControl = initializedAirTrafficControl(groundControl.ref, Set(runway.ref), 100)
 
       val game = TestProbe()
-      game.send(airTrafficControl, InitAirTrafficControl(Seq(runway.ref), 100))
+      game.send(airTrafficControl, InitAirTrafficControl(groundControl.ref, Set(runway.ref), 100))
       game expectMsg AirTrafficControlReady
     }
 
     it("should tell the plane to land when there is a free runway") {
+      pending
 
       Given("an air traffic control with 1 runway")
-      implicit val system = testActorSystem()
       val runway = TestProbe()
-      val airTrafficControl = initializedAirTrafficControl(Seq(runway.ref), 100)
+      val groundControl = TestProbe()
+      val airTrafficControl = initializedAirTrafficControl(groundControl.ref, Set(runway.ref), 100)
 
       When("a new plane incomes")
       val plane = TestProbe()
@@ -54,10 +55,10 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       pending
 
       Given("an air traffic control with 2 runways")
-      implicit val system = testActorSystem()
       val runway1 = TestProbe()
       val runway2 = TestProbe()
-      val airTrafficControl = initializedAirTrafficControl( Seq(runway1.ref, runway2.ref), 100)
+      val groundControl = TestProbe()
+      val airTrafficControl = initializedAirTrafficControl(groundControl.ref, Set(runway1.ref, runway2.ref), 100)
 
       When("a new 2 planes income")
       val plane1 = TestProbe()
@@ -82,10 +83,10 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       pending
 
       Given("an air traffic control with 1 runway")
-      implicit val system = testActorSystem()
       val runway = TestProbe()
+      val groundControl = TestProbe()
 
-      val airTrafficControl = initializedAirTrafficControl( Seq(runway.ref), 100)
+      val airTrafficControl = initializedAirTrafficControl(groundControl.ref, Set(runway.ref), 100)
 
       Given("a first plane has landed on the runway")
       val firstPlane = TestProbe()
@@ -111,11 +112,10 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
 
     it("should repeat message until it's successfully received") {
       pending
-
       Given("an air traffic control with 1 runway")
-      implicit val system = testActorSystem()
       val runway = TestProbe()
-      val airTrafficControl = initializedAirTrafficControl( Seq(runway.ref), 100)
+      val groundControl = TestProbe()
+      val airTrafficControl = initializedAirTrafficControl(groundControl.ref, Set(runway.ref), 100)
 
       When("when a new plane incomes")
       val plane = TestProbe()
@@ -132,17 +132,26 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
     }
   }
 
+  implicit var system: ActorSystem = _
 
-  def initializedAirTrafficControl(runways: Seq[ActorRef], ackMaxTimout: Int)(implicit system: ActorSystem): ActorRef = {
-    val airTrafficControl = system.actorOf(Props(classOf[AirTrafficControl], TestProbe().ref), "airTrafficControl")
+  override protected def afterEach(): Unit = {
+    system.shutdown()
+    system.awaitTermination()
+  }
+
+  override protected def beforeEach(): Unit = {
+    system = {
+      ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+    }
+  }
+
+  def initializedAirTrafficControl(groundControl: ActorRef, runways: Set[ActorRef], ackMaxTimout: Int)(implicit system: ActorSystem): ActorRef = {
+    val airTrafficControl = system.actorOf(Props[AirTrafficControl], "airTrafficControl")
     val game = TestProbe()
-    game.send(airTrafficControl, InitAirTrafficControl(runways, ackMaxTimout))
+    game.send(airTrafficControl, InitAirTrafficControl(groundControl, runways, ackMaxTimout))
     game expectMsg AirTrafficControlReady
 
     airTrafficControl
   }
 
-  def testActorSystem(): ActorSystem = {
-    ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
   }
-}

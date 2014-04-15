@@ -7,7 +7,7 @@ class Gate extends Actor with ActorLogging {
 
   def free: Receive = {
     case HasParked =>
-      val plane = sender
+      val plane = sender()
       log.debug("Plane <{}> parked on gate <{}>", plane.path.name, self.path.name)
 
       context become occupied(plane)
@@ -15,7 +15,7 @@ class Gate extends Actor with ActorLogging {
 
   def occupied(plane: ActorRef): Receive = {
     case HasParked => {
-      val newPlane = sender
+      val newPlane = sender()
 
       plane ! Collision(newPlane, self)
       newPlane ! Collision(plane, self)
@@ -24,7 +24,7 @@ class Gate extends Actor with ActorLogging {
       context stop self
     }
 
-    case HasLeft if sender == plane => {
+    case HasLeft if sender() == plane => {
       log.debug("Plane <{}> leaves gate <{}>", plane.path.name, self.path.name)
       context become free
     }

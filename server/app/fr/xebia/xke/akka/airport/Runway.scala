@@ -8,13 +8,13 @@ class Runway extends Actor with ActorLogging {
   val free: Receive = {
 
     case HasLanded =>
-      val plane = sender
+      val plane = sender()
       log.debug("Plane <{}> landed on runway <{}>", plane.path.name, self.path.name)
 
       context become occupied(plane)
 
     case HasLeft =>
-      val plane = sender
+      val plane = sender()
       log.debug("Runway {} free but plane {} has left", self.path.name, plane.path.name)
 
       context stop self
@@ -23,14 +23,14 @@ class Runway extends Actor with ActorLogging {
 
   def occupied(staying: ActorRef): Receive = {
 
-    case HasLeft if sender == staying =>
-      val plane = sender
+    case HasLeft if sender() == staying =>
+      val plane = sender()
       log.debug("Plane <{}> has left runway <{}>", plane.path.name, self.path.name)
 
       context become free
 
     case HasLanded =>
-      val other = sender
+      val other = sender()
 
       staying ! Collision(other, self)
       other ! Collision(staying, self)
