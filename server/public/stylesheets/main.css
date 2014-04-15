@@ -95,3 +95,6 @@ table > thead tr .header {
 .playerDown{
     color: rgba(255, 0, 0, 0.4);
 }
+.navbar .nav li .btn-link{
+    color: #777;
+}

@@ -1,4 +1,4 @@
-@(title: String)(level:Int)(airport:Option[fr.xebia.xke.akka.airport.Airport])(content: Html)
+@(title: String)(level:Int, restartRoute:Option[play.api.mvc.Call]=None)(airport:Option[fr.xebia.xke.akka.airport.Airport])(content: Html)
 <!DOCTYPE html>
 
 <html lang="en">
@@ -67,6 +67,19 @@
             <div class="brand">@airport.map(airport => airport.code + ": " + airport.city).getOrElse("Devoxx International Airport")</div>
             <ul class="nav">
                 <li><a href="@routes.Application.displayRegisterPage()" target="_blank">Get a new airport</a></li>
+
+
+                @restartRoute match {
+                    case Some(route) =>{
+                       <li>
+                        <form action="@route" method="POST" >
+                            <button type="submit" class="btn btn-link">Restart</button>
+                        </form>
+                       </li>
+                    }
+                    case _ =>{}
+                }
+
             </ul>
             <div class="brand" id="playerAddress"></div>
         </div>
