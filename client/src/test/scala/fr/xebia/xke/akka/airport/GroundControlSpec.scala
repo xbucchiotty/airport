@@ -23,14 +23,6 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers w
       game expectMsg GroundControlReady
     }
 
-    it("can be restarted") {
-      val groundControl = initializedGroundControl(Set.empty, Set.empty, 1, 100)
-
-      val game = TestProbe()
-      game.send(groundControl, InitGroundControl(Set.empty[ActorRef], Set.empty[ActorRef], 1, 100))
-      game expectMsg GroundControlReady
-    }
-
     it("should tell the plane to taxi when 1 taxiway is free") {
       pending
 

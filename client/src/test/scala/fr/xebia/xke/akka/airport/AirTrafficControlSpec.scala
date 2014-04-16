@@ -25,16 +25,6 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
       game expectMsg AirTrafficControlReady
     }
 
-    it("can be restarted") {
-      val runway = TestProbe()
-      val groundControl = TestProbe()
-      val airTrafficControl = initializedAirTrafficControl(groundControl.ref, Set(runway.ref), 100)
-
-      val game = TestProbe()
-      game.send(airTrafficControl, InitAirTrafficControl(groundControl.ref, Set(runway.ref), 100))
-      game expectMsg AirTrafficControlReady
-    }
-
     it("should tell the plane to land when there is a free runway") {
       pending
 
