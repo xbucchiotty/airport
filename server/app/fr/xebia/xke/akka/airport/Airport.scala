@@ -6,7 +6,7 @@ object Airport {
     val routesFrom = Route.routesFrom
     val routesTo = Route.routesTo
 
-    scala.io.Source.fromInputStream(classOf[Airport].getClassLoader.getResourceAsStream("data/airports.dat"))
+    scala.io.Source.fromInputStream(classOf[Airport].getClassLoader.getResourceAsStream("data/airports.dat"))("UTF-8") 
       .getLines()
       .filter(_.nonEmpty)
       .map(_.replaceAll("\"", ""))

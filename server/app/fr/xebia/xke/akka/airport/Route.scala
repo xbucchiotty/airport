@@ -14,7 +14,7 @@ object Route {
     .groupBy(_.to)
     .mapValues(_.toList)
 
-  private def routes = scala.io.Source.fromInputStream(classOf[Route].getClassLoader.getResourceAsStream("data/routes.dat"))
+  private def routes = scala.io.Source.fromInputStream(classOf[Route].getClassLoader.getResourceAsStream("data/routes.dat"))("UTF-8")
     .getLines()
     .toStream
     .filter(_.nonEmpty)
