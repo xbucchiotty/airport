@@ -8,6 +8,8 @@ import fr.xebia.xke.akka.airport.PlaneEvent.{EndOfTaxi, HasLeft, HasParked, Inco
 import fr.xebia.xke.akka.airport.command.{ParkAt, Ack, Taxi}
 import language.postfixOps
 import org.scalatest._
+import scala.collection.JavaConversions
+import JavaConversions._
 
 class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterEach {
 
@@ -17,7 +19,7 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers w
       val groundControl = system.actorOf(Props[GroundControl], "groundControl")
       val game = TestProbe()
 
-      game.send(groundControl, InitGroundControl(Set.empty, Set.empty, 1, 100))
+      game.send(groundControl, InitGroundControl(Set.empty[ActorRef], Set.empty[ActorRef], 1, 100))
       game expectMsg GroundControlReady
     }
 
@@ -25,7 +27,7 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers w
       val groundControl = initializedGroundControl(Set.empty, Set.empty, 1, 100)
 
       val game = TestProbe()
-      game.send(groundControl, InitGroundControl(Set.empty, Set.empty, 1, 100))
+      game.send(groundControl, InitGroundControl(Set.empty[ActorRef], Set.empty[ActorRef], 1, 100))
       game expectMsg GroundControlReady
     }
 

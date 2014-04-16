@@ -2,12 +2,13 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.TestProbe
+import com.typesafe.config.ConfigFactory
 import concurrent.duration._
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, HasLanded, Incoming}
 import fr.xebia.xke.akka.airport.command.{Ack, Land}
 import language.postfixOps
-import org.scalatest.{BeforeAndAfterEach, OneInstancePerTest, ShouldMatchers, GivenWhenThen, FunSpec}
-import com.typesafe.config.ConfigFactory
+import org.scalatest.{BeforeAndAfterEach, ShouldMatchers, GivenWhenThen, FunSpec}
+import scala.collection.JavaConversions._
 
 class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterEach {
 

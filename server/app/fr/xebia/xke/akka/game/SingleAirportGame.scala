@@ -20,6 +20,8 @@ import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
 import fr.xebia.xke.akka.infrastructure.SessionId
 import akka.util.Timeout
 import akka.cluster.Cluster
+import scala.collection.JavaConversions
+import JavaConversions._
 
 case class SinglePlayerGame(
                              sessionId: SessionId,
@@ -31,17 +33,23 @@ case class SinglePlayerGame(
 
   import settings._
 
-  val runways: Set[ActorRef] =
-    for (i <- (1 to nrOfRunways).toSet[Int])
-    yield context.actorOf(Runway.props(), s"runway-$i")
+  var runways: java.util.Set[ActorRef] = new java.util.HashSet[ActorRef]()
 
-  val taxiways: Set[ActorRef] =
-    for (i <- (1 to nrOfTaxiways).toSet[Int])
-    yield context.actorOf(Taxiway.props(settings), s"taxiway-$i")
+    for (i <- (1 to nrOfRunways)){
+      runways.add(context.actorOf(Runway.props(), s"runway-$i"))
+    }
 
-  val gates: Set[ActorRef] =
-    for (i <- (1 to nrOfGates).toSet[Int])
-    yield context.actorOf(Gate.props(), s"gate-$i")
+
+  var taxiways: java.util.Set[ActorRef] = new java.util.HashSet[ActorRef]()
+    for (i <- (1 to nrOfTaxiways)){
+      taxiways.add(context.actorOf(Taxiway.props(settings), s"taxiway-$i"))
+    }
+
+
+  var gates: java.util.Set[ActorRef] = new java.util.HashSet[ActorRef]()
+    for (i <- (1 to nrOfGates)){
+      gates.add(context.actorOf(Gate.props(), s"gate-$i"))
+    }
 
   var planeGeneration: Cancellable = null
 

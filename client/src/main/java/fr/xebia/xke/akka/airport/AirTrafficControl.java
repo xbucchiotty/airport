@@ -7,7 +7,8 @@ import akka.event.LoggingAdapter;
 import akka.japi.Procedure;
 import fr.xebia.xke.akka.airport.command.Contact;
 import fr.xebia.xke.akka.airport.command.Land;
-import scala.collection.immutable.Set;
+
+import java.util.Set;
 
 public class AirTrafficControl extends UntypedActor {
 
@@ -37,7 +38,7 @@ public class AirTrafficControl extends UntypedActor {
                     //you should not reply now
                     //but stashing the request
                     //to call him back when a runway will be free
-                    plane.tell(new Land((runways.head())), getSelf());
+                    plane.tell(new Land((runways.iterator().next())), getSelf());
 
                 }
                 //A plane has landed

@@ -7,7 +7,8 @@ import akka.event.LoggingAdapter;
 import akka.japi.Procedure;
 import fr.xebia.xke.akka.airport.command.ParkAt;
 import fr.xebia.xke.akka.airport.command.Taxi;
-import scala.collection.immutable.Set;
+
+import java.util.Set;
 
 public class GroundControl extends UntypedActor {
 
@@ -29,7 +30,7 @@ public class GroundControl extends UntypedActor {
                     ActorRef plane = getSender();
                     //we should find him a free taxiway
                     //tell him to taxy on it
-                    plane.tell(new Taxi(taxiways.head()), getSelf());
+                    plane.tell(new Taxi(taxiways.iterator().next()), getSelf());
                     //and stores in this actor
                     //that the targeted taxiway has on free slot less than before
 
@@ -45,7 +46,7 @@ public class GroundControl extends UntypedActor {
 
                     //We should find him a free gate
                     //tell the plane to park
-                    plane.tell(new ParkAt(gates.head()), getSelf());
+                    plane.tell(new ParkAt(gates.iterator().next()), getSelf());
 
                     //and stores in this actor
                     //that the targeted gate is occupied
