@@ -26,6 +26,8 @@ Commandes
 * `start` lance votre aéroport, ce dernier essaye de se connecter au noeud source pour trouver le serveur monde, une fois
 connecté vous pouvez interagir avec la session de votre aéroport sur l'ihm web du serveur monde.
 * `test` joue les tests de votre aéroport pour vérifier que vous avez correctement implémenté la logique.
+* `gen-idea`: permet de générer les modules pour IntelliJ
+* `eclipse`: permet de générer les modules pour Eclipse
 
 
 
