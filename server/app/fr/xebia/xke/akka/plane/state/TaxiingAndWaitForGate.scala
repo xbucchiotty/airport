@@ -44,7 +44,7 @@ private[plane] trait TaxiingAsLastStep extends Plane with RadioCommunication {
 
     case EndOfTaxi =>
 
-      groundControl ! EndOfTaxi
+      groundControl ! HasParked
       taxiway ! HasLeft
 
       done()
