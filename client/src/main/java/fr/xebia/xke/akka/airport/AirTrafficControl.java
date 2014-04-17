@@ -38,7 +38,6 @@ public class AirTrafficControl extends UntypedActor {
                     //you should not reply now
                     //but stashing the request
                     //to call him back when a runway will be free
-                    plane.tell(new Land((runways.iterator().next())), getSelf());
 
                 }
                 //A plane has landed
@@ -47,8 +46,6 @@ public class AirTrafficControl extends UntypedActor {
 
                     //It does not know yet the ground control
                     //You reply with the reference to the ground control
-                    //Nothing very useful to add there
-                    plane.tell(new Contact(groundControl), getSelf());
 
                 }
                 //The plane has left the runway
