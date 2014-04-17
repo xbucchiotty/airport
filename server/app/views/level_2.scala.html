@@ -1,4 +1,4 @@
-@(gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
+@( gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
 
 @game(2,gameContext){
 
@@ -10,16 +10,14 @@
                title="Incoming"
                data-toggle="popover"
                data-content="@gameContext.settings.planeGenerationInterval millis between each plane and @gameContext.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen"
-               data-intro='Even more planes. <b>@gameContext.settings.planeGenerationInterval millis</b> between each plane!'
+               data-intro='Now radio communication with planes is fuzzy. Some orders may not be received by planes. Controllers should received <b>Ack</b> messages after each order. They <b>should repeat</b> the message until successfully received. You should use the pattern Actor per request.'
                data-step='1'>Incoming</a>
         </th>
         <th class="header active">
             <a href="#"
                title="Runway"
                data-toggle="popover"
-               data-content="@gameContext.settings.nrOfRunways runways with @gameContext.settings.landingMaxDuration  millis max to land"
-               data-intro='and <b>@gameContext.settings.nrOfRunways runways</b> but planes are dead slow with <b>@gameContext.settings.landingMaxDuration millis</b> to land. Beware of collisions!'
-               data-step='2'>Runway</a>
+               data-content="@gameContext.settings.nrOfRunways runways with @gameContext.settings.landingMaxDuration  millis max to land">Runway</a>
         </th>
         <th class="header inactive">Taxiway</th>
         <th class="header inactive ">Gate</th>

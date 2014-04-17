@@ -4,6 +4,6 @@ import akka.actor.ActorRef
 
 case class NewGameInstance(sessionId: String)
 
-case class GameInstance(airTrafficControlRef: ActorRef, groundControlRef: ActorRef)
+case class GameInstance(airTrafficControlRef: ActorRef)
 
 case object ChaosMonkey

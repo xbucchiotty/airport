@@ -20,7 +20,7 @@ class AirportManagerSpec extends FunSpec with ShouldMatchers {
       probe.send(airportManager, NewGameInstance("1212133--1212"))
 
       //Then
-      val reply = probe receiveOne 100.milliseconds
+      val reply = probe receiveOne 500.milliseconds
       reply.isInstanceOf[GameInstance] should be(true)
     }
   }

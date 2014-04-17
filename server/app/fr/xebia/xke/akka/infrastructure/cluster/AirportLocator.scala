@@ -73,11 +73,10 @@ class AirportLocator(clusterEventStream: EventStream) extends Actor with ActorLo
       for (gameInstance <- ask(airportManager, NewGameInstance(sessionId.toString)).mapTo[GameInstance]) {
 
         val atcProxy = context.actorOf(RemoteProxy.props(gameInstance.airTrafficControlRef), s"$airportCode-$sessionId-airTrafficControl")
-        val gcProxy = context.actorOf(RemoteProxy.props(gameInstance.groundControlRef), s"$airportCode-$sessionId-groundControl")
 
-        gameSessions += (sessionId -> AirportProxy(address, atcProxy, gcProxy))
+        gameSessions += (sessionId -> AirportProxy(address, atcProxy))
 
-        lastSender ! ((atcProxy, gcProxy))
+        lastSender ! atcProxy
       }
     }
   }
@@ -92,7 +91,6 @@ class AirportLocator(clusterEventStream: EventStream) extends Actor with ActorLo
 
       for (gameSession <- gameSessions.get(sessionId)) {
         gameSession.airTrafficControl ! RemoteProxy.Register(gameInstance.airTrafficControlRef)
-        gameSession.groundControl ! RemoteProxy.Register(gameInstance.groundControlRef)
 
       }
     }
@@ -153,10 +151,9 @@ object AirportLocator {
 
 }
 
-case class AirportProxy(address: Address, airTrafficControl: ActorRef, groundControl: ActorRef) {
+case class AirportProxy(address: Address, airTrafficControl: ActorRef) {
 
   def stop(context: ActorContext) {
     context stop airTrafficControl
-    context stop groundControl
   }
 }

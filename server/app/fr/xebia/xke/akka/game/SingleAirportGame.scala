@@ -1,27 +1,19 @@
 package fr.xebia.xke.akka.game
 
 import akka.actor._
-import concurrent.duration._
-import languageFeature.postfixOps
 import akka.event.EventStream
-import scala.util.Random
-import fr.xebia.xke.akka.plane.Plane
+import concurrent.duration._
 import fr.xebia.xke.akka.airport._
-import fr.xebia.xke.akka.airport.InitGroundControl
-import fr.xebia.xke.akka.plane.PlaneListener
-import akka.actor.OneForOneStrategy
-import akka.actor.Terminated
-import fr.xebia.xke.akka.airport.InitAirTrafficControl
-import fr.xebia.xke.akka.game.SinglePlayerGame.NewPlane
-import fr.xebia.xke.akka.plane.event.PlaneStatus
 import fr.xebia.xke.akka.airport.command.Contact
-import akka.pattern.ask
-import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
+import fr.xebia.xke.akka.game.SinglePlayerGame.NewPlane
 import fr.xebia.xke.akka.infrastructure.SessionId
-import akka.util.Timeout
-import akka.cluster.Cluster
-import scala.collection.JavaConversions
-import JavaConversions._
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
+import fr.xebia.xke.akka.plane.Plane
+import fr.xebia.xke.akka.plane.PlaneListener
+import fr.xebia.xke.akka.plane.event.PlaneStatus
+import languageFeature.postfixOps
+import scala.collection.JavaConversions._
+import scala.util.Random
 
 case class SinglePlayerGame(
                              sessionId: SessionId,
@@ -35,21 +27,17 @@ case class SinglePlayerGame(
 
   var runways: java.util.Set[ActorRef] = new java.util.HashSet[ActorRef]()
 
-    for (i <- (1 to nrOfRunways)){
-      runways.add(context.actorOf(Runway.props(), s"runway-$i"))
-    }
+  for (i <- 1 to nrOfRunways){
+    runways.add(context.actorOf(Runway.props(), s"runway-$i"))
+  }
 
+  val taxiways: Set[ActorRef] =
+    for (i <- (1 to nrOfTaxiways).toSet[Int])
+    yield context.actorOf(Taxiway.props(settings), s"taxiway-$i")
 
-  var taxiways: java.util.Set[ActorRef] = new java.util.HashSet[ActorRef]()
-    for (i <- (1 to nrOfTaxiways)){
-      taxiways.add(context.actorOf(Taxiway.props(settings), s"taxiway-$i"))
-    }
-
-
-  var gates: java.util.Set[ActorRef] = new java.util.HashSet[ActorRef]()
-    for (i <- (1 to nrOfGates)){
-      gates.add(context.actorOf(Gate.props(), s"gate-$i"))
-    }
+  val gates: Set[ActorRef] =
+    for (i <- (1 to nrOfGates).toSet[Int])
+    yield context.actorOf(Gate.props(), s"gate-$i")
 
   var planeGeneration: Cancellable = null
 
@@ -74,35 +62,23 @@ case class SinglePlayerGame(
   def receive = idle
 
   def idle: Receive = {
-    case SinglePlayerGame.InitGame(airTrafficControl, groundControl) =>
+    case SinglePlayerGame.InitGame(airTrafficControl) =>
+
+      val groundControl = context.actorOf(GroundControl.props(taxiways, gates, taxiwayCapacity, settings.ackMaxDuration), "groundControl")
 
       airTrafficControl ! InitAirTrafficControl(groundControl, runways, settings.ackMaxDuration)
-      groundControl ! InitGroundControl(taxiways, gates, taxiwayCapacity, settings.ackMaxDuration)
 
-      context become waitingForTheGameReady(airTrafficControl, false, groundControl, false)
+      context become waitingForTheGameReady(airTrafficControl, groundControl)
 
   }
 
-  def waitingForTheGameReady(airTrafficControl: ActorRef, airTrafficControlReady: Boolean, groundControl: ActorRef, groundControlReady: Boolean): Receive = {
+  def waitingForTheGameReady(airTrafficControl: ActorRef, groundControl: ActorRef): Receive = {
     case AirTrafficControlReady =>
-      if (!groundControlReady) {
-        context become waitingForTheGameReady(airTrafficControl, true, groundControl, false)
-      } else {
-        import context.dispatcher
-        planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
+      import context.dispatcher
+      planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
 
-        context become started(airTrafficControl, groundControl)
-      }
+      context become started(airTrafficControl, groundControl)
 
-    case GroundControlReady =>
-      if (!airTrafficControlReady) {
-        context become waitingForTheGameReady(airTrafficControl, false, groundControl, true)
-      } else {
-        import context.dispatcher
-        planeGeneration = context.system.scheduler.schedule(1 second, planeGenerationInterval milliseconds, self, NewPlane)
-
-        context become started(airTrafficControl, groundControl)
-      }
   }
 
   def started(airTrafficControl: ActorRef, groundControl: ActorRef): Receive = {
@@ -186,7 +162,7 @@ object SinglePlayerGame {
 
   case class ErrorInGame(cause: String) extends Exception(cause)
 
-  case class InitGame(airTrafficControl: ActorRef, groundControl: ActorRef)
+  case class InitGame(airTrafficControl: ActorRef)
 
   case class GameInitialized(airTrafficControl: ActorRef, groundControl: ActorRef) extends GameEvent
 

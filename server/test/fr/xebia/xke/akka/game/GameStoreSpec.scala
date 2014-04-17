@@ -60,7 +60,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
       probe.send(gameStore, GameStore.StartGame(gameContext.sessionId))
       airportLocator.expectMsg(AirportLocator.CreateClient(airport.code, gameContext.sessionId))
-      airportLocator.reply((TestProbe().ref, TestProbe().ref))
+      airportLocator.reply(TestProbe().ref)
 
       probe expectMsg GameStarted
     }
@@ -77,7 +77,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
       airportLocator.reply(gameStore.path.address)
       probe.send(gameStore, StartGame(gameContext.sessionId))
       airportLocator.expectMsg(AirportLocator.CreateClient(airport.code, gameContext.sessionId))
-      airportLocator.reply((TestProbe().ref, TestProbe().ref))
+      airportLocator.reply(TestProbe().ref)
       probe expectMsg GameStarted
 
       whenReady(ask(gameStore, GameStore.Ask(gameContext.sessionId)).mapTo[Option[GameContext]]) {
