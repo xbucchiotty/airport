@@ -21,13 +21,17 @@
                data-intro='Here stays landed planes until there are asked to contact ground control. There is <b>@gameContext.settings.nrOfRunways runways</b> with <b>@gameContext.settings.landingMaxDuration millis</b> max to land. Here planes need to be told to <b>contact ground control</b>.'
                data-step='2'>Runway</a>
         </th>
-        <th class="header inactive">Taxiway</th>
-        <th class="header inactive ">Gate</th>
+        <th class="header inactive"
+            data-intro="This part is managed by the server. Taxiway are a queues that lead to gates. They have a fixed capacity and plane takes some times to transit through it."
+            data-step='3'>Taxiway</th>
+        <th class="header inactive"
+            data-intro="Boarding gates are the place where planes unboard passengers. They spend a long time on it! This is also managed by the server."
+            data-step='4'>Gate</th>
         <th class="header">
             <a href="#"
                title="Done"
-               data-intro='List of planes successfully landed.'
-               data-step='3'>Done</th>
+               data-intro='List of planes successfully landed. Now set your client airport code with <em>set airport in client := <strong>"@gameContext.airport.code"</strong></em>. Then launch <em>start-client</em> in the SBT interactive console.'
+               data-step='5'>Done</th>
     </tr>
     </thead>
     <tbody>

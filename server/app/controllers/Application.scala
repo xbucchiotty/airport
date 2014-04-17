@@ -33,37 +33,12 @@ object Application extends Controller with PlayerSessionManagement {
       objective = 20,
       ackMaxDuration = 1000)
 
-    newSinglePlayerGame(airportCode, settings, classOf[JustLandingPlane]) {
+    newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
       gameContext => routes.Application.level0(airportCode, gameContext.sessionId)
     }
   }
 
   def createLevel1(airportCode: AirportCode) = Action {
-    val settings = Settings(
-      nrOfRunways = 2,
-      landingMaxDuration = 1500,
-      planeGenerationInterval = 1250,
-      objective = 20,
-      ackMaxDuration = 1000)
-
-    newSinglePlayerGame(airportCode, settings, classOf[JustLandingPlane]) {
-      gameContext => routes.Application.level1(airportCode, gameContext.sessionId)
-    }
-  }
-
-  def createLevel2(airportCode: AirportCode) = Action {
-    val settings = Settings(
-      nrOfRunways = 4,
-      landingMaxDuration = 2500,
-      planeGenerationInterval = 500,
-      objective = 50,
-      ackMaxDuration = 1000)
-    newSinglePlayerGame(airportCode, settings, classOf[JustLandingPlane]) {
-      gameContext => routes.Application.level2(airportCode, gameContext.sessionId)
-    }
-  }
-
-  def createLevel3(airportCode: AirportCode) = Action {
     val settings = Settings(
       nrOfRunways = 4,
       landingMaxDuration = 2500,
@@ -74,30 +49,12 @@ object Application extends Controller with PlayerSessionManagement {
       taxiwayCapacity = 5,
       ackMaxDuration = 1000)
 
-    newSinglePlayerGame(airportCode, settings, classOf[JustTaxiingPlane]) {
-      gameContext => routes.Application.level3(airportCode, gameContext.sessionId)
-    }
-  }
-
-  def createLevel4(airportCode: AirportCode) = Action {
-    val settings = Settings(
-      nrOfRunways = 4,
-      landingMaxDuration = 2500,
-      planeGenerationInterval = 500,
-      objective = 50,
-      nrOfTaxiways = 2,
-      taxiingDuration = 1000,
-      taxiwayCapacity = 10,
-      nrOfGates = 2,
-      unloadingPassengersMaxDuration = 5000,
-      ackMaxDuration = 1000)
-
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
-      gameContext => routes.Application.level4(airportCode, gameContext.sessionId)
+      gameContext => routes.Application.level1(airportCode, gameContext.sessionId)
     }
   }
 
-  def createLevel5(airportCode: AirportCode) = Action {
+  def createLevel2(airportCode: AirportCode) = Action {
     val settings = Settings(
       nrOfRunways = 4,
       landingMaxDuration = 2500,
@@ -111,11 +68,11 @@ object Application extends Controller with PlayerSessionManagement {
       ackMaxDuration = 1000,
       radioReliability = 0.8)
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
-      gameContext => routes.Application.level5(airportCode, gameContext.sessionId)
+      gameContext => routes.Application.level2(airportCode, gameContext.sessionId)
     }
   }
 
-  def createLevel6(airportCode: AirportCode) = Action {
+  def createLevel3(airportCode: AirportCode) = Action {
     val settings = Settings(
       nrOfRunways = 4,
       landingMaxDuration = 2500,
@@ -130,7 +87,7 @@ object Application extends Controller with PlayerSessionManagement {
       radioReliability = 0.8,
       chaosMonkey = true)
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
-      gameContext => routes.Application.level6(airportCode, gameContext.sessionId)
+      gameContext => routes.Application.level3(airportCode, gameContext.sessionId)
     }
   }
 
@@ -170,36 +127,6 @@ object Application extends Controller with PlayerSessionManagement {
 
       gameContext match {
         case Some(context) => Ok(views.html.level_3(gameContext.get))
-        case None => Redirect(routes.Application.registered(airportCode))
-      }
-  }
-
-  def level4(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
-    implicit request =>
-      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
-
-      gameContext match {
-        case Some(context) => Ok(views.html.level_4(gameContext.get))
-        case None => Redirect(routes.Application.registered(airportCode))
-      }
-  }
-
-  def level5(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
-    implicit request =>
-      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
-
-      gameContext match {
-        case Some(context) => Ok(views.html.level_5(gameContext.get))
-        case None => Redirect(routes.Application.registered(airportCode))
-      }
-  }
-
-  def level6(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
-    implicit request =>
-      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
-
-      gameContext match {
-        case Some(context) => Ok(views.html.level_6(gameContext.get))
         case None => Redirect(routes.Application.registered(airportCode))
       }
   }

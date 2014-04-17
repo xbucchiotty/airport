@@ -98,12 +98,12 @@ class GameStore(airportsClusterLocation: ActorRef, clusterEventStream: EventStre
     for ((status, gameContext) <- gameContexts.find(_._1.sessionId == sessionId)) {
       log.info(s"Start the game <${gameContext.game.path.name}>")
 
-      def newInstances = ask(airportsClusterLocation, AirportLocator.CreateClient(gameContext.airport.code, sessionId)).mapTo[(ActorRef, ActorRef)]
+      def newAirport = ask(airportsClusterLocation, AirportLocator.CreateClient(gameContext.airport.code, sessionId)).mapTo[ActorRef]
 
       val lastSender = sender()
 
-      for ((airTrafficControl, groundControl) <- newInstances) {
-        gameContext.init(airTrafficControl, groundControl)
+      for (airTrafficControl <- newAirport) {
+        gameContext.init(airTrafficControl)
 
         lastSender ! GameStarted
 

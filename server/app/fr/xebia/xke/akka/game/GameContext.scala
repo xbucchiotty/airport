@@ -19,8 +19,8 @@ case class GameContext(
     eventBus.publish(any)
   }
 
-  def init(airTrafficControl: ActorRef, groundControl: ActorRef)(implicit sender: akka.actor.ActorRef) = {
-    game ! InitGame(airTrafficControl, groundControl)
+  def init(airTrafficControl: ActorRef)(implicit sender: akka.actor.ActorRef) = {
+    game ! InitGame(airTrafficControl)
   }
 
 }
