@@ -1,1 +1,0 @@
-.sbt/bin/sbt.bat %*

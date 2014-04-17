@@ -6,30 +6,32 @@ Vous avez besoin :
 * D'un éditeur de texte (nous recommandons sublime-text)
 * D'un serveur monde
 
-Lancer son propre serveur monde
+Démarrer avec SBT
 ------------
-Ouvrez un terminal et allez dans le sous dossier `server`. Il s'agit d'une application Play2. Toutes les commandes habituelles de play sont disponible.
-Pour démarrer le serveur faites `worldserver run` ou `worldserver.bat` run sous Windows.
+Pour lancer le serveur monde ou votre client du jeu, nous utilisons SBT (Simple Build Tool). 
+Le script ```handson```que vous trouvez à la racine du projet est un sbt préconfiguré avec les dépendances.
+
+Lancez la commande dans deux terminals différents.
+
+Intégration avec votre IDE
+------------
+Si vous possédez un IDE (Eclipse ou IntelliJ), vous pouvez importer les modules. Pour cela dans une session SBT, lancez:
+* gen-idea pour IntelliJ
+* eclipse pour Eclipse
+
+Pour démarrer le serveur monde
+------------
+Dans une des sessions SBT ouverte, dans la console interactive, ```start-server```. Il s'agit d'une application Play2. 
+Les logs du server monde défileront dans cette fenêtre. Vous pouvez oublier ce terminal pour le jeu.
 
 Lancer le Hands-on
 ------------
 Connectez-vous sur http://localhost:9000 et demandez-lui de vous assigner un aéroport.
-Modifiez le fichier `client/build.sbt` pour renseigner le nom de votre aéroport. (airport := "LHR" par exemple)
-Vous pouvez ensuite lancer le hands-on en tapant
-* ```./handson``` sous linux/mac
-* ```handson.bat``` sous windows
+Dans la seconde session SBT, tapez ```set airport in client := "XXX" ``` où XXX est le code de votre aéroport donné par le server.
+Vous pouvez ensuite lancer le hands-on en tapant,  ```start-client```.
+Vous pouvez à tout moment stopper le client avec ```CTRL+D```.
 
-Ces scripts lancent SBT (scala build tool) en arrière plan pré-configuré avec des commandes pour jouer le hands-on.
-
-Commandes
-------------
-* `start` lance votre aéroport, ce dernier essaye de se connecter au noeud source pour trouver le serveur monde, une fois
-connecté vous pouvez interagir avec la session de votre aéroport sur l'ihm web du serveur monde.
-* `test` joue les tests de votre aéroport pour vérifier que vous avez correctement implémenté la logique.
-* `gen-idea`: permet de générer les modules pour IntelliJ
-* `eclipse`: permet de générer les modules pour Eclipse
-
-
+Cela vous permet par exemple de lancer les tests unitaires avec la commande ```test```.
 
 Protocole de communication avec les avions
 ------------
