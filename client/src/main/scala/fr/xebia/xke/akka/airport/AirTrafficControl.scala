@@ -30,7 +30,6 @@ class AirTrafficControl extends Actor with ActorLogging {
       //it requests to land
       //you should tell the sender (the plane)
       //to land on a free runway
-      plane ! Land(runways.head)
 
     //and stores in this actor
     //that the targeted runway is allocated to this plane
@@ -45,8 +44,6 @@ class AirTrafficControl extends Actor with ActorLogging {
       val plane = sender()
       //It does not know yet the ground control
       //You reply with the reference to the ground control
-      //Nothing very useful to add there
-      plane ! Contact(groundControl)
 
     //The plane has left the runway
     case HasLeft =>
