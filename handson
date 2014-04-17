@@ -1,1 +1,3 @@
-.sbt/bin/sbt
+#!/usr/bin/env bash                                                                                                                                                           
+
+.sbt/bin/sbt $@
