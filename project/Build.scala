@@ -4,7 +4,7 @@ import Keys._
 object AirportBuild extends Build {
 
 
-  lazy val root = Project(id = "airport", base = file(".")).aggregate(messages, client).settings(  addCommandAlias("start-client", ";project client; run"):_*  )
+  lazy val root = Project(id = "airport", base = file(".")).aggregate(messages, client, server).settings(  addCommandAlias("start-client", ";project client; run"):_*  )
 
   lazy val messages = Project(id = "messages", base = file("messages"))
 
