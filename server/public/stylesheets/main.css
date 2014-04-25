@@ -4,10 +4,10 @@
 }
 
 .regular{
+    background-position: 140px -5px;
     background-color: rgba(255, 238, 0, 0.1);
     background-image: url(/assets/images/plane.png);
     background-repeat:no-repeat;
-    background-position-x: 140px;
     background-size: 70px;
 }
 
