@@ -29,7 +29,10 @@ object Application extends Controller with PlayerSessionManagement {
     val settings = Settings(
       nrOfRunways = 1,
       landingMaxDuration = 1500,
-      planeGenerationInterval = 3000,
+      planeGenerationInterval = 5000,
+      nrOfTaxiways = 2,
+      taxiingDuration = 500,
+      unloadingPassengersMaxDuration = 500,
       objective = 20,
       ackMaxDuration = 1000)
 
