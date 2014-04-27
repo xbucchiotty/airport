@@ -10,7 +10,7 @@ class AirportManagerSpec extends FunSpec with ShouldMatchers {
 
   describe("An airportManager") {
 
-    it("should create new AirTrafficControl and groundControl on demand") {
+    it("should create new AirTrafficControl on demand") {
       //Given
       implicit val system = testActorSystem()
       val airportManager = system.actorOf(AirportManager.props, "airportManager")
