@@ -30,7 +30,10 @@ class GroundControl(taxiways: Set[ActorRef], gates: Set[ActorRef], taxiwayCapaci
 
       } else {
 
-        pendingsForTaxiways = pendingsForTaxiways enqueue plane
+        if (!pendingsForTaxiways.contains(plane)) {
+
+          pendingsForTaxiways = pendingsForTaxiways enqueue plane
+        }
 
       }
 
@@ -48,7 +51,10 @@ class GroundControl(taxiways: Set[ActorRef], gates: Set[ActorRef], taxiwayCapaci
         gatesAllocations += (plane -> allocatedGate)
 
       } else {
-        pendingsForGates = pendingsForGates enqueue plane
+        if (!pendingsForGates.contains(plane)) {
+
+          pendingsForGates = pendingsForGates enqueue plane
+        }
       }
 
 
