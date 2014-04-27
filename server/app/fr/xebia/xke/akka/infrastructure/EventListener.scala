@@ -55,7 +55,7 @@ class EventListener(eventStream: EventStream) extends Actor with ActorLogging {
       if (buffer.nonEmpty) {
         val (msg, newBuffer) = buffer.dequeue
         sender() ! Some(msg)
-        log.debug(s"send buffered $msg")
+        log.debug(s"send $msg")
         buffer = newBuffer
       } else {
         if (!listening) {
@@ -72,7 +72,7 @@ class EventListener(eventStream: EventStream) extends Actor with ActorLogging {
   def sendWhenPendingRequestOrQueue(msg: String) {
     pendingRequest match {
       case None =>
-        log.debug(s"Queuing $msg")
+        log.debug(s"Queuing")
         buffer = buffer enqueue msg
 
       case Some(caller) =>
