@@ -1,6 +1,6 @@
 package fr.xebia.xke.akka.plane.state
 
-import akka.actor.{ActorRef, Cancellable, Actor}
+import akka.actor.{Cancellable, Actor}
 import fr.xebia.xke.akka.airport.command.Ack
 import fr.xebia.xke.akka.game.Settings
 import fr.xebia.xke.akka.Transition

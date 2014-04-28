@@ -27,6 +27,7 @@ private[plane] trait Incoming extends Plane with RadioCommunication {
     case Land(runway) =>
 
       replyWithRadio(() => {
+
         import context.dispatcher
         context.system.scheduler.scheduleOnce(settings.aLandingDuration, self, Landed(runway))
 

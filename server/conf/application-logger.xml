@@ -14,6 +14,8 @@
     <logger name="akka.event" level="ERROR"/>
     <logger name="akka.serialization" level="ERROR"/>
 
+    <logger name="java" level="INFO"/>
+    <logger name="org" level="INFO"/>
     <logger name="play" level="INFO"/>
     <logger name="application" level="INFO"/>
     <logger name="fr.xebia" level="INFO"/>

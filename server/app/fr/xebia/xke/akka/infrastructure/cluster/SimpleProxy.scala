@@ -8,16 +8,16 @@ class SimpleProxy(inbound: ActorRef, upperProxy: ActorRef) extends Actor with Ac
 
   var lastMessage: Option[(Any, ActorRef)] = None
 
-  context watch inbound
-
   override def preStart() {
-    log.debug(s"Creating an inbound proxy from <${self.path}> to ${sender().path}")
+    context watch inbound
+
+    log.debug(s"Creating an inbound proxy from <${self.path}> to ${inbound.path}")
   }
 
   def receive: Receive = {
 
     case SimpleProxy.Send(msg, outbound) =>
-      log.debug(s"==> Sending <$msg> from <${inbound.path}> to <${outbound.path}>")
+      log.debug(s"==> Sending <${msg.getClass.getSimpleName}> from <${inbound.path}> to <${outbound.path}>")
 
       outbound ! msg
 
@@ -26,7 +26,7 @@ class SimpleProxy(inbound: ActorRef, upperProxy: ActorRef) extends Actor with Ac
     case Repeat =>
       lastMessage.foreach {
         case (msg, outbound) => {
-          log.debug(s"==> Repeating <$msg> from <${inbound.path}> to <${outbound.path}>")
+          log.debug(s"==> Repeating <${msg.getClass.getSimpleName}> from <${inbound.path}> to <${outbound.path}>")
           sender() ! msg
         }
       }
@@ -35,8 +35,8 @@ class SimpleProxy(inbound: ActorRef, upperProxy: ActorRef) extends Actor with Ac
       context stop self
 
     case any =>
-      log.debug(s"<== Receiving <$any> from <${sender().path}> to <${inbound.path}>")
-      inbound.tell(any, upperProxy)
+      log.debug(s"<== Receiving <${any.getClass.getSimpleName}> from <${sender().path}> to <${inbound.path}>")
+      upperProxy ! SimpleProxy.Reply(any, sender())
   }
 
 }
@@ -45,5 +45,7 @@ object SimpleProxy {
   def props(target: ActorRef, upperProxy: ActorRef): Props = Props(classOf[SimpleProxy], target, upperProxy)
 
   case class Send(msg: Any, outbound: ActorRef)
+
+  case class Reply(msg: Any, messageSender: ActorRef)
 
 }

@@ -18,13 +18,23 @@ class RemoteProxy(firstRemoteLookup: ActorRef) extends Actor with ActorLogging {
     case Unregister =>
       context become unregistered(target)
 
+    case SimpleProxy.Reply(msg, messageSender) =>
+      val inbound = inboundProxies.find(_._2 == sender()).map(_._1).head
+
+      if (messageSender == target) {
+        inbound ! msg
+      } else {
+        inbound.tell(msg, messageSender)
+      }
+
     case any =>
 
       if (!inboundProxies.isDefinedAt(sender())) {
-        inboundProxies += (sender() -> context.actorOf(SimpleProxy.props(sender(), self), sender().path.name))
+        inboundProxies += (sender() -> context.actorOf(SimpleProxy.props(sender(), self), s"proxy-${sender().path.name}"))
       }
 
-      inboundProxies(sender()) ! SimpleProxy.Send(any, target)
+      val proxy = inboundProxies(sender())
+      proxy ! SimpleProxy.Send(any, target)
   }
 
   def unregistered(lastTarget: ActorRef): Receive = {
@@ -32,7 +42,7 @@ class RemoteProxy(firstRemoteLookup: ActorRef) extends Actor with ActorLogging {
       context become registered(newTarget)
 
     case any =>
-      log.debug(s"Unable to deliver <$any> to <${self.path.name}>}")
+      log.debug(s"Unable to deliver <${any.getClass.getSimpleName}> to <${self.path.name}>}")
   }
 }
 

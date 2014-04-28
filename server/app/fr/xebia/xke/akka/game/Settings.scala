@@ -19,7 +19,7 @@ case class Settings(
                      chaosMonkey: Boolean = false) {
 
   private def aRandomDuration(maxDurationInMillis: Int): FiniteDuration = {
-    val minDuration = maxDurationInMillis / 2
+    val minDuration = maxDurationInMillis / 3
     val random = Random.nextInt(minDuration)
 
     Duration(

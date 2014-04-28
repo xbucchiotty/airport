@@ -20,11 +20,11 @@ private[plane] trait TaxiingAndWaitForGate extends Plane with RadioCommunication
     case ParkAt(gate) =>
       replyWithRadio(() => {
 
-        import context.dispatcher
-        context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, PassengerUnloaded)
+          import context.dispatcher
+          context.system.scheduler.scheduleOnce(settings.anUnloadingPassengersDuration, self, PassengerUnloaded)
 
-        taxiway ! HasLeft
-        gate ! HasParked
+          taxiway ! HasLeft
+          gate ! HasParked
 
         transitionTo(transition = () => {
 
@@ -38,20 +38,4 @@ private[plane] trait TaxiingAndWaitForGate extends Plane with RadioCommunication
 
 }
 
-private[plane] trait TaxiingAsLastStep extends Plane with RadioCommunication {
-
-  def taxiing(groundControl: ActorRef, taxiway: ActorRef) = State("taxiway", LoggingReceive {
-
-    case EndOfTaxi =>
-
-      groundControl ! HasParked
-      taxiway ! HasLeft
-
-      done()
-
-  })
-
-}
-
 private[plane] case object PassengerUnloaded
-
