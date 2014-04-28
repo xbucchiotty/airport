@@ -16,7 +16,8 @@
 
     <logger name="play" level="INFO"/>
     <logger name="application" level="INFO"/>
-    <logger name="fr.xebia.xke.akka.infrastructure.cluster" level="INFO"/>
+    <logger name="fr.xebia" level="INFO"/>
+    <logger name="fr.xebia.xke.akka.infrastructure.EventListener" level="DEBUG"/>
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
