@@ -47,9 +47,10 @@ object Application extends Controller with PlayerSessionManagement {
       landingMaxDuration = 2500,
       planeGenerationInterval = 500,
       objective = 50,
-      nrOfTaxiways = 1,
+      nrOfTaxiways = 2,
       taxiingDuration = 1000,
       taxiwayCapacity = 5,
+      nrOfGates = 2,
       ackMaxDuration = 1000)
 
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {

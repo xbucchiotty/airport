@@ -68,5 +68,40 @@ class RemoteProxySpec extends FunSpec with ShouldMatchers {
       target1 expectNoMsg (100 milliseconds)
       target2 expectMsg "Hello"
     }
+
+    it("should forward message from outbound with proxy when sender is the proxied target") {
+      implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+
+      val targetATC = TestProbe()
+      val proxy = system.actorOf(RemoteProxy.props(targetATC.ref), "proxy")
+      val plane = TestProbe()
+      plane.send(proxy, "Hello")
+      targetATC.expectMsg("Hello")
+
+      //When
+      targetATC reply "World"
+
+      //Then
+      plane expectMsg "World"
+      plane.lastSender should be(proxy)
+    }
+
+    it("should forward message from outbound with original sender when sender is not the proxied target") {
+      implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
+
+      val targetATC = TestProbe()
+      val proxy = system.actorOf(RemoteProxy.props(targetATC.ref), "proxy")
+      val plane = TestProbe()
+      plane.send(proxy, "Hello")
+      targetATC.expectMsg("Hello")
+
+      //When
+      val operator = TestProbe()
+      operator.send(targetATC.lastSender, "World")
+
+      //Then
+      plane expectMsg "World"
+      plane.lastSender should be(operator.ref)
+    }
   }
 }

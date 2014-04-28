@@ -7,7 +7,7 @@ import fr.xebia.xke.akka.plane.Plane
 import languageFeature.postfixOps
 import concurrent.duration._
 
-private[plane] trait OnRunwayWaitingForTaxiway extends Plane with RadioCommunication {
+private[plane] trait OnRunway extends Plane with RadioCommunication {
 
   private var repeatIncomingTask: Option[Cancellable] = None
 
@@ -20,8 +20,7 @@ private[plane] trait OnRunwayWaitingForTaxiway extends Plane with RadioCommunica
         transitionTo(transition = () => {
 
           import context.dispatcher
-          groundControl ! Incoming
-          repeatIncomingTask = Some(context.system.scheduler.schedule(10 seconds, 10 seconds, groundControl, Incoming))
+          repeatIncomingTask = Some(context.system.scheduler.schedule(Duration.Zero, 10 seconds, groundControl, Incoming))
 
         })(nextState = incoming(airControl, runway, groundControl))
       })
@@ -32,12 +31,12 @@ private[plane] trait OnRunwayWaitingForTaxiway extends Plane with RadioCommunica
 
       replyWithRadio(() => {
 
-        for (task <- repeatIncomingTask if !task.isCancelled) {
-          task.cancel()
-        }
+          for (task <- repeatIncomingTask if !task.isCancelled) {
+            task.cancel()
+          }
 
-        runway ! HasLeft
-        taxiway ! Taxiing
+          runway ! HasLeft
+          taxiway ! Taxiing
 
 
         transitionTo(transition = () => {
@@ -50,18 +49,4 @@ private[plane] trait OnRunwayWaitingForTaxiway extends Plane with RadioCommunica
 
   def taxiing(groundControl: ActorRef, taxiway: ActorRef): State
 
-}
-
-private[plane] trait LandingAsLastStep extends Plane with RadioCommunication {
-
-  def waitingToTaxi(airControl: ActorRef, runway: ActorRef) = State("runway", LoggingReceive {
-    case Contact(groundControl) =>
-      replyWithRadio(() => {
-        runway ! HasLeft
-
-        airControl ! HasLeft
-
-        done()
-      })
-  })
 }
