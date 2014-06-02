@@ -51,7 +51,7 @@ public class AirTrafficControl extends UntypedActor {
                         ActorRef firstFreeRunway = freeRunways.iterator().next();
                         planeRunwayMap.put(plane, firstFreeRunway);
 
-                        plane.tell(new Land(firstFreeRunway), self());
+                        context().actorOf(ActorRepeater.props(new Land(firstFreeRunway), plane, ackMaxTimeout));
 
                     } else {
 
@@ -68,7 +68,7 @@ public class AirTrafficControl extends UntypedActor {
 
                     ActorRef plane = sender();
 
-                    plane.tell(new Contact(groundControl), self());
+                    context().actorOf(ActorRepeater.props(new Contact(groundControl), getSender(), ackMaxTimeout));
 
                 }
                 //The plane has left the runway
@@ -88,7 +88,7 @@ public class AirTrafficControl extends UntypedActor {
 
                         planeRunwayMap.put(firstWaitingPlane, freeRunway);
 
-                        firstWaitingPlane.tell(new Land(freeRunway), self());
+                        context().actorOf(ActorRepeater.props(new Land(freeRunway), firstWaitingPlane, ackMaxTimeout));
 
                     }
 
