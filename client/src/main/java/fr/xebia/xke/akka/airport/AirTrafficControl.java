@@ -31,6 +31,10 @@ public class AirTrafficControl extends UntypedActor {
                     //to land on a free runway
                     ActorRef plane = sender();
 
+                    ActorRef firstRunaway = runways.iterator().next();
+
+                    plane.tell(new Land(firstRunaway), self());
+
                     //and stores in this actor
                     //that the targeted runway is allocated to this plane
 
@@ -43,6 +47,8 @@ public class AirTrafficControl extends UntypedActor {
                 //A plane has landed
                 else if (message instanceof PlaneEvent.HasLanded$) {
                     ActorRef plane = sender();
+
+                    plane.tell(new Contact(groundControl), self());
 
                     //It does not know yet the ground control
                     //You reply with the reference to the ground control
