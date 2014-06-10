@@ -4,15 +4,18 @@ organization := "fr.xebia.xke.akka.airport"
 
 name := "client"
 
+scalaVersion := "2.11.1"
+
+
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "2.0" % "test",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.1",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.3.1",
-  "ch.qos.logback" % "logback-classic" % "1.0.13",
-  "ch.qos.logback" % "logback-core" % "1.0.13",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.1" % "test",
-  "com.typesafe.akka" %% "akka-cluster" % "2.3.1",
-  "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.1"
+  "org.scalatest" %% "scalatest" % "2.1.6" % "test",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.3",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.3.3",
+  "ch.qos.logback" % "logback-classic" % "1.1.1",
+  "ch.qos.logback" % "logback-core" % "1.1.1",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.3" % "test",
+  "com.typesafe.akka" %% "akka-cluster" % "2.3.3",
+  "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.3"
 )
 
 incOptions := incOptions.value.withNameHashing(true)
@@ -23,7 +26,7 @@ connectInput in run := true
 
 seedNode := "akka.tcp://airportSystem@127.0.0.1:2554"
 
-airport   := ""
+airport   := "LHR"
 
 check := {
   println("seedNode: " + seedNode.value )

@@ -7,3 +7,8 @@ RUNNING_PID
 logs/
 .boot
 .ivy
+repository
+activator
+activator.bat
+activator-launch*
+project/activator-sbt*

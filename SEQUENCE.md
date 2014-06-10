@@ -1,6 +1,6 @@
 #Sequence diagrams
 ##Short Landing procedure
-![Sequence as image](http://www.websequencediagrams.com/cgi-bin/cdraw?lz=ICAgIHRpdGxlIFNob3J0IExhbmRpbmcgcHJvY2VkdXJlCgogICAgb3AAEgkACwVQbGFuZS0tPitBaXIgQ29udHJvbDogSW5jb20AGwgADwstPgAaDVdhaXQgZnJlZSBydW53YXkAHRIAWgU6AIEIBShSAB8FKQBsCwBADkFjawCBHgYAgQwIADILaW5nIHdpdGggcmFuZG9tIGR1cmF0aW9uAIE3DQCBNg1IYXNMYW5kZWQocGxhbmUAcQYAgT4NLQCBFgdDb250YWN0KGdyb3VuZACBAh4gICAgZW5k&s=modern-blue)
+![Sequence as image](http://www.websequencediagrams.com/cgi-bin/cdraw?lz=dGl0bGUgU2hvcnQgTGFuZGluZyBwcm9jZWR1cmUKCiAgICBvcAASCQALBVBsYW5lLS0-K0FpciBDb250cm9sOiBJbmNvbQAbCAAPCy0-ABoNV2FpdCBmcmVlIHJ1bndheQAdEgBaBToAgQgFKFIAHwUpAGwLAEAOQWNrAIEeBgCBDAgAMgtpbmcgd2l0aCByYW5kb20gZHVyYXRpb24AgTcNAIE2DUhhc0xhbmRlZChwbGFuZQBxBgCBPg0tAIEWB0NvbnRhY3QoZ3JvdW5kAIECHgCBDBNXYWl0aW5nIGZvciB0YXhpd2F5cwCBWAwtAIEGEWVmdACDBwVlbmQ&s=modern-blue)
 
     title Short Landing procedure
 
@@ -14,5 +14,7 @@
     Plane-->Air Control: HasLanded(plane)
     Air Control->-Plane: Contact(ground)
     Plane->Air Control: Ack
+    Plane-->Plane: Waiting for taxiways
+    Plane->-Air Control: HasLeft
     end
 

@@ -2,56 +2,40 @@ package fr.xebia.xke.akka.airport
 
 import akka.actor.{ActorLogging, ActorRef, Actor}
 import fr.xebia.xke.akka.airport.PlaneEvent.{HasLeft, Incoming, HasLanded}
-import fr.xebia.xke.akka.airport.command.{Contact, Land}
+import fr.xebia.xke.akka.airport.command._
+import akka.persistence.EventsourcedProcessor
+import scala.collection.immutable.Queue
+import scala.concurrent.duration._
 
 class AirTrafficControl extends Actor with ActorLogging {
 
-  def receive = uninitialized
-
   var groundControl: ActorRef = null
+  var ackMaxTimeout: Int = _
+  var runways = Set.empty[ActorRef]
 
   log.info("ATC created")
 
-  def uninitialized: Receive = {
-    case InitAirTrafficControl(groundControlRef, runways, ackMaxTimeout) =>
+  def receive: Receive = {
+
+    case Incoming =>
+      val plane = sender()
+
+    case HasLanded =>
+      val plane = sender()
+
+    case HasLeft =>
+      val plane = sender()
+
+
+    //Initialization
+    case InitAirTrafficControl(_groundControl, _runways, _ackMaxTimeout) =>
       sender ! AirTrafficControlReady
 
       log.info("ATC ready")
 
-      groundControl = groundControlRef
-
-      context become (ready(runways, ackMaxTimeout) orElse uninitialized)
-  }
-
-  def ready(runways: Set[ActorRef], ackMaxTimeout: Int): Receive = {
-    //Plane incomes from the sky
-    case Incoming =>
-      val plane = sender()
-      //it requests to land
-      //you should tell the sender (the plane)
-      //to land on a free runway
-
-    //and stores in this actor
-    //that the targeted runway is allocated to this plane
-
-    //if there is no runway available
-    //you should not reply now
-    //but stashing the request
-    //to call him back when a runway will be free
-
-    //A plane has landed
-    case HasLanded =>
-      val plane = sender()
-      //It does not know yet the ground control
-      //You reply with the reference to the ground control
-
-    //The plane has left the runway
-    case HasLeft =>
-      val plane = sender()
-    //It's now free to accept a new plane
-    //and if the actor has stashed request
-    //it's time to reply to  them
-
+      this.groundControl = _groundControl
+      this.runways = _runways
+      this.ackMaxTimeout = _ackMaxTimeout
   }
 
 }
