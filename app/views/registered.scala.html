@@ -1,0 +1,17 @@
+@(airport:fr.xebia.xke.akka.airport.Airport)
+
+@main("Mixit Akka workshop")(0)(Some(airport)){
+
+<div class="container">
+
+    <div class="hero">
+        Hello there. You will manage airport @airport.code in @airport.city. Please, check that your client config <em>set airport := <strong>"@airport.code"</strong></em>
+        before start playing!
+    </div>
+
+    <form action="@routes.Application.createLevel0(airport.code)" method="POST" class="form-inline">
+        <button type="submit" class="btn btn-primary">PLAY</button>
+    </form>
+</div>
+
+}
