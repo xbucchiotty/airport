@@ -2,34 +2,32 @@
     <body>
         <div>
             <h2>Bienvenue</h2>
-            <p>Bienvenue à ce Xebia Tech'Events sur Akka. Nous utiliserons l'outil Typesafe Activator de Typesafe pour le suivi du tutorial.</p>
+            <p>Bienvenue à ce Xebia Tech'Events sur Akka. Nous utiliserons l'outil Typesafe Activator comme support de ce tutoriel.</p>
 
-            <p>Pour démarrer, il vous faut un serveur pour le jeu. Dans une autre console, lancer "activator
+            <p>Pour démarrer, il vous faut un serveur pour le jeu. Ouvrez une autre console puis lancez
                 <pre><code>activator start</code></pre>
             </p>
 
-            <p>Cette commande lance une application Play! qui sert de support pour le jeu. Elle est disponible en <a href="http://localhost:9000">localhost:9000</a></p>
+            <p>Cette commande lance une application Play!. Elle est disponible sur <a href="http://localhost:9000">http://localhost:9000</a>.</p>
         </div>
 
         <div>
             <h2>Description du jeu</h2>
             <p>Nous vous proposons de découvrir Akka au travers d'un jeu autour de la gestion de trafic d'un aéroport.</p>
-            <p>Vous êtes un contrôleur aérien. Des avions vont vous envoyer une série de message pour pouvoir attérir.</p>
-            <p>Vous avez une liste de piste d'attérissage à votre dispotion. A vous de bien les utiliser dans cet univers hautement concurrentiel pour arriver
-            à se faire poser tous les avions.
+            <p>Vous êtes un contrôleur aérien. Des avions vont vous envoyer une série de messages pour atterrir.</p>
+            <p>Vous avez une liste de pistes d'atterrissage à votre dispotion. A vous de bien les utiliser dans cet univers hautement concurrentiel pour arriver
+            à faire atterrir tous les avions. Attention aux pannes de carburant et aux collisions!
             </p>
-            <p>Le serveur de jeu se chargera ensuite d'envoyer les avions jusqu'à la porte d'embarquement.</p>
+            <p>Le serveur de jeu endosse le rôle de contrôleur au sol. Il se charge d'acheminer les avions jusqu'à la porte d'embarquement.</p>
 
             <p>Le workflow est simple</p>
-            <h3>Incoming</h3>
-            <p>Un avion arrive et vous contacte. Vous devez lui répondre par <code>new Land(...)</code> avec la référence vers une piste d'attérissage.</p>
-
-           <h3>HasLanded</h3>
-           <p>Quand l'avion est au sol, il vous demande l'adresse de la tour de contrôle au sol. Répondez lui tout simplement <code>Contact(groundControl)</code>. ATTENTION, l'avion est toujours sur la piste.</p>
-
-            <h3>HasLeft</h3><p>L'avion a liberé la piste d'attérissage.</code></p>
-            <p>La liste intégrale des états des avions est disponibles <a href="#code/app/fr/xebia/xke/akka/message/PlaneEvent.scala" class="shortcut">ici</a>. Seul les trois états cités ici sont intéressants.</p>
-            <p>La liste des commandes est disponible ici <a href="#code/app/fr/xebia/xke/akka/message/command/Command.scala" class="shortcut">ici</a>. Seul les citées ici sont intéressantes.</p>
+            <ul>
+                <li><code>Incoming</code></li>Un avion arrive et vous contacte. Vous devez lui répondre par <code>Land(...)</code> avec la référence vers une piste d'atterrissage.
+                <li><code>HasLanded</code></li>Quand l'avion a atterri, il vous demande l'adresse de la tour de contrôle au sol. Répondez lui tout simplement <code>Contact(groundControl)</code>. ATTENTION, à cet instant l'avion est toujours sur la piste.
+                <li><code>HasLeft</code></li>L'avion a libéré la piste d'atterrissage.
+            </ul>
+            <p>La liste intégrale des états des avions est disponible <a href="#code/app/fr/xebia/xke/akka/message/PlaneEvent.scala" class="shortcut">ici</a>. Seul les trois états cités ici sont intéressants.</p>
+            <p>La liste des commandes est disponible ici <a href="#code/app/fr/xebia/xke/akka/message/command/Command.scala" class="shortcut">ici</a>. Seules les commandes citées ici sont intéressantes pour le jeu.</p>
             <img src="http://www.websequencediagrams.com/cgi-bin/cdraw?lz=dGl0bGUgU2hvcnQgTGFuZGluZyBwcm9jZWR1cmUKCiAgICBvcAASCQALBVBsYW5lLS0-K0FpciBDb250cm9sOiBJbmNvbQAbCAAPCy0-ABoNV2FpdCBmcmVlIHJ1bndheQAdEgBaBToAgQgFKFIAHwUpAGwLAEAOQWNrAIEeBgCBDAgAMgtpbmcgd2l0aCByYW5kb20gZHVyYXRpb24AgTcNAIE2DUhhc0xhbmRlZChwbGFuZQBxBgCBPg0tAIEWB0NvbnRhY3QoZ3JvdW5kAIECHgCBDBNXYWl0aW5nIGZvciB0YXhpd2F5cwCBWAwtAIEGEWVmdACDBwVlbmQ&s=modern-blue">
 
             <p>Vous êtes prêts, alors c'est parti!</p>
@@ -42,20 +40,20 @@
         <div>
             <h2>Etape 1: 1ère version (30 min)</h2>
             <p>
-                <a href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala" class="shortcut">AirTrafficControl.scala</a>. C'est dans cette classe que vous allez implémenter votre algorithme. Après, une petite étape d'initialisation du jeu, vous travaillez dans la méthode <code>ready</code>.
+                <a href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala" class="shortcut">AirTrafficControl.scala</a>. C'est dans cette classe que vous allez implémenter votre algorithme.
             </p>
 
             <h3>case Incoming =></h3>
-            <p>Dans cette première version, contentez vous de lui répondre <pre><code>plane ! Land(runways.head)</code></pre></p>
+            <p>Dans cette première version, contentez vous de répondre à l'avion d'atterrir sur la première piste <pre><code>plane ! Land(runways.head)</code></pre></p>
 
             <h3>case HasLanded =></h3>
             <pre><code>plane ! Contact(groundControl)</code></pre>
 
             <h3>case HasLeft =></h3>
-            <p>Ici, l'avion est vraiment parti. Pour le moment, on peut juste logger avec <pre><code>log.info(s"${plane.path.name} has arrived")</code></pre></p>
+            <p>Ici, l'avion a libéré la piste. On logger l'événement avec <pre><code>log.info(s"${plane.path.name} has left")</code></pre></p>
 
             <h3>Et on teste</h3>
-            <p>Rendez-vous ensuite sur votre server jeu sur <a href="http://localhost:9000">localhost:9000</a> et lancer une partie au niveau 0.
+            <p>Rendez-vous ensuite sur votre server jeu sur <a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 0.
         </div>
 
 
@@ -70,48 +68,48 @@
             <p>Nous sommes toujours dans le code de la classe :<a href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala" class="shortcut">AirTrafficControl.scala</a>.</p>
             <h3>case Incoming =></h3>
             <p>
-                Un acteur est un objet, il peut avoir un état. Ici, l'agent de contrôle va devoir se souvenir des affectations qu'il fait. Pour cela créer un variable d'instance de type Map<pre><code>var allocations = Map.empty[ActorRef,ActorRef]</code></pre>dans la classe.
-                La clé est la référence de l'avion, la valeur est la référence vers la piste d'attérissage affectée.
+                Un acteur est un objet, il peut avoir un état. L'agent de contrôle va devoir se souvenir des pistes qu'il affecte aux avions. Pour cela créez une variable d'instance de type Map<pre><code>var allocations = Map.empty[ActorRef,ActorRef]</code></pre>
+                La clé est la référence de l'avion, la valeur est la référence vers la piste d'atterrissage affectée.
             </p>
             <p>
                 Lors de l'arrivée d'un avion, il suffit de connaitre la liste des pistes libres, en Scala, cela s'obtient par la ligne suivante
                 <pre><code>def freeRunways = runways -- allocations.values</code></pre>
             </p>
             <h4>Si cette liste est non vide</h4>
-            <p>Récupérez le premier élément, envoyer l'ordre à l'avion d'attérir sur cette piste, et stocker l'association dans la Map.</p>
+            <p>Récupérez le premier élément, envoyez l'ordre à l'avion d'atterrir sur cette piste, et stockez l'association dans la Map.</p>
             <pre><code>val freeRunway = freeRunways.head
 plane ! Land(freeRunway)
 allocations += (plane -> freeRunway)</code></pre>
 
             <h4>Si cette liste est vide</h4>
             <p>
-                Nous ne sommes pas obliger de répondre tout de suite. Nous sommes en environnement totalement asynchrone. Nous pouvons mettre de côté cette demande et la traiter quand une place sera libérée.
-                Pour cela, il faut créer variable d'instance de type Queue: <pre><code>var pendings = Queue.empty[ActorRef]</code></pre>
-                Cette queue contiendra la liste des avions en attentes avec la ligne de code suivante:
+                Nous ne sommes pas obliger de répondre tout de suite. Nous sommes en environnement asynchrone. Nous pouvons mettre de côté cette demande et la traiter quand une place se libérera.
+                Pour cela, il faut créer une variable d'instance de type Queue: <pre><code>var pendings = Queue.empty[ActorRef]</code></pre>
+                Cette queue contiendra la liste des avions en attente avec la ligne de code suivante:
                 <pre><code>pendings = pendings enqueue plane</code></pre>
             </p>
 
             <h3>case HasLanded =></h3>
-            <p>Il n'y a rien à changer ici.</p>
+            <p>Il n'y a rien à changer.</p>
 
             <h3>case HasLeft =></h3>
-            <p>Il faut récupérer ici la piste d'attérissage affectée pour la rendre de nouveau libre.
+            <p>Il faut récupérer la piste d'atterrissage affectée pour la rendre de nouveau libre.
             <pre><code>val freeRunway = allocations(plane)
-allocations -= plane</code></pre>.
-            Il faut ensuite savoir s'il y a des avions en attentes:
+allocations -= plane</code></pre>
+            Il faut ensuite savoir s'il y a des avions en attente.
             </p>
             <h4>S'il y a de l'attente</h4>
-            <p>Il récupérer l'avion en attente, lui demander d'attérir puis réaffecter cette voie à cet avion.<pre><code>val (pendingPlane,newPendings) = pendings.dequeue
+            <p>Récupérez l'avion en attente, demandez-lui d'atterrir puis réaffectez cette piste à ce dernier avion.<pre><code>val (pendingPlane,newPendings) = pendings.dequeue
 pendingPlane ! Land(freeRunway)
 allocations += (pendingPlane -> freeRunway)
 pendings = newPendings</code></pre></p>
 
             <h3>Et on teste</h3>
-            <p><a href="http://localhost:9000">localhost:9000</a> et lancer une partie au niveau 1.
+            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 1.
 
             <h4>NB</h4>
-            <p>Un acteur est encapsulé, il n'est donc pas nécessaire d'utiliser des structures de données concurrentes. Un acteur ne sera toujours accéder que par 1 seul thread au plus.</p>
-            <p>Une bonne pratique est d'utiliser des références <b>mutables</b> sur des structures <b>immutables.</b>En effet, les structures immutables peuvent être
+            <p>Un acteur est encapsulé, il n'est donc pas nécessaire d'utiliser des structures de données concurrentes. Un acteur sera toujours accédé que par 1 seul thread au plus.</p>
+            <p>Une bonne pratique est d'utiliser des références <b>mutables</b> sur des structures <b>immutables.</b> En effet, les structures immutables peuvent être
                 échangées avec d'autres acteurs sans problème d'état partagé.
             </p>
         </div>
@@ -123,15 +121,15 @@ pendings = newPendings</code></pre></p>
         --------------------->
         <div>
             <h2>Etape 3: Radio is failing (30 min)</h2>
-            <p>Cette fois, l'avion va 'perdre' des messages. Il vous faut vous assurer qu'il a bien compris vos ordres. Un des patterns classiques pour cela en message est celui des <b>Ack</b>.</p>
+            <p>Cette fois, l'avion va 'perdre' des messages. Il faut vous assurer qu'il a bien compris vos ordres. Un des patterns classiques pour cela en message est celui des <b>Ack</b>.</p>
             <p>
-                Un acteur n'est pas coûteux en mémoire. On peut en créer qui ont une durée de vie très courte.
+                Un acteur n'est pas coûteux en mémoire. Il est possible d'en créer beaucoup, même avec une durée de vie très courte.
                 De plus, il est préférable de garder des responsabilités ciblées pour chaque acteur. Notre opérateur de tour de contrôle
                 n'est pas un expert de la radio, il va donc déléguer la répétition du message à un autre acteur.
            </p>
             <h3>Création d'OrderSender.scala</h3>
-            <p>Pour cela, crééez un autre acteur à côté d'AirTrafficControl.scala, dans le package <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/">player</a>. Vous pouvez nommer votre fichier <pre><code>OrderSender.scala</code></pre></p>
-            <p>Penser à ajouter le package de la classe: <pre><code>package fr.xebia.xke.akka.player</code></pre></p>
+            <p>Pour cela, créez un autre acteur à côté d'AirTrafficControl.scala, dans le package <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/">player</a>. Vous pouvez nommer votre fichier <pre><code>OrderSender.scala</code></pre></p>
+            <p>Pensez à ajouter le package de la classe: <pre><code>package fr.xebia.xke.akka.player</code></pre></p>
             <p>Voici aussi la liste des imports dont vous allez avoir besoin.<pre><code>import akka.actor.{ActorLogging, ActorRef, Actor}
 import akka.actor.{ActorLogging, Actor, ActorRef}
 import scala.concurrent.duration._
@@ -146,25 +144,25 @@ import fr.xebia.xke.akka.airport.message.PlaneEvent.Ack</code></pre></p>
             <p>
                 Votre acteur va prendre 3 paramètres:
                 <ul>
-                    <li><code>target: ActorRef</code></li>: l'avion qu'il faut contacter
+                    <li><code>target: ActorRef</code></li>l'avion qu'il faut contacter
                     <li><code>msg: Any</code></li>le message à délivrer
                     <li><code>ackMaxTimeout: FiniteDuration</code></li>le temps au bout duquel l'avion devrait avoir répondu
                 </ul>
             </p>
             <h3>Envoie du message au démarrage de l'application</h3>
             <p>
-                Il est possible de surcharger certaines méthodes de l'acteur pour intéragir avec son cycle de vie. Ici
-                nous allons déclencher l'envoie d'un messag à l'avion lors de la création de cet acteur.
+                Il est possible de surcharger certaines méthodes de l'acteur pour intéragir avec son cycle de vie. Nous
+                nous allons déclencher l'envoie d'un message à l'avion lors de la création de cet acteur.
                 <pre><code>target ! msg</code></pre>
             </p>
             <h3>Planification du timeout</h3>
-            <p>Créer un <code>case object Timeout</code> au sein du même fichier de classe.</p>
-            <p>L'OrderSender va ensuite s'envoyer un message pour le prévenir du timeout de l'avion. Pour cela, créer un <code>case object Timeout</code>dans votre fichier <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/OrderSender.scala">OrderSender.scala</a>.
-        Juste après l'envoie du message, nous pouvons utiliser le scheduler proposé par Akka pour s'envoyer un message:<pre><code>import context.dispatcher
+            <p>Créez un <code>case object Timeout</code> au sein du même fichier de classe.</p>
+            <p>L'OrderSender va ensuite s'envoyer un message pour se prévenir du timeout de l'avion. Pour cela, créez un <code>case object Timeout</code> dans votre fichier <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/OrderSender.scala">OrderSender.scala</a>.
+        Juste après l'envoi du message, nous pouvons utiliser le scheduler proposé par Akka pour s'envoyer un message:<pre><code>import context.dispatcher
 context.system.scheduler.scheduleOnce(ackMaxTimeout, self, Timeout)</code></pre>
             </p>
             <h3>Comportement</h3>
-            <p>L'implémentation de l'acteur est ensuite facile à réaliser. Si l'on recoit le message <code>fr.xebia.xke.akka.airport.message.command.Ack</code>, on arrête l'acteur. Si l'on recoit <code>Timeout</code> il faut de nouveau envoyer le message et planifier le Timeout.<pre><code>def receive: Receive = {
+            <p>L'implémentation de l'acteur est ensuite facile à réaliser. Si l'on reçoit le message <code>fr.xebia.xke.akka.airport.message.command.Ack</code>, on arrête l'acteur. Si l'on reçoit <code>Timeout</code> il faut de nouveau envoyer le message et planifier le Timeout.<pre><code>def receive: Receive = {
     case Ack =>
 
         log.debug(s"Ack of ${msg.getClass.getSimpleName} to ${target.path.name}")
@@ -184,7 +182,7 @@ context.system.scheduler.scheduleOnce(ackMaxTimeout, self, Timeout)</code></pre>
 import scala.concurrent.duration._
 context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds)))</code></pre>
             <h3>Et on teste</h3>
-            <p><a href="http://localhost:9000">localhost:9000</a> et lancer une partie au niveau 2.
+            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 2.
         </div>
 
 
@@ -196,17 +194,15 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
         <div>
             <h2>Etape 4: EventSourcing (bonus)</h2>
             <p>Cette étape permet de stocker l'état de l'<code>AirTrafficControl</code>. La communication peut être coupée à tout moment, il faut donc être capable de redémarrer un <code>AirTrafficControl</code> avec un état du jeu persisté.</p>
-            <p>Lors de cette étape du jeu, un <code>ChaosMonkey</code> peut être envoyé à tout moment à <code>l'AirTrafficControl.</code> A la réception de ce message, l'<code>AirTrafficControl</code> redémarre. Il pert alors son état.
-            Le superviseur de cet acteur est  <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/AirportManager.scala">AirportManager.scala</a>. C'est lui qui fixe cet stratégie.
-            </p>
+            <p>Lors de cette étape du jeu, un <code>ChaosMonkey</code> peut être envoyé à tout moment à <code>l'AirTrafficControl.</code> A la réception de ce message, l'<code>AirTrafficControl</code> redémarre. Il perd alors son état.</p>
 
             <h3>Eventsourcing</h3>
-            <p>Contrairement à une approche classique à base d'ORM et d'update dans une base de données, cette approche ce fait en mode 'append-only'.
-            L'objet stocke dans une structure de données des événements métiers (un avion a été affecté à une piste, un avion est ajouté en attente...). </p>
+            <p>Contrairement à une approche classique à base d'ORM et d'update dans une base de données, cette approche se fait en mode 'append-only'.
+            L'objet stocke dans une structure de données des événements métiers (un avion a été affecté à une piste, un avion est mis en attente...). </p>
             <p>Le système peut alors décider de faire rejouer tous les événements d'un acteur quand il 'renaît' avant de l'autoriser à consommer des messages de sa mailbox.</p>
             <p>
                 Mais il faut faire une différence entre un message en entrée de l'acteur (<code>Command</code>), et l'événement fonctionnel qui en résulte (<code>Event</code>).
-                Il existe deux stratégie : CommandSourcing (persistance des messages en entrée) et EventSourcing (persistence des changements d'états).
+                Il existe deux stratégies : CommandSourcing (persistance des messages en entrée) et EventSourcing (persistence des changements d'états).
             </p>
             <p>Quels sont pour vous les commandes de l'acteur AirTrafficControl? Quels sont les événements? Les commandes sont:
                 <ul>
@@ -221,7 +217,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
                 <li><code>PlaneEnqueued(plane)</code></li>
                 <li><code>PlaneDequeued</code></li>
             </ul>
-            Dans le même fichier que <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala">AirTrafficControl.scala</a>, créer donc quatre classes:
+            Dans le même fichier que <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala">AirTrafficControl.scala</a>, créez donc ces classes:
             <ul>
                 <li><code>case class PlaneAffected(plane:ActorRef,runway:ActorRef)</code></li>
                 <li><code>case class PlaneDisaffected(plane:ActorRef)</code></li>
@@ -229,13 +225,13 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
                 <li><code>case object PlaneDequeued</code></li>
                 <li><code>case class Initiated(groundControl: ActorRef, runways: Set[ActorRef], ackMaxTimeout:Int)</code></li>
             </ul>
-            Cette dernière classe correspond au message d'intialisation du l'ATC par le jeu (transparent pour vous jusque là!).
-            Il ne sert à rien non plus de gérer le message <code>ChaosMonkey</code>. Il permet seulement de lancer une exception pour redémarrer l'instance.
+            Cette dernière classe correspond au message d'initialisation du l'ATC par le jeu (transparent pour vous jusque là!).
+            Il n'est pas nécessaire de gérer le message <code>ChaosMonkey</code>. Il permet seulement de lancer une exception pour redémarrer l'instance.
             </p>
 
             <h3>EventsourcedProcessor</h3>
             <p>
-                Pour utiliser l'EventSourcing, le code doit être changé en profondeur. Il faut tout d'abord changer d'héritage.
+                Pour utiliser l'EventSourcing, le code doit être modifié en profondeur. Il faut tout d'abord changer d'héritage.
                 Dans <a href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala" class="shortcut">AirTrafficControl.scala</a>
                 faites hériter la classe d'<code>EventsourcedProcessor</code>. Vous pouvez garder le mixin avec <code>ActorLogging</code>.
                 Cette nouvelle classe nécessite l'implémentation de deux méthodes:
@@ -245,21 +241,21 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
                 </ul>
             </p>
 
-            <p>Aucun message ne sera traité par <code>receiveCommand</code> tant que <code>receiveRecover</code> recoit des messages. C'est l'abstraction qui gère cela pour nous. </p>
+            <p>Aucun message ne sera traité par <code>receiveCommand</code> tant que <code>receiveRecover</code> reçoit des messages. C'est l'abstraction qui gère cela pour nous. </p>
 
             <h3>receiveCommand</h3>
             <p>On peut copier-coller l'intégralité du traitement fait jusqu'ici depuis la méthode <code>recover</code> dans la méthode <code>receiveCommand</code>. Il faut cependant la modifier un peu:</p>
 
             <h4>case Incoming => </h4>
             <p>
-                Le code reste la même pour savoir si une piste est libre ou pas. Mais plutôt que d'envoyer un message à l'avion ou stocker l'affectation, il faut d'abord créer l'événement, le persister avant de faire des "effets de bord".
+                Le code reste le même pour savoir si une piste est libre ou pas. Mais plutôt que d'envoyer un message à l'avion ou stocker l'affectation, il faut d'abord créer l'événement, le persister avant de faire des "effets de bord".
                 Cela se fait grâce à la méthode <pre><code>def persist[A](event : A)(handler : (A => Unit))</code></pre>
                 Une fois persisté, l'acteur appelle la fonction <code>handler</code>. Pour notre cas, cela donne:
             <pre><code>persist(PlaneAffected(plane,freeRunway)){
     case PlaneAffected(p,f) =>
         ensure(p,Land(f))
         allocations += (p -> f)
-}</code></pre>Nous voyons bien ici la différence qu'il existe entre la valorisation métier d'une commande et les effets de bords.</p>
+}</code></pre>Nous voyons bien la différence entre la valorisation métier d'une commande et les effets de bords.</p>
             <p>Ensuite, il faut gérer le cas où l'avion doit être mis en attente:
             <pre><code>persist(PlaneEnqueued(plane)){
     case PlaneEnqueued(p) =>
@@ -314,10 +310,10 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <h3>receiveRecover</h3>
             <p>
                 Cette méthode doit être plus simple. Elle est appelée par le framework lors du démarrage d'un acteur.
-                Ce qu'il est important de savoir, c'est que l'identifiant unique d'un acteur est son path dans le système.
-                Au démarrage, le système vérifie si des événements on déjà été stockés pour cet identifiant.
+                Ce qui est important de savoir, c'est que l'identifiant unique d'un acteur est son path dans le système.
+                Au démarrage, le système vérifie si des événements ont déjà été stockés pour cet identifiant.
                 Si oui, il les joue un par un avant de laisser l'acteur consommer des messages de sa mailbox.
-                Nous utilisons LevelDB comme implémentation de store. C'est celle par défaut.
+                Nous utilisons LevelDB comme implémentation de store, celle par défaut.
             </p>
             <p>
                 Voici le code de gestion du recover:
@@ -341,6 +337,8 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
         this.ackMaxTimeout = a
 }</code></pre>
             </p>
+            <h3>Et on teste</h3>
+            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 3.
         </div>
 
 
@@ -362,10 +360,10 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <h3>Directive</h3>
             <p>Si vous inspectez le code de <code>SupervisorStrategy</code>, vous trouverez la liste des actions possibles:
                 <ul>
-                    <li><code>Resume</code></li>l'acteur continue comme si de rien était.
+                    <li><code>Resume</code></li>l'acteur continue de consommer des messages.
                     <li><code>Stop</code></li>l'acteur se termine et n'existe plus.
-                    <li><code>Restart</code></li>l'acteur est redémarré. Il pert le message qui a produit l'exception et perd son état.
-                    <li><code>Escalate</code></li>le superviseur ne sait pas quoi faire et escale le problème.
+                    <li><code>Restart</code></li>l'acteur est redémarré. Il perd le message qui a produit l'exception et perd son état.
+                    <li><code>Escalate</code></li>le superviseur ne sait pas quoi faire et escalade le problème.
                 </ul>
             </p>
             <h3>SupervisorStrategy</h3>
@@ -377,13 +375,13 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             </p>
             <h3>Options</h3>
             <p>
-                En paramètre de la stratégie, on retrouve les paramètres suivants:
+                En paramètre de la stratégie, on retrouve aussi:
                 <ul>
                     <li><code>maxNrOfRetries</code></li>nombre de fois que l'exception doit être lancée pour un même acteur avant que le superviseur n'intervienne.
                     <li><code>withinTimeRange</code></li>fenêtre glissante de temps pour le compteur du nombre d'exceptions.
                     <li><code>loggingEnabled</code></li>loggue ou non l'exception
                 </ul>
-                Ces options permettent déclencher des actions qui si une exception est appelée, par exemple, <b>5 fois</b> en moins de <b>10 secondes</b>.
+                Ces options permettent déclencher des actions que si une exception est appelée, par exemple, <b>5 fois</b> en moins de <b>10 secondes</b>.
             </p>
         </div>
 
@@ -396,7 +394,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <h2>Bonus: Finite State Machine</h2>
             <p>
                 Le modèle acteur est adapté à la gestion de machine à états finis.
-                Nous ne l'avons pas vu ce soir, mais cette fonctionnalitée est beaucoup utilisé dans notre serveur Play!.
+                Nous ne l'avons lors de cet atelier, mais cette fonctionnalité est régulièrement utilisée dans notre serveur Play!.
                 Pour cela, nous utilisons une commande très puissante: <code>become</code>.
                 La méthode <code>become</code> sur le <code>context</code> d'un acteur permet de définir le code de la méthode qui va traiter le prochain message.
             </p>
@@ -404,18 +402,18 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <h3>Exemple</h3>
             <p>
                 Un exemple de l'utilisation de cette fonctionnalité se trouve dans le fichier <a class="shortcut" href="#code/app/fr/xebia/xke/akka/airport/Runway.scala">Runway.scala</a>.
-                En effet, une piste d'attérissage à deux états possibles, <code>free</code> ou <code>occupied(plane)</code>.
+                En effet, une piste d'atterrissage à deux états possibles, <code>free</code> ou <code>occupied(plane)</code>.
             </p>
             <h3>free</h3>
             <p>
-                Lorsqu'elle est <b>libre</b>, la piste d'atérissage accepte l'atérissage d'un nouvel avion. Elle <b>devient</b> alors <code>occupied(plane)</code>.
+                Lorsqu'elle est <b>libre</b>, la piste accepte l'atterrissage d'un nouvel avion. Elle <b>devient</b> alors <code>occupied(plane)</code>.
             </p>
             <h3>occupied</h3>
             <p>
-                Lorsqu'elle est <b>occupée</b>, la piste d'atérissage émet une erreur lorsqu'elle reçoit un nouvel avion et termine. Sinon, elle redevient <code>free</code> lorsqu'un avion s'en va.
+                Lorsqu'elle est <b>occupée</b>, la piste émet une erreur lorsqu'elle reçoit un nouvel avion et termine. Sinon, elle re<b>devient</b> <code>free</code> lorsqu'un avion s'en va.
             </p>
             <p>
-                L'apport du <code>become</code> permet d'isoler les différents états et évite de stocker des variables mutables sur l'acteur. Finalement, l'acteur ne pourrait contenir aucun état. Tout peut être passer d'appels en appels en invoquant
+                L'apport du <code>become</code> est d'isoler les différents états et d'éviter de stocker des variables mutables sur l'acteur. Finalement, l'acteur ne pourrait contenir aucun état. Tout peut être passé d'appel en appel en invoquant
                 la méthode <code>become</code> à chaque réception de message. Cela peut rendre le code plus facilement testable unitairement.
             </p>
         </div>
@@ -427,7 +425,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <h2>Bonus: Akka Cluster</h2>
             <p>
                 Pour faire communiquer les acteurs du serveur Play! avec ceux du joueur, nous utilisons le module <code>akka-cluster</code>.
-                Baser sur une communication TCP via Netty, il permet de créer une connexion entre deux acteurs systèmes distants.
+                Basé sur une communication TCP via Netty, il permet de créer une connexion entre deux acteurs systèmes distants.
                 Un acteur peut alors discuter avec un autre, qui peut potentiellement être sur une autre machine.
             </p>
             <p>
@@ -442,12 +440,12 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
     //connexion d'un nouveau membre
 
 case UnreachableMember(member) =>
-    //la communication réseau est rompu</code></pre>
+    //la communication réseau est rompue</code></pre>
             </p>
             <p>
                 L'objet <code>Member</code> contient l'adresse du système et les rôles qu'il déclare accepter. Cela permet de créer des noeuds taggés (back, web, log...)
             </p>
-            <p>On peut alors faire deux choses, créer des acteurs sur un autre système de que le sien, ou faire du lookup par path. Ici nous utilisons du lookup.
+            <p>On peut alors faire deux choses, créer des acteurs sur un autre système, ou faire du lookup par path. Ici nous utilisons du lookup.
                 L'instance d'AirportManager est localisée par son path.
                 <pre><code>context.actorSelection(ActorPath.fromString(address.toString) / "user" / airportCode)</code></pre>
                 Cet acteur créé ensuite à la demande des instances locales d'AirTrafficControl pour ensuite envoyer leur ActorRef à l'appelant.
