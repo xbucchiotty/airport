@@ -146,9 +146,9 @@ import fr.xebia.xke.akka.airport.message.PlaneEvent.Ack</code></pre></p>
             <p>
                 Votre acteur va prendre 3 paramètres:
                 <ul>
-                    <li><code>target: ActorRef</code>: l'avion qu'il faut contacter</li>
-                    <li><code>msg: Any</code>: le message à délivrer</li>
-                    <li><code>ackMaxTimeout: FiniteDuration</code>: le temps au bout duquel l'avion devrait avoir répondu</li>
+                    <li><code>target: ActorRef</code></li>: l'avion qu'il faut contacter
+                    <li><code>msg: Any</code></li>le message à délivrer
+                    <li><code>ackMaxTimeout: FiniteDuration</code></li>le temps au bout duquel l'avion devrait avoir répondu
                 </ul>
             </p>
             <h3>Envoie du message au démarrage de l'application</h3>
@@ -240,8 +240,8 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
                 faites hériter la classe d'<code>EventsourcedProcessor</code>. Vous pouvez garder le mixin avec <code>ActorLogging</code>.
                 Cette nouvelle classe nécessite l'implémentation de deux méthodes:
                 <ul>
-                    <li><code>override def receiveCommand: Receive</code>: cette méthode <code>receive</code> va recevoir les commandes comme la méthode <code>receive</code> d'un acteur classique.</li>
-                    <li><code>override def receiveRecover: Receive</code>: cette méthode <code>receive</code> va recevoir les événements qui ont été persistés au redémarrage d'un acteur.</li>
+                    <li><code>override def receiveCommand: Receive</code></li>cette méthode <code>receive</code> va recevoir les commandes comme la méthode <code>receive</code> d'un acteur classique.
+                    <li><code>override def receiveRecover: Receive</code></li>cette méthode <code>receive</code> va recevoir les événements qui ont été persistés au redémarrage d'un acteur.
                 </ul>
             </p>
 
@@ -340,6 +340,50 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
         this.runways = r
         this.ackMaxTimeout = a
 }</code></pre>
+            </p>
+        </div>
+
+
+        <!-------------------
+       BONUS: Supervisor
+       --------------------->
+        <div>
+            <h2>Bonus: Supervisor</h2>
+            <p>Un acteur est forcément supervisé par celui qui l'a créé. Cela forme un graphe d'objet, en partant du système comme niveau le plus haut.</p>
+            <p>Si un acteur lance une exception, son superviseur reçoit un message avec l'exception. Il peut alors décider du sort de ses 'supervisés'.</p>
+            <p>Un exemple se trouve dans la classe <a class="shortcut" href="#code/app/fr/xebia/xke/akka/player/AirportManager.scala">AirportManager.scala</a>.</p>
+            <pre><code>override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy(loggingEnabled = true) {
+    case _: ChaosMonkeyException =>
+        SupervisorStrategy.Restart
+}</code></pre>
+            <p>
+                Grâce au pattern matching, la gestion d'erreur est très claire. En cas d'une exception <code>ChaosMonkeyException</code>, le superviseur demande à l'acteur de faire un <code>Restart</code>.
+             </p>
+            <h3>Directive</h3>
+            <p>Si vous inspectez le code de <code>SupervisorStrategy</code>, vous trouverez la liste des actions possibles:
+                <ul>
+                    <li><code>Resume</code></li>l'acteur continue comme si de rien était.
+                    <li><code>Stop</code></li>l'acteur se termine et n'existe plus.
+                    <li><code>Restart</code></li>l'acteur est redémarré. Il pert le message qui a produit l'exception et perd son état.
+                    <li><code>Escalate</code></li>le superviseur ne sait pas quoi faire et escale le problème.
+                </ul>
+            </p>
+            <h3>SupervisorStrategy</h3>
+            <p>Il existe une autre variation du traitement d'erreurs:
+                <ul>
+                    <li><code>OneForOneStrategy</code></li>la commande choisie par le superviseur ne s'applique qu'à l'acteur en erreur.
+                    <li><code>AllForOneStrategy</code></li>la commande choisie s'applique à tous les acteurs 'enfants' du superviseur.
+                </ul>
+            </p>
+            <h3>Options</h3>
+            <p>
+                En paramètre de la stratégie, on retrouve les paramètres suivants:
+                <ul>
+                    <li><code>maxNrOfRetries</code></li>nombre de fois que l'exception doit être lancée pour un même acteur avant que le superviseur n'intervienne.
+                    <li><code>withinTimeRange</code></li>fenêtre glissante de temps pour le compteur du nombre d'exceptions.
+                    <li><code>loggingEnabled</code></li>loggue ou non l'exception
+                </ul>
+                Ces options permettent déclencher des actions qui si une exception est appelée, par exemple, <b>5 fois</b> en moins de <b>10 secondes</b>.
             </p>
         </div>
 
