@@ -53,7 +53,7 @@
             <p>Ici, l'avion a libéré la piste. On logger l'événement avec <pre><code>log.info(s"${plane.path.name} has left")</code></pre></p>
 
             <h3>Et on teste</h3>
-            <p>Rendez-vous ensuite sur votre server jeu sur <a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 0.
+            <p>Rendez-vous ensuite sur votre server jeu sur <a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 1.
         </div>
 
 
@@ -105,7 +105,7 @@ allocations += (pendingPlane -> freeRunway)
 pendings = newPendings</code></pre></p>
 
             <h3>Et on teste</h3>
-            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 1.
+            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 2.
 
             <h4>NB</h4>
             <p>Un acteur est encapsulé, il n'est donc pas nécessaire d'utiliser des structures de données concurrentes. Un acteur sera toujours accédé que par 1 seul thread au plus.</p>
@@ -182,7 +182,7 @@ context.system.scheduler.scheduleOnce(ackMaxTimeout, self, Timeout)</code></pre>
 import scala.concurrent.duration._
 context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds)))</code></pre>
             <h3>Et on teste</h3>
-            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 2.
+            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 3.
         </div>
 
 
@@ -338,7 +338,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
 }</code></pre>
             </p>
             <h3>Et on teste</h3>
-            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 3.
+            <p><a href="http://localhost:9000">localhost:9000</a> et lancez une partie au niveau 4.
         </div>
 
 

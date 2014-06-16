@@ -20,23 +20,23 @@
                     <div class="brand dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Level <span class="badge">@level</a></span>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <form action="@routes.Application.createLevel0(selectedAirport.code)" method="POST" >
-                                    <button type="submit" class="btn btn-link">Level 0, a piece of cake.</button>
-                                </form>
-                            </li>
-                            <li>
                                 <form action="@routes.Application.createLevel1(selectedAirport.code)" method="POST" >
-                                    <button type="submit" class="btn btn-link">Level 1, more runways.</button>
+                                    <button type="submit" class="btn btn-link">Level 1, a piece of cake.</button>
                                 </form>
                             </li>
                             <li>
                                 <form action="@routes.Application.createLevel2(selectedAirport.code)" method="POST" >
-                                    <button type="submit" class="btn btn-link">Level 2, dawn radio (delivery reliability).</button>
+                                    <button type="submit" class="btn btn-link">Level 2, more runways.</button>
                                 </form>
                             </li>
                             <li>
                                 <form action="@routes.Application.createLevel3(selectedAirport.code)" method="POST" >
-                                    <button type="submit" class="btn btn-link">Level 3, chaos monkey (Event sourcing).</button>
+                                    <button type="submit" class="btn btn-link">Level 3, dawn radio (delivery reliability).</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="@routes.Application.createLevel4(selectedAirport.code)" method="POST" >
+                                    <button type="submit" class="btn btn-link">Level 4, chaos monkey (Event sourcing).</button>
                                 </form>
                             </li>
                         </ul>

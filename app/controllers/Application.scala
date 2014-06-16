@@ -25,7 +25,7 @@ object Application extends Controller with PlayerSessionManagement {
 
   val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(airportsClusterLocation, clusterEventStream), "gameStore")
 
-  def createLevel0(airportCode: AirportCode) = Action {
+  def createLevel1(airportCode: AirportCode) = Action {
     val settings = Settings(
       nrOfRunways = 1,
       landingMaxDuration = 1500,
@@ -34,23 +34,6 @@ object Application extends Controller with PlayerSessionManagement {
       taxiingDuration = 500,
       unloadingPassengersMaxDuration = 500,
       objective = 20,
-      ackMaxDuration = 1000)
-
-    newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
-      gameContext => routes.Application.level0(airportCode, gameContext.sessionId)
-    }
-  }
-
-  def createLevel1(airportCode: AirportCode) = Action {
-    val settings = Settings(
-      nrOfRunways = 4,
-      landingMaxDuration = 2500,
-      planeGenerationInterval = 500,
-      objective = 50,
-      nrOfTaxiways = 2,
-      taxiingDuration = 1000,
-      taxiwayCapacity = 5,
-      nrOfGates = 2,
       ackMaxDuration = 1000)
 
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
@@ -66,17 +49,34 @@ object Application extends Controller with PlayerSessionManagement {
       objective = 50,
       nrOfTaxiways = 2,
       taxiingDuration = 1000,
-      taxiwayCapacity = 10,
+      taxiwayCapacity = 5,
       nrOfGates = 2,
-      unloadingPassengersMaxDuration = 5000,
-      ackMaxDuration = 1000,
-      radioReliability = 0.8)
+      ackMaxDuration = 1000)
+
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
       gameContext => routes.Application.level2(airportCode, gameContext.sessionId)
     }
   }
 
   def createLevel3(airportCode: AirportCode) = Action {
+    val settings = Settings(
+      nrOfRunways = 4,
+      landingMaxDuration = 2500,
+      planeGenerationInterval = 500,
+      objective = 50,
+      nrOfTaxiways = 2,
+      taxiingDuration = 1000,
+      taxiwayCapacity = 10,
+      nrOfGates = 2,
+      unloadingPassengersMaxDuration = 5000,
+      ackMaxDuration = 1000,
+      radioReliability = 0.8)
+    newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
+      gameContext => routes.Application.level3(airportCode, gameContext.sessionId)
+    }
+  }
+
+  def createLevel4(airportCode: AirportCode) = Action {
     val settings = Settings(
       nrOfRunways = 4,
       landingMaxDuration = 2500,
@@ -91,18 +91,8 @@ object Application extends Controller with PlayerSessionManagement {
       radioReliability = 0.8,
       chaosMonkey = true)
     newSinglePlayerGame(airportCode, settings, classOf[JustParkingPlane]) {
-      gameContext => routes.Application.level3(airportCode, gameContext.sessionId)
+      gameContext => routes.Application.level4(airportCode, gameContext.sessionId)
     }
-  }
-
-  def level0(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
-    implicit request =>
-      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
-
-      gameContext match {
-        case Some(context) => Ok(views.html.level_0(gameContext.get))
-        case None => Redirect(routes.Application.registered(airportCode))
-      }
   }
 
   def level1(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
@@ -131,6 +121,16 @@ object Application extends Controller with PlayerSessionManagement {
 
       gameContext match {
         case Some(context) => Ok(views.html.level_3(gameContext.get))
+        case None => Redirect(routes.Application.registered(airportCode))
+      }
+  }
+
+  def level4(airportCode: AirportCode, sessionId: SessionId) = LoggedInAction(airportCode) {
+    implicit request =>
+      val gameContext = Await.result(ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]], 10 seconds)
+
+      gameContext match {
+        case Some(context) => Ok(views.html.level_4(gameContext.get))
         case None => Redirect(routes.Application.registered(airportCode))
       }
   }

@@ -1,6 +1,6 @@
-@( gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
+@(gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
 
-@game(3,gameContext,routes.Application.createLevel3(gameContext.airport.code)){
+@game(4,gameContext,routes.Application.createLevel4(gameContext.airport.code)){
 
 <table id='strips'>
     <thead>
@@ -9,9 +9,8 @@
             <a href="#"
                title="Incoming"
                data-toggle="popover"
-               data-content="@gameContext.settings.planeGenerationInterval millis between each plane and @gameContext.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen"
-               data-intro='Now radio communication with planes is fuzzy. Some orders may not be received by planes. Controllers should received <b>Ack</b> messages after each order. They <b>should repeat</b> the message until successfully received. You should use the pattern Actor per request.'
-               data-step='1'>Incoming</a>
+               data-intro='Welcome to the chaos monkey level. Some monkeys will eventually shoot your instance. Use Persistence to be fault tolerant and be able to restart in the middle of a game session.'
+               data-content="@gameContext.settings.planeGenerationInterval millis between each plane and @gameContext.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
         </th>
         <th class="header active">
             <a href="#"
@@ -40,7 +39,7 @@
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Close</a>
-        <form action="@routes.Application.createLevel3(gameContext.airport.code)" method="POST" class="form-inline">
+        <form action="@routes.Application.createLevel4(gameContext.airport.code)" method="POST" class="form-inline">
             <button type="submit" class="btn btn-primary">Retry</button>
         </form>
     </div>
@@ -53,13 +52,11 @@
     <div class="modal-body">
         <img src="/assets/images/hellyeah.jpeg" class="img-polaroid">
 
-        <p>Well done!</p>
+        <p>You mastered the game! Congratulation!!!!</p>
 
     </div>
     <div class="modal-footer">
-        <form action="@routes.Application.createLevel4(gameContext.airport.code)" method="POST" class="form-inline">
-            <button type="submit" class="btn btn-primary">Next</button>
-        </form>
+        <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
     </div>
 </div>
 
