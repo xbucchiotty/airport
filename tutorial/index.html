@@ -153,7 +153,7 @@ import fr.xebia.xke.akka.airport.message.PlaneEvent.Ack</code></pre></p>
             <p>
                 Il est possible de surcharger certaines méthodes de l'acteur pour intéragir avec son cycle de vie. Nous
                 nous allons déclencher l'envoie d'un message à l'avion lors de la création de cet acteur.
-                <pre><code>target ! msg</code></pre>
+		<pre><code>override def preStart(){target ! msg}</code></pre>
             </p>
             <h3>Planification du timeout</h3>
             <p>Créez un <code>case object Timeout</code> au sein du même fichier de classe.</p>
@@ -259,7 +259,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <p>Ensuite, il faut gérer le cas où l'avion doit être mis en attente:
             <pre><code>persist(PlaneEnqueued(plane)){
     case PlaneEnqueued(p) =>
-            pendings = pendings enqueue plane
+            pendings = pendings enqueue p
 }</code></pre></p>
             <h4>case HasLanded => </h4>
             <p>Rien à changer de ce côté pour le moment.</p>
@@ -324,7 +324,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
     case PlaneDisaffected(plane) =>
         allocations -= plane
 
-    case PlaneEnqueued(p) =>
+    case PlaneEnqueued(plane) =>
         pendings = pendings enqueue plane
 
     case PlaneDequeued =>
