@@ -30,14 +30,25 @@ public class AirTrafficControl extends UntypedActor {
     Set<ActorRef> runways = new HashSet<>();
     int ackMaxTimeout = 0;
 
-    Map<ActorRef, ActorRef> planeRunwayMap;
+    Map<ActorRef, ActorRef> planeRunwayMap = new HashMap<>();
+    List<ActorRef> waitingPlanes = new ArrayList<>();
+
 
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof Incoming$) {
             ActorRef plane = sender();
-            ActorRef firstRunaway = runways.iterator().next();
-            plane.tell(new Land(firstRunaway), self());
+            
+            Set<ActorRef> freeRunways = Sets.difference(runways, Sets.newHashSet(planeRunwayMap.values()));
+
+            if(!freeRunways.isEmpty()){
+                ActorRef firstFreeRunway = freeRunways.iterator().next();
+                planeRunwayMap.put(plane, firstFreeRunway);
+                plane.tell(new Land(firstFreeRunway), self());
+            }else{
+                waitingPlanes.add(plane);
+            }
+
 
         } else if (message instanceof HasLanded$) {
             ActorRef plane = sender();
@@ -45,7 +56,14 @@ public class AirTrafficControl extends UntypedActor {
 
         } else if (message instanceof HasLeft$) {
             ActorRef plane = getSender();
-            log.info(plane.path().name()+" has left");
+            ActorRef freeRunway = planeRunwayMap.remove(plane);
+
+            if(!waitingPlanes.isEmpty()){
+                ActorRef firstWaitingPlane = waitingPlanes.get(0);
+                waitingPlanes.remove(0);
+                planeRunwayMap.put(firstWaitingPlane, freeRunway);
+                firstWaitingPlane.tell(new Land(freeRunway), self());
+            }
 
         } else if (message instanceof ChaosMonkey) {
             throw new ChaosMonkeyException();
