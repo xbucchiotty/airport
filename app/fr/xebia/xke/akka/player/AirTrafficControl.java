@@ -36,13 +36,16 @@ public class AirTrafficControl extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof Incoming$) {
             ActorRef plane = sender();
+            ActorRef firstRunaway = runways.iterator().next();
+            plane.tell(new Land(firstRunaway), self());
 
         } else if (message instanceof HasLanded$) {
             ActorRef plane = sender();
-
+            plane.tell(new Contact(groundControl), self());
 
         } else if (message instanceof HasLeft$) {
             ActorRef plane = getSender();
+            log.info(plane.path().name()+" has left");
 
         } else if (message instanceof ChaosMonkey) {
             throw new ChaosMonkeyException();
