@@ -85,4 +85,45 @@ public class AirTrafficControl extends UntypedActor {
 
 
     }
+    
+    public static class PlaneAffected{
+        public final ActorRef plane; 
+        public final ActorRef runway;
+        
+        public PlaneAffected(ActorRef plane,ActorRef runway ){
+            this.plane = plane;
+            this.runway = runway;
+        }
+        
+    }
+    
+    public static class PlaneDisaffected{
+        public final ActorRef plane;
+        
+        public PlaneDisaffected(ActorRef plane){
+            this.plane = plane;
+        }
+    }
+    public static class PlaneEnqueued{
+        public final ActorRef plane;
+        
+        public PlaneEnqueued(ActorRef plane){
+            this.plane = plane;
+        }
+    }
+    public static class PlaneDequeued{
+        
+    }
+
+    public static class Initiated{
+        public final ActorRef groundControl;
+        public final Set<ActorRef> runways;
+        public final Integer ackMaxTimeout;
+        
+        public Initiated(ActorRef groundControl, Set<ActorRef> runways, Integer ackMaxTimeout){
+            this.groundControl = groundControl;
+            this.runways = runways;
+            this.ackMaxTimeout = ackMaxTimeout;
+        }
+    }
 }
