@@ -3,11 +3,14 @@ package fr.xebia.xke.akka.player;
 import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.persistence.EventsourcedProcessor;
+import akka.japi.Procedure;
+import akka.persistence.UntypedEventsourcedProcessor;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.FluentIterable;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Sets;
 import fr.xebia.xke.akka.airport.message.AirTrafficControlReady$;
 import fr.xebia.xke.akka.airport.message.InitAirTrafficControl;
 import fr.xebia.xke.akka.airport.message.ChaosMonkey;
@@ -27,11 +30,12 @@ public class AirTrafficControl extends UntypedActor {
     Set<ActorRef> runways = new HashSet<>();
     int ackMaxTimeout = 0;
 
+    Map<ActorRef, ActorRef> planeRunwayMap;
+
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof Incoming$) {
             ActorRef plane = sender();
-
 
         } else if (message instanceof HasLanded$) {
             ActorRef plane = sender();
@@ -39,7 +43,6 @@ public class AirTrafficControl extends UntypedActor {
 
         } else if (message instanceof HasLeft$) {
             ActorRef plane = getSender();
-
 
         } else if (message instanceof ChaosMonkey) {
             throw new ChaosMonkeyException();
