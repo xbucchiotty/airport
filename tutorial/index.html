@@ -244,7 +244,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <p>Aucun message ne sera traité par <code>receiveCommand</code> tant que <code>receiveRecover</code> reçoit des messages. C'est l'abstraction qui gère cela pour nous. </p>
 
             <h3>receiveCommand</h3>
-            <p>On peut copier-coller l'intégralité du traitement fait jusqu'ici depuis la méthode <code>recover</code> dans la méthode <code>receiveCommand</code>. Il faut cependant la modifier un peu:</p>
+            <p>On peut copier-coller l'intégralité du traitement fait jusqu'ici depuis la méthode <code>receive</code> dans la méthode <code>receiveCommand</code>. Il faut cependant la modifier un peu:</p>
 
             <h4>case Incoming => </h4>
             <p>
