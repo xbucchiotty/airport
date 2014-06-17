@@ -26,7 +26,12 @@ class AirTrafficControl extends Actor with ActorLogging {
       
       if(freeRunways.nonEmpty){
           val freeRunway = freeRunways.head
-          plane ! Land(freeRunway)
+          
+          val message = Land(freeRunway)
+          
+          import scala.concurrent.duration._
+          context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds)))
+          
           allocations += (plane -> freeRunway)
       }else{
           pendings = pendings enqueue plane
@@ -35,7 +40,12 @@ class AirTrafficControl extends Actor with ActorLogging {
 
     case HasLanded =>
       val plane = sender()
-      plane ! Contact(groundControl)
+      
+      val message = Contact(groundControl)
+          
+      import scala.concurrent.duration._
+      context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds)))
+      
 
     case HasLeft =>
       val plane = sender()
@@ -44,7 +54,13 @@ class AirTrafficControl extends Actor with ActorLogging {
       
       if(pendings.nonEmpty){
           val (pendingPlane,newPendings) = pendings.dequeue
-          pendingPlane ! Land(freeRunway)
+          
+          val message = Land(freeRunway)           
+
+         import scala.concurrent.duration._
+         context.actorOf(Props(new OrderSender(pendingPlane, message, ackMaxTimeout.milliseconds)))
+
+
           allocations += (pendingPlane -> freeRunway)
           pendings = newPendings
       }
