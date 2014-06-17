@@ -18,12 +18,15 @@ class AirTrafficControl extends Actor with ActorLogging {
 
     case Incoming =>
       val plane = sender()
+      plane ! Land(runways.head)
 
     case HasLanded =>
       val plane = sender()
+      plane ! Contact(groundControl)
 
     case HasLeft =>
       val plane = sender()
+      log.info(s"${plane.path.name} has left")
 
 
     case ChaosMonkey =>
