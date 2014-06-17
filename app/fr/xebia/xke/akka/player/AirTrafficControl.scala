@@ -13,12 +13,25 @@ class AirTrafficControl extends Actor with ActorLogging {
   var groundControl: ActorRef = null
   var ackMaxTimeout: Int = _
   var runways = Set.empty[ActorRef]
+  
+  var allocations = Map.empty[ActorRef,ActorRef]
+  var pendings = Queue.empty[ActorRef]
+  
+  def freeRunways = runways -- allocations.values
 
   def receive: Receive = {
 
     case Incoming =>
       val plane = sender()
-      plane ! Land(runways.head)
+      
+      if(freeRunways.nonEmpty){
+          val freeRunway = freeRunways.head
+          plane ! Land(freeRunway)
+          allocations += (plane -> freeRunway)
+      }else{
+          pendings = pendings enqueue plane
+      }
+      
 
     case HasLanded =>
       val plane = sender()
@@ -26,7 +39,15 @@ class AirTrafficControl extends Actor with ActorLogging {
 
     case HasLeft =>
       val plane = sender()
-      log.info(s"${plane.path.name} has left")
+      val freeRunway = allocations(plane)
+      allocations -= plane
+      
+      if(pendings.nonEmpty){
+          val (pendingPlane,newPendings) = pendings.dequeue
+          pendingPlane ! Land(freeRunway)
+          allocations += (pendingPlane -> freeRunway)
+          pendings = newPendings
+      }
 
 
     case ChaosMonkey =>
