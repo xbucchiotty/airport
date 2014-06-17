@@ -8,7 +8,7 @@ import fr.xebia.xke.akka.airport.message.command.{Contact, Land}
 
 import scala.collection.immutable.Queue
 
-class AirTrafficControl extends Actor with ActorLogging {
+class AirTrafficControl extends EventsourcedProcessor with ActorLogging {
 
   var groundControl: ActorRef = null
   var ackMaxTimeout: Int = _
@@ -19,7 +19,7 @@ class AirTrafficControl extends Actor with ActorLogging {
   
   def freeRunways = runways -- allocations.values
 
-  def receive: Receive = {
+  override def receiveCommand: Receive = {
 
     case Incoming =>
       val plane = sender()
@@ -27,14 +27,21 @@ class AirTrafficControl extends Actor with ActorLogging {
       if(freeRunways.nonEmpty){
           val freeRunway = freeRunways.head
           
-          val message = Land(freeRunway)
+          persist(PlaneAffected(plane,freeRunway)){
+            case PlaneAffected(p,f) =>
+                allocations += (p -> f)
+                
+                val message = Land(f)
           
-          import scala.concurrent.duration._
-          context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds)))
-          
-          allocations += (plane -> freeRunway)
+                import scala.concurrent.duration._
+                context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds)))
+          }
+
       }else{
-          pendings = pendings enqueue plane
+          persist(PlaneEnqueued(plane)){
+            case PlaneEnqueued(p) =>
+                pendings = pendings enqueue plane
+          }
       }
       
 
@@ -50,20 +57,31 @@ class AirTrafficControl extends Actor with ActorLogging {
     case HasLeft =>
       val plane = sender()
       val freeRunway = allocations(plane)
-      allocations -= plane
-      
-      if(pendings.nonEmpty){
-          val (pendingPlane,newPendings) = pendings.dequeue
-          
-          val message = Land(freeRunway)           
 
-         import scala.concurrent.duration._
-         context.actorOf(Props(new OrderSender(pendingPlane, message, ackMaxTimeout.milliseconds)))
-
-
-          allocations += (pendingPlane -> freeRunway)
-          pendings = newPendings
+      persist(PlaneDisaffected(plane)) {
+        case PlaneDisaffected(p) =>
+            allocations -= p
       }
+
+      if (pendings.nonEmpty) {
+        val (pendingPlane, _) = pendings.dequeue
+
+        persist(PlaneDequeued) {
+            case _ =>
+                val (_, newPendings) = pendings.dequeue
+                pendings = newPendings
+        }
+
+        persist(PlaneAffected(pendingPlane, freeRunway)) {
+            case PlaneAffected(pp, f) =>
+                val message = Land(f)
+          
+                import scala.concurrent.duration._
+                context.actorOf(Props(new OrderSender(pp, message, ackMaxTimeout.milliseconds)))
+                allocations += (pp -> f)
+        }
+    }
+     
 
 
     case ChaosMonkey =>
@@ -73,11 +91,43 @@ class AirTrafficControl extends Actor with ActorLogging {
     //Initialization
     case InitAirTrafficControl(_groundControl, _runways, _ackMaxTimeout) =>
 
-      this.groundControl = _groundControl
-      this.runways = _runways
-      this.ackMaxTimeout = _ackMaxTimeout
+      val game = sender()
+      
+      persist(Initiated(_groundControl, _runways, _ackMaxTimeout)){
+        case Initiated(g,r,a) =>{
+            this.groundControl = g
+            this.runways = r
+            this.ackMaxTimeout = a
 
-      sender() ! AirTrafficControlReady
+            game ! AirTrafficControlReady
+    }
+  }
+  }
+  
+  override def receiveRecover: Receive = {
+    case PlaneAffected(plane, runway) =>
+        allocations += (plane -> runway)
+
+    case PlaneDisaffected(plane) =>
+        allocations -= plane
+
+    case PlaneEnqueued(plane) =>
+        pendings = pendings enqueue plane
+
+    case PlaneDequeued =>
+        val (_, newPendings) = pendings.dequeue
+        pendings = newPendings
+
+    case Initiated(g,r,a) =>
+        this.groundControl = g
+        this.runways = r
+        this.ackMaxTimeout = a
   }
 
 }
+
+case class PlaneAffected(plane:ActorRef,runway:ActorRef)
+case class PlaneDisaffected(plane:ActorRef)
+case class PlaneEnqueued(plane:ActorRef)
+case object PlaneDequeued
+case class Initiated(groundControl: ActorRef, runways: Set[ActorRef], ackMaxTimeout:Int)
