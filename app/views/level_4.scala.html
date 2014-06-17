@@ -1,0 +1,63 @@
+@(gameContext: fr.xebia.xke.akka.game.GameContext)(implicit request: RequestHeader)
+
+@game(4,gameContext,routes.Application.createLevel4(gameContext.airport.code)){
+
+<table id='strips'>
+    <thead>
+    <tr>
+        <th class="header active">
+            <a href="#"
+               title="Incoming"
+               data-toggle="popover"
+               data-intro='Welcome to the chaos monkey level. Some monkeys will eventually shoot your instance. Use Persistence to be fault tolerant and be able to restart in the middle of a game session.'
+               data-content="@gameContext.settings.planeGenerationInterval millis between each plane and @gameContext.settings.outOfKerozenTimeout millis before a plane beiing out of kerozen">Incoming</a>
+        </th>
+        <th class="header active">
+            <a href="#"
+               title="Runway"
+               data-toggle="popover"
+               data-content="@gameContext.settings.nrOfRunways runways with @gameContext.settings.landingMaxDuration  millis max to land">Runway</a>
+        </th>
+        <th class="header inactive">Taxiway</th>
+        <th class="header inactive ">Gate</th>
+        <th class="header">Done</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<div class="modal hide fade" id="GameOver">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Xebia International Airport</h3>
+    </div>
+    <div class="modal-body">
+        <img src="/assets/images/haha.jpeg"
+             class="img-polaroid">
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <form action="@routes.Application.createLevel4(gameContext.airport.code)" method="POST" class="form-inline">
+            <button type="submit" class="btn btn-primary">Retry</button>
+        </form>
+    </div>
+</div>
+<div class="modal hide fade" id="GameEnded">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Xebia International Airport</h3>
+    </div>
+    <div class="modal-body">
+        <img src="/assets/images/hellyeah.jpeg" class="img-polaroid">
+
+        <p>You mastered the game! Congratulation!!!!</p>
+
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+    </div>
+</div>
+
+}

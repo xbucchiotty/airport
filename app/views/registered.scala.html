@@ -1,0 +1,16 @@
+@(airport:fr.xebia.xke.akka.airport.Airport)
+
+@main("Xebia Akka workshop")(0)(Some(airport)){
+
+<div class="container">
+
+    <div class="hero">
+        Hello there. You will manage airport @airport.code in @airport.city!
+    </div>
+
+    <form action="@routes.Application.createLevel1(airport.code)" method="POST" class="form-inline">
+        <button type="submit" class="btn btn-primary">PLAY</button>
+    </form>
+</div>
+
+}
