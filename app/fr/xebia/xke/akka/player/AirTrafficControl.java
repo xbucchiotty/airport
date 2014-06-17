@@ -44,7 +44,9 @@ public class AirTrafficControl extends UntypedActor {
             if(!freeRunways.isEmpty()){
                 ActorRef firstFreeRunway = freeRunways.iterator().next();
                 planeRunwayMap.put(plane, firstFreeRunway);
-                plane.tell(new Land(firstFreeRunway), self());
+                
+                context().actorOf(ActorRepeater.props(new Land(firstFreeRunway), plane, ackMaxTimeout));
+
             }else{
                 waitingPlanes.add(plane);
             }
@@ -52,7 +54,7 @@ public class AirTrafficControl extends UntypedActor {
 
         } else if (message instanceof HasLanded$) {
             ActorRef plane = sender();
-            plane.tell(new Contact(groundControl), self());
+            context().actorOf(ActorRepeater.props(new Contact(groundControl), plane, ackMaxTimeout));
 
         } else if (message instanceof HasLeft$) {
             ActorRef plane = getSender();
@@ -62,7 +64,9 @@ public class AirTrafficControl extends UntypedActor {
                 ActorRef firstWaitingPlane = waitingPlanes.get(0);
                 waitingPlanes.remove(0);
                 planeRunwayMap.put(firstWaitingPlane, freeRunway);
-                firstWaitingPlane.tell(new Land(freeRunway), self());
+
+                context().actorOf(ActorRepeater.props(new Land(freeRunway), firstWaitingPlane, ackMaxTimeout));
+
             }
 
         } else if (message instanceof ChaosMonkey) {
