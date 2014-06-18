@@ -11,4 +11,5 @@ repository
 activator
 activator.bat
 activator-launch*
+activator-sbt*
 project/activator-sbt*
