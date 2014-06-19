@@ -17,25 +17,4 @@ libraryDependencies ++= Seq(
 
 incOptions := incOptions.value.withNameHashing(true)
 
-fork in run := true
-
-seedNode := "akka.tcp://airportSystem@127.0.0.1:2554"
-
-airport   := "LHR"
-
-check := {
-  println("seedNode: " + seedNode.value )
-  println("airport : " + airport.value )
-}
-
-javaOptions in run := Seq(
-  "-Xmx256M",
-  "-server",
-  "-Dplayer.akka.cluster.seed-nodes.0=" + seedNode.value,
-  "-Dplayer.akka.cluster.roles.0=" + airport.value,
-  "-Dplayer.akka.persistence.snapshot-store.local.dir=target/"+airport.value+"/snapshots",
-  "-Dplayer.akka.persistence.journal.leveldb.dir=target/"+airport.value+"/journal"
-)
-
 mainClass in (Compile,run) := Some("fr.xebia.xke.akka.player.Launcher")
-
