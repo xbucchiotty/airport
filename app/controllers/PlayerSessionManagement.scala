@@ -1,20 +1,21 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.ask
-import scala.concurrent.{ExecutionContext, Await}
-import scala.concurrent.duration._
-import language.postfixOps
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
+import fr.xebia.xke.akka.airport.{Airport, AirportCode}
+import fr.xebia.xke.akka.infrastructure.AirportStore.{Register, Registered}
 import fr.xebia.xke.akka.infrastructure._
-import fr.xebia.xke.akka.infrastructure.AirportStore.Register
-import fr.xebia.xke.akka.infrastructure.AirportStore.Registered
-import fr.xebia.xke.akka.airport.{AirportCode, Airport}
+import play.api.mvc.InjectedController
+
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext}
+import scala.language.postfixOps
 
 trait PlayerSessionManagement {
 
-  this: Controller =>
+  this: InjectedController =>
 
   implicit val timeout = Timeout(10 second)
 
@@ -22,7 +23,7 @@ trait PlayerSessionManagement {
 
   val airports = Airport.top100
 
-  val airportActorSystem: ActorSystem = ActorSystem.create("airportSystem")
+  val airportActorSystem: ActorSystem = ActorSystem.create("airportSystem", ConfigFactory.load().getConfig("airportSystem"))
 
   val airportStore: ActorRef = airportActorSystem.actorOf(AirportStore.props(airports), "airportStore")
 
@@ -32,7 +33,7 @@ trait PlayerSessionManagement {
 
 
   def LoggedInAction(airportCode: AirportCode)(securedAction: (play.api.mvc.Request[_] => play.api.mvc.Result)): play.api.mvc.Action[play.api.mvc.AnyContent] = Action {
-    implicit request =>
+    implicit request: play.api.mvc.Request[_] =>
       checkAirport(airportCode) match {
         case Some(airport) =>
           securedAction(request)

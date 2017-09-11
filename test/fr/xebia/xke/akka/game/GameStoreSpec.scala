@@ -33,7 +33,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should create a game for an airport") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val airportLocator = TestProbe()
-      val gameStore = system.actorOf(GameStore.props(airportLocator.ref, new EventStream()), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(airportLocator.ref, new EventStream(system)), "gameStore")
       val airport = Airport.top100.head
 
       val probe = TestProbe()
@@ -50,7 +50,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should be able to start a created game") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val airportLocator = TestProbe()
-      val gameStore = system.actorOf(GameStore.props(airportLocator.ref, new EventStream()), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(airportLocator.ref, new EventStream(system)), "gameStore")
       val airport = Airport.top100.head
       val probe = TestProbe()
       probe.send(gameStore, NewGame(airport, Settings.TEST, classOf[JustParkingPlane]))
@@ -68,7 +68,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
     it("should returns the context of an existing sessionId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
       val airportLocator = TestProbe()
-      val gameStore = system.actorOf(GameStore.props(airportLocator.ref, new EventStream()), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(airportLocator.ref, new EventStream(system)), "gameStore")
       val airport = Airport.top100.head
       val probe = TestProbe()
       probe.send(gameStore, NewGame(airport, Settings.TEST, classOf[JustParkingPlane]))
@@ -87,7 +87,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should not returns the context of an unknown sessionId") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val gameStore = system.actorOf(GameStore.props(TestProbe().ref, new EventStream()), "gameStore")
+      val gameStore = system.actorOf(GameStore.props(TestProbe().ref, new EventStream(system)), "gameStore")
 
       whenReady(ask(gameStore, GameStore.Ask(SessionId())).mapTo[Option[GameContext]]) {
         reply => reply should not(be(defined))
@@ -96,7 +96,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should publish into the stream PlayerUp event if session is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val clusterEventStream = new EventStream()
+      val clusterEventStream = new EventStream(system)
       val gameStore = system.actorOf(GameStore.props(TestProbe().ref, clusterEventStream), "gameStore")
       val airport = Airport.top100.head
       val probe = TestProbe()
@@ -113,7 +113,7 @@ class GameStoreSpec extends FunSpec with ShouldMatchers with ScalaFutures {
 
     it("should publish into the stream PlayerDown event if session is known") {
       implicit val system = ActorSystem("TestSystem", ConfigFactory.load("application-test.conf"))
-      val clusterEventStream = new EventStream()
+      val clusterEventStream = new EventStream(system)
       val gameStore = system.actorOf(GameStore.props(TestProbe().ref, clusterEventStream), "gameStore")
       val airport = Airport.top100.head
       val probe = TestProbe()

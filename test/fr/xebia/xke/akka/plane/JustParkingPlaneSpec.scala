@@ -26,7 +26,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
           "Then it should contact the aircontrol" in {
             val airControl = TestProbe()
 
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
@@ -48,7 +48,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
               val airControl = TestProbe()
 
               for (_ <- 1 to 10) {
-                val plane = system.actorOf(JustParkingPlane.props(settings.copy(radioReliability = 0.5, ackMaxDuration = 50), new EventStream()))
+                val plane = system.actorOf(JustParkingPlane.props(settings.copy(radioReliability = 0.5, ackMaxDuration = 50), new EventStream(system)))
                 airControl.send(plane, Contact(airControl.ref))
 
                 airControl.send(plane, Land(TestProbe().ref))
@@ -76,7 +76,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
 
           "Then it should terminates" in {
             val airControl = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             TestProbe().send(plane, Contact(airControl.ref))
 
             val probe = TestProbe()
@@ -99,7 +99,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             //Given
             val airControl = TestProbe()
             val runway = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             val operator = TestProbe()
             TestProbe().send(plane, Contact(airControl.ref))
             airControl expectMsg Incoming
@@ -127,7 +127,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             //Given
             val airControl = TestProbe()
             val groundControl = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             val operator = TestProbe()
 
             TestProbe().send(plane, Contact(airControl.ref))
@@ -163,7 +163,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val taxiway = TestProbe()
             val runway = TestProbe()
             val operator = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
@@ -201,7 +201,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val airControl = TestProbe()
             val groundControl = TestProbe()
             val taxiway = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             val operator = TestProbe()
             TestProbe().send(plane, Contact(airControl.ref))
 
@@ -241,7 +241,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val taxiway = TestProbe()
             val gate = TestProbe()
             val operator = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             TestProbe().send(plane, Contact(airControl.ref))
 
             airControl expectMsg Incoming
@@ -284,7 +284,7 @@ class JustParkingPlaneSpec extends ActorSpecs with ShouldMatchers {
             val groundControl = TestProbe()
             val taxiway = TestProbe()
             val gate = TestProbe()
-            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream()), "plane")
+            val plane = system.actorOf(JustParkingPlane.props(settings, new EventStream(system)), "plane")
             val probe = TestProbe()
             val operator = TestProbe()
             TestProbe().send(plane, Contact(airControl.ref))

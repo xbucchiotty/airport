@@ -239,7 +239,7 @@ context.actorOf(Props(new OrderSender(plane, message, ackMaxTimeout.milliseconds
             <p>
                 Pour utiliser l'EventSourcing, le code doit être modifié en profondeur. Il faut tout d'abord changer d'héritage.
                 Dans <a href="#code/app/fr/xebia/xke/akka/player/AirTrafficControl.scala" class="shortcut">AirTrafficControl.scala</a>
-                faites hériter la classe d'<code>EventsourcedProcessor</code>. Vous pouvez garder le mixin avec <code>ActorLogging</code>.
+                faites hériter la classe d'<code>PersistentActor</code>. Vous pouvez garder le mixin avec <code>ActorLogging</code>.
                 Cette nouvelle classe nécessite l'implémentation de deux méthodes:
                 <ul>
                     <li><code>override def receiveCommand: Receive</code></li>cette méthode <code>receive</code> va recevoir les commandes comme la méthode <code>receive</code> d'un acteur classique.

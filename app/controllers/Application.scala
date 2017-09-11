@@ -1,29 +1,36 @@
 package controllers
 
-import play.api.libs.iteratee.{Enumerator, Iteratee}
-import play.api.mvc._
-import fr.xebia.xke.akka.infrastructure._
-import fr.xebia.xke.akka.game._
-import akka.util.Timeout
-import language.postfixOps
-import concurrent.duration._
-import akka.pattern.ask
-import scala.concurrent.{Future, Await}
-import akka.actor.ActorRef
-import fr.xebia.xke.akka.plane._
-import fr.xebia.xke.akka.game.GameStore.GameCreated
-import fr.xebia.xke.akka.game.GameStore.StartGame
-import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
-import fr.xebia.xke.akka.airport.{Airport, AirportCode}
+import javax.inject.Inject
+
+import akka.actor.{Actor, ActorRef, Props}
 import akka.event.EventStream
+import akka.pattern.ask
+import akka.stream.ActorMaterializer
+import fr.xebia.xke.akka.airport.{Airport, AirportCode}
+import fr.xebia.xke.akka.game.GameStore.{GameCreated, StartGame}
+import fr.xebia.xke.akka.game._
+import fr.xebia.xke.akka.infrastructure._
+import fr.xebia.xke.akka.infrastructure.cluster.AirportLocator
+import fr.xebia.xke.akka.plane._
+import play.api.inject.ApplicationLifecycle
+import play.api.libs.streams.ActorFlow
+import play.api.mvc._
 
-object Application extends Controller with PlayerSessionManagement {
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
-  val clusterEventStream = new EventStream()
+class Application @Inject()(lifecycle: ApplicationLifecycle) extends InjectedController with PlayerSessionManagement {
+
+  val clusterEventStream = new EventStream(airportActorSystem)
 
   val airportsClusterLocation: ActorRef = airportActorSystem.actorOf(AirportLocator.props(clusterEventStream), "airportsClusterLocation")
 
   val gameStore: ActorRef = airportActorSystem.actorOf(GameStore.props(airportsClusterLocation, clusterEventStream), "gameStore")
+
+  lifecycle.addStopHook(() => {
+    airportActorSystem.terminate()
+  })
 
   def createLevel1(airportCode: AirportCode) = Action {
     val settings = Settings(
@@ -135,32 +142,11 @@ object Application extends Controller with PlayerSessionManagement {
       }
   }
 
-  def events(airportCode: AirportCode, sessionId: SessionId) = WebSocket.tryAccept[String] {
+  def events(airportCode: AirportCode, sessionId: SessionId) = WebSocket.accept[String, String] {
     _ =>
-
-      import scala.concurrent.ExecutionContext.Implicits.global
-
-      val contextReply = ask(gameStore, GameStore.Ask(sessionId)).mapTo[Option[GameContext]]
-
-      for {
-        context <- contextReply
-      }
-      yield {
-        var started = false
-
-        val in = Iteratee.foreach[String] {
-          case "start" if !started =>
-            gameStore ! StartGame(sessionId)
-
-            started = true
-        }
-
-        val out = Enumerator.fromCallback1 {
-          _ => ask(context.get.listener, DequeueEvents)(Timeout(10 minutes)).mapTo[Option[String]]
-        }
-
-        Right(in, out)
-      }
+      implicit val system = airportActorSystem
+      implicit val mat = ActorMaterializer.create(system)
+      ActorFlow.actorRef({ out => Props(new WebSocketActor(out, gameStore, sessionId)) })
   }
 
   private def newSinglePlayerGame(airportCode: AirportCode, settings: Settings, planeType: Class[_ <: Plane])(template: (GameContext => play.api.mvc.Call)) = {
@@ -189,3 +175,28 @@ object Application extends Controller with PlayerSessionManagement {
 }
 
 case object DequeueEvents
+
+class WebSocketActor(out: ActorRef, gameStore: ActorRef, sessionId: SessionId) extends Actor {
+  var listener: ActorRef = _
+  var started = false
+
+  override def preStart(): Unit = {
+    gameStore ! GameStore.Ask(sessionId)
+  }
+
+  def receive = {
+    case Some(GameContext(_,_,_,l,_,_)) =>
+      this.listener = l
+      this.listener ! DequeueEvents
+
+    case Some(msg) if msg.isInstanceOf[String] =>
+      out ! msg
+      this.listener ! DequeueEvents
+
+    case msg: String =>
+      if (!started) {
+        started = true
+        gameStore ! StartGame(sessionId)
+      }
+  }
+}

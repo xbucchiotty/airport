@@ -4,6 +4,7 @@ import org.scalatest._
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import akka.testkit.TestProbe
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import fr.xebia.xke.akka.airport.message.PlaneEvent.Ack
 
@@ -60,8 +61,7 @@ class OrderSenderSpec extends FunSpec with ShouldMatchers with BeforeAndAfterEac
   implicit var system: ActorSystem = _
 
   override protected def afterEach(): Unit = {
-    system.shutdown()
-    system.awaitTermination()
+    Await.result(system.terminate(), 10 second)
   }
 
   override protected def beforeEach(): Unit = {
