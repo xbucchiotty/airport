@@ -15,8 +15,8 @@ object Airport {
 
       val airportCode = AirportCode(data(4))
 
-      val departures = routesFrom.get(airportCode).getOrElse(Nil)
-      val arrivals = routesTo.get(airportCode).getOrElse(Nil)
+      val departures = routesFrom.getOrElse(airportCode, Nil)
+      val arrivals = routesTo.getOrElse(airportCode, Nil)
 
       Airport(
         city = data(2),

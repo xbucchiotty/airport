@@ -1,12 +1,8 @@
 package fr.xebia.xke.akka.player
 
 import akka.actor._
-import akka.persistence.EventsourcedProcessor
-import fr.xebia.xke.akka.airport.message.{AirTrafficControlReady, InitAirTrafficControl, ChaosMonkey}
-import fr.xebia.xke.akka.airport.message.PlaneEvent.{HasLeft, HasLanded, Incoming}
-import fr.xebia.xke.akka.airport.message.command.{Contact, Land}
-
-import scala.collection.immutable.Queue
+import fr.xebia.xke.akka.airport.message.PlaneEvent.{HasLanded, HasLeft, Incoming}
+import fr.xebia.xke.akka.airport.message.{AirTrafficControlReady, ChaosMonkey, InitAirTrafficControl}
 
 class AirTrafficControl extends Actor with ActorLogging {
 

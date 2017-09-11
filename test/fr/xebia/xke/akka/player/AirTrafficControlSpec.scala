@@ -11,6 +11,8 @@ import org.scalatest.{BeforeAndAfterEach, ShouldMatchers, GivenWhenThen, FunSpec
 import com.typesafe.config.ConfigFactory
 import fr.xebia.xke.akka.airport.message.PlaneEvent.Ack
 
+import scala.concurrent.Await
+
 class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterEach {
 
   describe("An air traffic control") {
@@ -127,8 +129,7 @@ class AirTrafficControlSpec extends FunSpec with GivenWhenThen with ShouldMatche
   implicit var system: ActorSystem = _
 
   override protected def afterEach(): Unit = {
-    system.shutdown()
-    system.awaitTermination()
+    Await.result(system.terminate(), 10 second)
   }
 
   override protected def beforeEach(): Unit = {

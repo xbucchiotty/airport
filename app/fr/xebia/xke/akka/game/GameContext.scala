@@ -30,7 +30,7 @@ object GameContext {
   def create(settings: Settings, planeType: Class[_ <: Plane], airport: Airport, airportClusterLocation: ActorRef)(context: ActorContext): GameContext = {
     val sessionId = SessionId()
 
-    val eventStream = new EventStream(false)
+    val eventStream = new EventStream(context.system, false)
 
     val listener = context.actorOf(EventListener.props(eventStream), s"$sessionId-listener")
 

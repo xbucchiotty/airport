@@ -11,6 +11,8 @@ import language.postfixOps
 import org.scalatest._
 import fr.xebia.xke.akka.airport.message.PlaneEvent.Ack
 
+import scala.concurrent.Await
+
 class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers with BeforeAndAfterEach {
 
   describe("A ground control in taxiway management") {
@@ -249,8 +251,7 @@ class GroundControlSpec extends FunSpec with GivenWhenThen with ShouldMatchers w
   implicit var system: ActorSystem = _
 
   override protected def afterEach(): Unit = {
-    system.shutdown()
-    system.awaitTermination()
+    Await.result(system.terminate(), 10 second)
   }
 
   override protected def beforeEach(): Unit = {

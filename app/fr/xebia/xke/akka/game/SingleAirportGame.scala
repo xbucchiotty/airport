@@ -102,7 +102,7 @@ case class SinglePlayerGame(
 
       val anArrivalFlight = airport.arrivals(Random.nextInt(airport.arrivals.size))
 
-      val planeEventStream = new EventStream()
+      val planeEventStream = new EventStream(this.context.system)
 
       val plane = context.actorOf(Props(planeType, settings, planeEventStream), s"${anArrivalFlight.airline}-${Random.nextLong() % 100000}")
       val listener = context.actorOf(PlaneListener.props(plane, gameEventStream))
